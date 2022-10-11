@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="./frontend/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <title>Hello, world!</title>
+  </head>
+  <body>
+
+    <header>
+        <nav class="navbar navbar-expand-lg bg-primary-1 sticky-top">
+            <div class="container-fluid">
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="text-white fa fa-bars" aria-hidden="true"></i>
+                  </button>
+                <a class="text-white navbar-brand flex-md-grow-0 flex-grow-1 ps-2" href="#">Ebiwani</a>
+                <a class="order-1 ms-auto">
+                    <a class="navbar-brand fs-6 text-white" href="#">Task
+                        <i class="fa fa-circle text-success" style="font-size: 8px;" aria-hidden="true"></i>
+                    </a>
+                    
+                    <img class="dropdown-toggle" id="dropdownMenu" data-bs-toggle="dropdown" aria-expanded="false" 
+                        src="./frontend/img/avatar.png" style="height: 2em;" alt="">
+                    
+                    <ul class="dropdown-menu dropdown-menu-end bg-primary-1 m-0 border-0" aria-labelledby="dropdownMenu">
+                        <li><a class="dropdown-item text-white" href="#">Dashboard</a></li>
+                        <li><a class="dropdown-item text-white" href="#">Account</a></li>
+                        <li><a class="dropdown-item text-white" href="#">Logout</a></li>
+                    </ul>
+                </a>
+              
+                <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Features</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Pricing</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </nav>
+    </header>
+
+    <section>
+        <div class="">
+            <ul class="row bg-secondary py-1 p-0 m-0">
+                <li class="col dropdown-item text-center text-white">Personal <hr class="bg-primary-1 m-0 rounded-pill mt-1" style="height: .1em; opacity: 1"></li>
+                <li class="col dropdown-item text-center text-white">Account <hr class="d-none bg-primary-1 m-0 rounded-pill mt-1" style="height: .1em; opacity: 1"></li>
+                <li class="col dropdown-item text-center text-white">Profile <hr class="d-none bg-primary-1 m-0 rounded-pill mt-1" style="height: .1em; opacity: 1"></li>
+            </ul>
+        </div>
+    </section>
+    <section>
+        <div class="p-3">
+            <h3 class="mb-0 text-start">Personal Information</h3>
+            <div class="list-group list-group-flush">
+                <div class="d-flex list-group-item mt-3">
+                    <div class="me-2 text-secondary">First Name:</div>
+                    <div class="col  mb-3">Rebecca</div>
+                </div>
+                <div class="d-flex list-group-item mt-3">
+                    <div class="me-2 text-secondary">Other Names:</div>
+                    <div class="col  mb-3">Jolie</div>
+                </div>
+                <div class="d-flex list-group-item mt-3">
+                    <div class="me-2 text-secondary">Email:</div>
+                    <div class="col  mb-3">rebecca.jolie@gmail.com</div>
+                </div>
+                <div class="d-flex list-group-item mt-3">
+                    <div class="me-2 text-secondary">Phone Number:</div>
+                    <div class="col  mb-3">2348033578300</div>
+                </div>
+                <div class="d-flex list-group-item mt-3">
+                    <div class="me-2 text-secondary">Address:</div>
+                    <div class="col  mb-3">67 Edepie School Road</div>
+                </div>
+                <div class="d-flex list-group-item mt-3">
+                    <div class="me-2 text-secondary">Local Government:</div>
+                    <div class="col  mb-3">Yenagoa</div>
+                </div>
+                <div class="d-flex list-group-item mt-3">
+                    <div class="me-2 text-secondary">State:</div>
+                    <div class="col  mb-3">Bayelsa</div>
+                </div>
+            </div>
+            <div class="mb-4 text-center">
+                <button type="button" class="btn bg-primary-1 px-3">Update Personal Information</button>
+            </div>
+        </div>
+    </section>
+
+
+    
+
+    <!-- <footer>
+        <div class="container-fluid text-center mx-auto">
+            <hr>
+            <h3>Ebiwani</h3>
+            <p>© ebiwani Limited 2022</p>
+            <span>
+                <i class="p-2 fa fa-facebook" aria-hidden="true"></i>
+                <i class="p-2 fa fa-linkedin" aria-hidden="true"></i>
+                <i class="p-2 fa fa-twitter" aria-hidden="true"></i>
+                <i class="p-2 fa fa-instagram" aria-hidden="true"></i>
+            </span>
+            <hr>
+        </div>
+    </footer> -->
+    
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+  </body>
+</html>
