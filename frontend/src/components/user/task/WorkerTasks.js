@@ -6,12 +6,12 @@ import {
   myTasks,
   updateTask,
   updateTaskProgress,
-} from "../../actions/taskAction";
+} from "../../../actions/taskAction";
 import PropTypes from "prop-types";
 import { useHistory, useLocation } from "react-router-dom";
-import { UPDATE_TASK_PROGRESS_RESET } from "../../constants/taskConstants";
+import { UPDATE_TASK_PROGRESS_RESET } from "../../../constants/taskConstants";
 
-const Task = () => {
+const WorkerTask = () => {
   const alert = useAlert();
   const dispatch = useDispatch();
   const history = useHistory();
@@ -61,10 +61,9 @@ const Task = () => {
     }
   };
 
-  const updateEscrow = (data) => {
-    data.uid = user._id;
-    data.role = 'user';
-    dispatch(updateTaskProgress(data));
+  const updateEscrow = (message) => {
+    message.role = 'worker';
+    dispatch(updateTaskProgress(message));
   };
 
   useEffect(() => {
@@ -111,29 +110,26 @@ const Task = () => {
 };
 
 const SingeTask = ({
-  task,
-  title,
   _id,
   getColor,
   escrow,
   firstName, lastName, avatar,
   updateEscrow,
   getButtonText,
-  getStatusUpdate,
-  history,
+  getStatusUpdate
 }) => {
-  const displayButton =
-    escrow.worker === "Pending" ||
-    (escrow.worker === "Finished" && escrow.user !== "Confirmed")
-      ? ""
-      : "d-none";
   const message = {
     taskId: _id,
     status: getStatusUpdate(getButtonText(escrow.worker)),
   };
+
+  const displayStatus = "Accepted Declined Completed Abandoned".includes(escrow.worker) || escrow.user==="Cancelled";
+  const displayActionBtn = "Pending Accepted".includes(escrow.worker) && escrow.user!=="Cancelled";
+  const statusInfo = escrow.user==="Cancelled"? escrow.user:escrow.worker==="Accepted"?"In progress":escrow.worker;
+  const action = status => updateEscrow({status, taskId:_id})
   return (
     <div
-      className="row bg-secondary-4 mb-1 mx-0 py-1"
+      className="row bg-secondary-4 mb-1 mx-0"
       // onClick={() => history.push({ pathname: "/progress", state: task })}
     >
       <div className=" col-3 text-center my-auto">
@@ -141,34 +137,49 @@ const SingeTask = ({
           <img src={avatar.url} alt="" />
         </div>
       </div>
-      <div className="col-6 py-2 gx-1 my-auto">
-        <h5 className="mb-0">
-          <small>{`${firstName} ${lastName}`}</small>
-        </h5>
+      <div className="col-9 py-1 gx-1 my-auto">
+        <div className="d-flex align-items-center ">
+            <h5 className="mb-0">
+                <small>{`${firstName} ${lastName}`}</small>
+            </h5>
+            <div className="ms-2">
+                <i class="fa fa-phone my-auto text-primary-1" aria-hidden="true"></i>
+            </div>
+            <span className="ms-auto badge text-dark fst-italic my-auto fw-normal">5 mins ago</span>
+        </div>
         <p className="mb-0 lh-sm fw-light">
-          <small>{`Work Order: ${title}`}</small>
+          <small>Request to perform electrical bulb installation and wall socket installation</small>
         </p>
-        <p className="mb-0 fw-light">
-          <em>
-            <small>{escrow.worker}</small>
-          </em>
-          <i
-            className={`fa fa-circle ps-1 ${getColor(escrow.worker)}`}
-            style={{ "font-size": "10px" }}
-            aria-hidden="true"
-          ></i>
-        </p>
-      </div>
-      <div className="col-3 text-center my-auto">
-        <button
-          type="button"
-          className={`btn btn-sm p-sm-2 px-sm-3 ${displayButton} ${
-            escrow.artisan === "Pending" ? "bg-dark-3" : "bg-primary-1"
-          } rounded-3`}
-          onClick={() => updateEscrow(message)}
-        >
-          {`${getButtonText(escrow.worker)}`}
-        </button>
+        <div className="d-flex">
+            {/* WORKER: Pending, Accepted||Declined, Completed||Abandoned */}
+            {displayStatus &&
+                <p className="mb-0 me-auto fw-light">
+                    <em>
+                        <small>{statusInfo}</small>
+                    </em>
+                    <i
+                        className={`fa fa-circle ps-1 ${getColor(escrow.worker)}`}
+                        style={{ "font-size": "10px" }}
+                        aria-hidden="true"
+                    ></i>
+                </p>}
+            
+            {displayActionBtn && 
+            <div className="mt-1">
+                <button 
+                    type="button" 
+                    className={`btn btn-sm p-sm-2 px-sm-3 me-1 accept`} 
+                    onClick={()=>action(escrow.worker==='Pending'? 'Accepted':'Completed')}
+                    > {escrow.worker==='Pending'? 'Accept':'Completed'}
+                </button>
+                <button 
+                    type="button" 
+                    className={`btn btn-sm p-sm-2 px-sm-3 me-1 decline`} 
+                    onClick={()=>action(escrow.worker==='Pending'? 'Declined':'Abandoned')}
+                    > {escrow.worker==='Pending'? 'Decline':'Abandon'}
+                </button>
+            </div>}
+        </div>
       </div>
     </div>
   );
@@ -189,4 +200,4 @@ SingeTask.defaultProps = {
     avatar: { url: `${window.location.origin}/images/avatar.png` },
   },
 };
-export default Task;
+export default WorkerTask;

@@ -3,18 +3,21 @@ import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
 import MetaData from '../layout/MetaData';
 
-import { register, clearErrors, savePersonalInfo } from '../../actions/userActions'
+import { clearErrors, savePersonalInfo } from '../../actions/artisanAction'
 
 const Register = ({ history }) => {
+    
+    const personalInfo = JSON.parse(localStorage.getItem('personalInfo'));
 
-    const [user, setUser] = useState({
-        fistName: '',
+    const [user, setUser] = useState(personalInfo || {
+        firstName: '',
         lastName: '',
+        gender: '',
         email: '',
         phoneNumber: ''
     })
 
-    const { firstName, lastName, email, phoneNumber } = user;
+    const { firstName, lastName, email, gender, phoneNumber } = user;
 
     const [avatar, setAvatar] = useState('');
     const [avatarPreview, setAvatarPreview] = useState('/images/default_avatar.jpg');
@@ -41,17 +44,8 @@ const Register = ({ history }) => {
     const submitHandler = (e) => {
         e.preventDefault();
 
-        // const formData = new FormData();
-        // formData.set('firstName', firstName)
-        // formData.set('lastName', lastName)
-        // formData.set('email', email)
-        // formData.set('phoneNumber', phoneNumber)
-        // formData.set('avatar', avatar)
-
-        // dispatch(register(formData))
-
-        dispatch(savePersonalInfo({firstName, lastName, email, phoneNumber, avatar}))
-        history.push('/register/contact')
+        dispatch(savePersonalInfo({firstName, lastName, gender, email, phoneNumber, avatar}))
+        history.push('/register/contact/artisan')
     }
 
     const onChange = e => {
@@ -79,7 +73,15 @@ const Register = ({ history }) => {
             <section className='center-screen tile'>
                 <div className="auth">
                     <form onSubmit={ submitHandler} encType='multipart/form-data'>
-                        <h3 class="mb-3 text-start">Register - Personal Details</h3>
+                        <div class="position-relative">
+                            <div class="avatar-preview">
+                            <img 
+                                class="rounded-circle w-100 mx-auto" 
+                                src={ avatarPreview } alt="Avatar Preview"
+                            />
+                            </div>
+                        </div>
+                        <h3 class="py-4 text-start">Register - Personal Details</h3>
                         <div class="progress mb-3 rounded-pill">
                             <div class="progress-bar bg-primary-2 rounded-pill" role="progressbar" style={{width: "33%"}} aria-valuenow="33" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
@@ -87,7 +89,9 @@ const Register = ({ history }) => {
                             <input 
                                 name="avatar"
                                 type="file" 
+                                required
                                 class="form-control" 
+                                src={avatar}
                                 id="avatar"
                                 onChange={onChange}
                             />
@@ -97,6 +101,7 @@ const Register = ({ history }) => {
                             <input 
                                 type="name" 
                                 name="firstName" 
+                                required
                                 class="form-control" 
                                 id="firstName" 
                                 placeholder="First Name"
@@ -109,6 +114,7 @@ const Register = ({ history }) => {
                             <input 
                                 name="lastName"
                                 type="name" 
+                                required
                                 class="form-control" 
                                 id="lastName" 
                                 placeholder="Last Name"
@@ -117,10 +123,24 @@ const Register = ({ history }) => {
                             />
                         </div>
                         <div class="mb-3">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select 
+                                class="form-select" 
+                                aria-label="Select gender" 
+                                name="gender"
+                                value={gender}
+                                onChange={onChange} >
+                                <option selected>select</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input 
                                 name="email"
                                 type="email" 
+                                required
                                 class="form-control" 
                                 id="email" 
                                 placeholder="name@example.com"
@@ -133,6 +153,7 @@ const Register = ({ history }) => {
                             <input 
                                 name="phoneNumber"
                                 type="number" 
+                                required
                                 class="form-control" 
                                 id="number"
                                 value={phoneNumber}

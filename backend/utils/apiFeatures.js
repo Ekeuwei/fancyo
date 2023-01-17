@@ -1,19 +1,28 @@
 class APIFeatures {
-    constructor (query, queryStr){
+    constructor (query, queryStr, searchFields){
         this.query = query;
         this.queryStr = queryStr;
+        this.searchFields = searchFields;
     }
 
     search(){
-        const keyword = this.queryStr.keyword? {
-            name: {
+        const keywordSingleField = this.queryStr.keyword? {
+            firstName: {
                 $regex: this.queryStr.keyword, 
                 $options: 'i'
-            } 
+            }
         } : {}
 
+        const keyword = this.queryStr.keyword? 
+                        this.searchFields.map(field => ({[field]:{
+                            $regex: this.queryStr.keyword, 
+                            $options: 'i'
+                        }}))
+                        : [{}]
+
         // console.log(keyword);
-        this.query = this.query.find({...keyword})
+        // this.query = this.query.find({...keywordSingleField})
+        this.query = this.query.find({$or:[...keyword]})
         return this;
     }
 

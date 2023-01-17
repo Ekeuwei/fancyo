@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { config } from 'dotenv'
 
 import {
     LOGIN_REQUEST,
@@ -50,7 +51,10 @@ import {
 
     CLEAR_ERRORS,
     SAVE_PERSONAL_INFO,
-    SAVE_CONTACT_INFO
+    SAVE_CONTACT_INFO,
+    CREATE_WORKER_FAIL,
+    CREATE_WORKER_REQUEST,
+    CREATE_WORKER_SUCCESS
 } from '../constants/userConstants'
 
 // Login
@@ -108,7 +112,7 @@ export const savePersonalInfo = (data) => async (dispatch, getState) =>{
         type: SAVE_PERSONAL_INFO,
         payload: data
     })
-
+    // if(!data.firstName.length === 0)
     localStorage.setItem('personalInfo', JSON.stringify(data))
 }
 
@@ -119,6 +123,7 @@ export const saveContactInfo = (data) => async (dispatch, getState) =>{
         payload: data
     })
 
+    // if(!data.city.length === 0)
     localStorage.setItem('contactInfo', JSON.stringify(data))
 }
 

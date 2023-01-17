@@ -14,8 +14,7 @@ const Header = () => {
     const alert = useAlert()
     const dispatch = useDispatch()
 
-    const { user, loading } = useSelector(state => state.auth)
-    const { cartItems } = useSelector(state => state.cart)
+    const { isAuthenticated, user, loading } = useSelector(state => state.auth)
 
     const logoutHandler = ()=>{
         dispatch(logout());
@@ -31,24 +30,7 @@ const Header = () => {
                     </button>
                     <Link to={'/'} class="text-white navbar-brand flex-md-grow-0 flex-grow-1 ps-2" >Ebiwani</Link>
                     <div class="order-1 ms-auto">
-                        {user ? (<Fragment>
-                                    <div class="d-block">
-                                        <Link class="navbar-brand fs-6 text-white" to="#">Task
-                                            <i class="fa fa-circle text-success" style={{"font-size": "10px"}} aria-hidden="true"></i>
-                                        </Link>
-                                        
-                                        <Link to="#" className="dropdown-toggle text-white text-decoration-none" id="dropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <img class="rounded-circle me-2" src={user.avatar && user.avatar.url} style={{height: "2em"}} alt="" />
-                                            <span>{user && user.firstName}</span>
-                                        </Link>
-                                        
-                                        <ul class="dropdown-menu dropdown-menu-end bg-primary-1 m-0 border-0 end-0" aria-labelledby="dropdownMenu">
-                                            <li><Link class="dropdown-item text-white" to="#">Dashboard</Link></li>
-                                            <li><Link class="dropdown-item text-white" to="#">Account</Link></li>
-                                            <li><Link class="dropdown-item text-white" to="/" onClick={logoutHandler}>Logout</Link></li>
-                                        </ul>
-                                    </div>
-                                </Fragment>):
+                        {isAuthenticated ? <NavLinks {...user} logoutHandler={logoutHandler}/>:
                                 (<Fragment>
                                     <Link class="navbar-brand fs-6 text-white" to='/login'>Login</Link>
                                     <Link class="navbar-brand fs-6 text-white" to='/register'>Register</Link>
@@ -76,6 +58,28 @@ const Header = () => {
                 </div>
             </nav>
         </Fragment>
+    )
+}
+
+const NavLinks = ({avatar, firstName, logoutHandler, role})=>{
+    return(
+        <div class="d-block">
+            <Link class="navbar-brand fs-6 text-white" to="/tasks">Task
+                <i class="fa fa-circle text-success" style={{"font-size": "10px"}} aria-hidden="true"></i>
+            </Link>
+            
+            <Link to="#" className="dropdown-toggle text-white text-decoration-none" id="dropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <img class="rounded-circle me-2" src={avatar.url} style={{height: "2em"}} alt="" />
+                <span>{firstName}</span>
+            </Link>
+            
+            <ul class="dropdown-menu dropdown-menu-end bg-primary-1 m-0 border-0 end-0" aria-labelledby="dropdownMenu">
+                <li><Link class="dropdown-item text-white" to="#">Dashboard</Link></li>
+                <li><Link class="dropdown-item text-white" to="#">Account</Link></li>
+                {role==='worker' && <li><Link class="dropdown-item text-white" to="/works">My Orders</Link></li>}
+                <li><Link class="dropdown-item text-white" to="/" onClick={logoutHandler}>Logout</Link></li>
+            </ul>
+        </div>
     )
 }
 

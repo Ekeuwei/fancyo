@@ -3,11 +3,14 @@ import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
 import MetaData from '../layout/MetaData';
 
-import { register, clearErrors, savePersonalInfo, saveContactInfo } from '../../actions/userActions'
+import { register, clearErrors, saveContactInfo } from '../../actions/userActions'
 
 const ContactInfo = ({ history }) => {
 
-    const [user, setUser] = useState({
+    const contactDetails = JSON.parse(localStorage.getItem('contactInfo'));
+    const personalInfo = JSON.parse(localStorage.getItem('personalInfo'));
+
+    const [user, setUser] = useState(contactDetails || {
         address: '',
         city: '',
         state: '',
@@ -15,10 +18,6 @@ const ContactInfo = ({ history }) => {
     })
 
     const { address, city, state, lga } = user;
-
-    const [avatar, setAvatar] = useState('');
-    const [avatarPreview, setAvatarPreview] = useState('/images/default_avatar.jpg');
-
 
     const alert = useAlert();
     const dispatch = useDispatch()
@@ -31,27 +30,22 @@ const ContactInfo = ({ history }) => {
             history.push('/')
         }
 
+        if(!personalInfo){
+            history.push('/register/artisan')
+        }
+
         if (error) {
             alert.error(error);
             dispatch(clearErrors());
         }
 
-    }, [dispatch, alert, isAuthenticated, error, history])
+    }, [dispatch, alert, personalInfo, isAuthenticated, error, history])
 
     const submitHandler = (e) => {
         e.preventDefault();
 
-        // const formData = new FormData();
-        // formData.set('firstName', firstName)
-        // formData.set('lastName', lastName)
-        // formData.set('email', email)
-        // formData.set('phoneNumber', phoneNumber)
-        // formData.set('avatar', avatar)
-
-        // dispatch(register(formData))
-
         dispatch(saveContactInfo({address, city, state, lga}))
-        history.push('/register/password')
+        history.push('/register/password/artisan')
     }
 
     const onChange = e => {
@@ -66,7 +60,15 @@ const ContactInfo = ({ history }) => {
             <section className='center-screen tile'>
                 <div className="auth">
                     <form onSubmit={ submitHandler} encType='multipart/form-data'>
-                        <h3 class="mb-3 text-start">Register - Contact Details</h3>
+                        <div class="position-relative">
+                            <div class="avatar-preview">
+                            <img 
+                                class="rounded-circle w-100 mx-auto" 
+                                src={ personalInfo && personalInfo.avatar } alt="Avatar Preview"
+                            />
+                            </div>
+                        </div>
+                        <h3 class="py-3 text-start">Register - Contact Details</h3>
                         <div class="progress mb-3 rounded-pill">
                             <div class="progress-bar bg-primary-2 rounded-pill" role="progressbar" style={{width: "66%"}} aria-valuenow="66" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
@@ -75,6 +77,7 @@ const ContactInfo = ({ history }) => {
                             <input 
                                 type="address" 
                                 class="form-control" 
+                                required
                                 id="contactAddress" 
                                 placeholder="Contact Address"
                                 name="address"
@@ -87,6 +90,7 @@ const ContactInfo = ({ history }) => {
                             <input 
                                 type="name" 
                                 class="form-control" 
+                                required
                                 id="city" 
                                 placeholder="City"                                 
                                 name="city"
@@ -99,6 +103,7 @@ const ContactInfo = ({ history }) => {
                             <select 
                                 class="form-select" 
                                 aria-label="Select State" 
+                                required
                                 name="state"
                                 value={state}
                                 onChange={onChange} >
@@ -113,6 +118,7 @@ const ContactInfo = ({ history }) => {
                             <select 
                                 class="form-select" 
                                 aria-label="Select LGA"
+                                required
                                 name="lga"
                                 value={lga}
                                 onChange={onChange} >

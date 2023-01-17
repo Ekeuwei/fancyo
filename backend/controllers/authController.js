@@ -20,26 +20,25 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
 
     const { firstName, lastName, phoneNumber, gender, email, password } = req.body;
 
-    const user = await User.create({
-        firstName,
-        lastName,
-        phoneNumber,
-        gender,
-        email,
-        password,
-        avatar: {
-            public_id: result.public_id,
-            url: result.secure_url
-        }
-    });
+    let user;
 
-    /*
-    const token = user.getJwtToken();
-
-    res.status(201).json({
-        success: true,
-        token
-    }); */
+    try {
+        user = await User.create({
+            firstName,
+            lastName,
+            phoneNumber,
+            gender,
+            email,
+            password,
+            avatar: {
+                public_id: result.public_id,
+                url: result.secure_url
+            }
+        });
+    } catch (error) {
+        await cloudinary.v2.uploader.destroy(result.public_id); // Delete uploaded image
+        return next(error)
+    }
 
     sendToken(user, 200, res);
 
@@ -94,7 +93,7 @@ exports.forgotPassword = catchAsyncErrors( async (req, res, next) => {
 
         await sendEmail({
             email: user.email,
-            subject: 'ShopIt Password Recovery',
+            subject: 'Ebiwani Password Recovery',
             message
         });
 
@@ -147,7 +146,8 @@ exports.resetPassword = catchAsyncErrors( async (req, res, next) => {
 
 // Get currently logged in user details => /api/v1/me
 exports.getUserProfile = catchAsyncErrors( async (req, res, next) => {
-    const user = await User.findById(req.user.id);
+    // const user = await User.findById(req.user.id);
+    const user = req.user;
 
     res.status(200).json({
         success: true,

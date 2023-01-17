@@ -1,7 +1,7 @@
 {
   "name": "shopit",
   "version": "1.0.0",
-  "description": "Full Ecommerce site using mern",
+  "description": "Ebiwani - A Work Management App",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

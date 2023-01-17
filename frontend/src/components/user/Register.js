@@ -22,7 +22,6 @@ const Register = ({ history }) => {
     const [avatar, setAvatar] = useState('');
     const [avatarPreview, setAvatarPreview] = useState('/images/default_avatar.jpg');
 
-
     const alert = useAlert();
     const dispatch = useDispatch()
 
@@ -35,7 +34,8 @@ const Register = ({ history }) => {
         }
 
         if (error) {
-            alert.error(error);
+            if(error !== 'Login first to access the resource')
+                alert.error(error);
             dispatch(clearErrors());
         }
 
@@ -175,7 +175,7 @@ const Register = ({ history }) => {
                         </div>
                         <div class="mb-3 text-end">
                             <Link to="/login" class="btn btn-link text-dark-1" >Login</Link>
-                            <button type="submit" class="btn bg-primary-1 px-3">Submit</button>
+                            <button type="submit" class={`${loading && 'disabled'} btn bg-primary-1 px-3`}>Submit</button>
                         </div>
                     </form>
                 </div>

@@ -23,14 +23,20 @@ app.use(fileUpload());
 
 //Import all routes 
 const products = require('./routes/product');
+const artisans = require('./routes/artisan');
+const task = require('./routes/task');
 const auth = require('./routes/auth');
 const payment = require('./routes/payment');
 const order = require('./routes/order');
+const worker = require('./routes/worker')
 
 app.use('/api/v1', products);
+app.use('/api/v1', artisans);
+app.use('/api/v1', task);
 app.use('/api/v1', auth);
 app.use('/api/v1', payment)
 app.use('/api/v1', order)
+app.use('/api/v1', worker)
 
 if(process.env.NODE_ENV === 'PRODUCTION'){
     app.use(express.static(path.join(__dirname, '../frontend/build')))

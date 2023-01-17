@@ -56,6 +56,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'user'
     },
+    workers: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Business'
+        }
+    ],
     createdAt:{
         type: Date,
         default: Date.now
@@ -99,4 +105,4 @@ userSchema.methods.getResetPasswordToken = function(){
     return resetToken;
 }
 
-module.exports = mongoose.model('user', userSchema);
+module.exports = mongoose.model('User', userSchema);

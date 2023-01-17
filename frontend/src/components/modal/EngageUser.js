@@ -1,11 +1,28 @@
-import { Fragment } from "react"
+import { Fragment, useState } from "react"
 
 const EngageUser = ()=>{
+    const [jobOrder, setJobOrder] = useState({
+        workOrder: '',
+        taskLocation: '',
+        duration: '',
+        waitTime: ''
+    });
+
+    
+    const {workOrder,taskLocation,duration,waitTime} = jobOrder;
+
+    const onChange = (e) => setJobOrder({ ...jobOrder, [e.target.name]: e.target.value})
     return (
         <Fragment>            
             <div class="mb-3">
                 <label for="workOder" class="form-label">What I’m I doing for you?</label>
-                <textarea class="form-control" id="workOder" rows="3"></textarea>
+                <textarea 
+                    class="form-control" 
+                    id="workOder" 
+                    name="workOrder"
+                    value={workOrder} 
+                    onChange={onChange}
+                    rows="3" />
                 <ul class="card-text d-flex flex-wrap list-unstyled text-center">
                     <li class="col mt-1 me-1 px-2 text-nowrap" style={{"max-width": "fit-content"}}>Suggestion:</li>
                     <li class="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap" style={{"max-width": "fit-content"}}>Dispatch Job</li>
@@ -16,7 +33,7 @@ const EngageUser = ()=>{
                 </div>
                 <div class="mb-3">
                     <label for="taskLocation" class="form-label">Where I’m I performing the job?</label>
-                    <input type="text" class="form-control" id="taskLocation" placeholder="Amarata"/>
+                    <input type="text" class="form-control" id="taskLocation" name={taskLocation} onChange={onChange} placeholder="Amarata"/>
                 </div>
                 <div class="mb-3">
                     <label class="d-block form-label">How long do you want to engage me?</label>

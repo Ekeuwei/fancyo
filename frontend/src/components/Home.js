@@ -6,13 +6,12 @@ import 'rc-slider/assets/index.css'; // Import the default design of the slider
 import MetaData from './layout/MetaData'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { getProducts } from '../actions/productActions'
-import Product from './product/Product'
 import Loader from './layout/Loader'
 import { useAlert } from 'react-alert'
 import SearchComponent from './SearchComponent';
 import Search from './layout/Search';
 import { Route } from 'react-router-dom';
+import { getWorkers } from '../actions/workerActions';
 
 const { createSliderWithTooltip } = Slider;
 const Range = createSliderWithTooltip(Slider.Range);
@@ -44,7 +43,7 @@ const Home = ({ match }) => {
     
     const dispatch = useDispatch();
 
-    const {  loading, products, error, productsCount, resPerPage, filteredProductsCount } = useSelector(state => state.products)
+    const {  loading, workers, error, workersCount, resPerPage, filteredWorkersCount } = useSelector(state => state.workers)
 
     const keyword = match.params.keyword
 
@@ -54,7 +53,7 @@ const Home = ({ match }) => {
             return  alert.error(error)
         }
          
-        dispatch(getProducts(keyword, currentPage, price, category, rating))        
+        dispatch(getWorkers(keyword, currentPage, price, category, rating))        
 
     }, [dispatch, alert, error, keyword, currentPage, category, price, rating])
 
@@ -62,9 +61,9 @@ const Home = ({ match }) => {
         setCurrentPage(pageNumber)
     }
 
-    let count = productsCount;
+    let count = workersCount;
     if(keyword){
-        count = filteredProductsCount
+        count = filteredWorkersCount
     }
 
 
@@ -74,7 +73,7 @@ const Home = ({ match }) => {
             {loading? <Loader /> : (            
                 <Fragment>        
                     <MetaData title= {'Getting Things Done The Most Efficient Way'} />
-                    {keyword? <SearchComponent keyword = {keyword} /> : (
+                    {keyword? <SearchComponent keyword = {keyword} workers = {workers} count = {count}/> : (
                         <Fragment>
                             <section >
                                 <div className="p-5 bg-img h-l-50">
@@ -204,12 +203,12 @@ const Home = ({ match }) => {
                         </Fragment>
                     )}
                     
-                    {resPerPage <= count && (
+                    {(resPerPage <= count || currentPage !==1) && (
                         <div className="d-flex justify-content-center mt-5">
                             <Pagination 
                                 activePage = {currentPage}
                                 itemsCountPerPage = {resPerPage}
-                                totalItemsCount = {productsCount}
+                                totalItemsCount = {workersCount}
                                 onChange = {setCurrentPageNo}
                                 nextPageText = {'Next'}
                                 prevPageText = {'Prev'}
