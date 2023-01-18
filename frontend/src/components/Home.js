@@ -72,13 +72,13 @@ const Home = ({ match }) => {
         <Fragment>
             {loading? <Loader /> : (            
                 <Fragment>        
-                    <MetaData title= {'Getting Things Done The Most Efficient Way'} />
+                    <MetaData title= {'Getting Things Done with Good Help'} />
                     {keyword? <SearchComponent keyword = {keyword} workers = {workers} count = {count}/> : (
                         <Fragment>
                             <section >
                                 <div className="p-5 bg-img h-l-50">
-                                    <h3 className="mb-4 text-white">Find the most efficient person for the job</h3>
-                                    <p className="mb-4 text-white">Thousands of Nigerians use ebiwani.com to get things done</p>
+                                    <h3 className="mb-4 text-white">Find the right worker for any task, easily and quickly</h3>
+                                    <p className="mb-4 text-white">Free up your time and energy by letting professionals handle your personal tasks.</p>
                                     <div className="mx-md-5">
                                         <Route render={ ({history}) => <Search history = {history} />} />
                                     </div>       
