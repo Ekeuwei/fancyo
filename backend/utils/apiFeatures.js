@@ -13,6 +13,10 @@ class APIFeatures {
             }
         } : {}
 
+        const category = this.queryStr.category? {
+            ['category.key']:{ $regex: this.queryStr.category, $options:'i'}
+        } : {}
+        
         const keyword = this.queryStr.keyword? 
                         this.searchFields.map(field => ({[field]:{
                             $regex: this.queryStr.keyword, 
@@ -20,18 +24,20 @@ class APIFeatures {
                         }}))
                         : [{}]
 
-        // console.log(keyword);
         // this.query = this.query.find({...keywordSingleField})
-        this.query = this.query.find({$or:[...keyword]})
+        this.query = this.query.find({$and:[{$or:[...keyword]},{...category}]})
+        
         return this;
     }
 
     filter(){
-        const queryCopy = {...this.queryStr};
+        let queryCopy = {...this.queryStr};
 
         // Removing fields from the query
         const removeFields = ['keyword', 'limit', 'page'];
         removeFields.forEach(el => delete queryCopy[el]);
+
+        // this.filterFields.map(field => ({[field]: {$regex: 'yenagoa', $options: 'i'}}));
 
         // Advance filter for price, rating etc
         let queryStr = JSON.stringify(queryCopy)

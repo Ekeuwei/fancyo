@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import Header from "./components/layout/Header";
@@ -6,18 +6,13 @@ import Footer from "./components/layout/Footer";
 import Home from "./components/Home";
 import ProductDetails from "./components/product/ProductDetails";
 
-import RegisterArtisan from "./components/artisan/Register";
-import LoginArtisan from "./components/artisan/Login";
-import ContactInfo from "./components/artisan/ContactInfo";
-import RegAuth from "./components/artisan/RegAuth";
 
 import Login from "./components/user/Login";
 import Register from "./components/user/Register";
 
 import { loadUser } from "./actions/userActions";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import store from "./store";
-import Profile from "./components/user/Profile";
 import ProtectedRoute from "./components/route/ProtectedRoute";
 import UpdateProfile from "./components/user/UpdateProfile";
 import UpdatePassword from "./components/user/UpdatePassword";
@@ -28,45 +23,35 @@ import NewPassword from "./components/user/NewPassword";
 import Cart from "./components/cart/Cart";
 import Shipping from "./components/cart/Shipping";
 import ConfirmOrder from "./components/cart/ConfirmOrder";
-import Payment from "./components/cart/Payment";
-import axios from "axios";
 
 // Payments
-import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
 import OrderSuccess from "./components/cart/OrderSuccess";
 import ListOrders from "./components/orders/ListOrders";
 import OrderDetails from "./components/orders/OrderDetails";
 
 // Admin Imports
-import Dashboard from "./components/admin/Dashboard";
-import ProductsList from "./components/admin/ProductsList";
-import NewProduct from "./components/admin/NewProduct";
-import UpdateProduct from "./components/admin/UpdateProduct";
-import OrdersList from "./components/admin/OrdersList";
-import ProcessOrder from "./components/admin/ProcessOrder";
+import Dashboard from "./components/user/Dashboard";
 import UsersList from "./components/admin/UsersList";
 import UpdateUser from "./components/admin/UpdateUser";
 import ProductReviews from "./components/admin/ProductReviews";
 import Task from "./components/user/Task";
-import ArtisanDetails from "./components/artisan/ArtisanDetails";
 import TaskProgress from "./components/user/TaskProgress";
 import CreateWorker from "./components/worker/CreateWorker";
 import WorkerDetails from "./components/worker/WorkerDetails";
 import WorkerTask from "./components/user/task/WorkerTasks";
+import Category from "./components/Category";
+import AccountProfile from "./components/user/AccountProfile";
+import AccountAddress from "./components/user/AccountAddress";
+import AccountPassword from "./components/user/AccountPassword";
+import AccountWorker from "./components/user/AccountWorker";
+import AccounCreatetWorker from "./components/user/AccountCreateWorker";
+import NearbyJobs from "./components/user/dashboardLayout/NearbyJobs";
+import AllTasksAndWorks from "./components/user/dashboardLayout/AllTasksAndWorks";
+import PaymentHistory from "./components/user/dashboardLayout/PaymentHistory";
 
 function App() {
-  const [stripeApiKey, setStripeApiKey] = useState("");
-
   useEffect(() => {
     store.dispatch(loadUser());
-
-    async function getStripeApiKey() {
-      const { data } = await axios.get("/api/v1/stripeapi");
-      setStripeApiKey(data.stripeApiKey);
-    }
-
-    // getStripeApiKey();
   }, []);
 
   const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
@@ -77,6 +62,7 @@ function App() {
         <Header />
         <div className="container_del container-fluid_del">
           <Route path="/" component={Home} exact />
+          <Route path="/category/:name" component={Category} exact />
           <Route path="/search/:keyword" component={Home} />
           <Route path="/product/:id" component={ProductDetails} exact />
 
@@ -84,18 +70,7 @@ function App() {
           <ProtectedRoute path="/shipping" component={Shipping} />
           <ProtectedRoute path="/order/confirm" component={ConfirmOrder} />
           <ProtectedRoute path="/success" component={OrderSuccess} />
-          {stripeApiKey && (
-            <Elements stripe={loadStripe(stripeApiKey)}>
-              <ProtectedRoute path="/payment" component={Payment} />
-            </Elements>
-          )}
-
-          {/* Artisan */}
-          <Route path="/login/artisan/" component={LoginArtisan} exact />
-          <Route path="/register/artisan/" component={RegisterArtisan} exact />
-          <Route path="/register/contact/artisan/" component={ContactInfo} exact />
-          <Route path="/register/password/artisan/" component={RegAuth} exact />
-          <Route path="/artisan/:id" component={ArtisanDetails} exact />
+        
 
             {/* Worker */}
           <ProtectedRoute path="/user/create/worker" component={CreateWorker} exact />
@@ -109,11 +84,9 @@ function App() {
           {/* User */}
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} exact />
-          <Route path="/register/contact" component={ContactInfo} exact />
-          <Route path="/register/password" component={RegAuth} exact />
           <Route path="/password/forgot" component={ForgotPassword} exact />
           <Route path="/password/reset/:token" component={NewPassword} exact />
-          <Route path="/user" component={Profile} exact />
+          <Route path="/dashboard" component={Dashboard} exact/>
           {/* <ProtectedRoute path = "/me" component = {MyProfile} exact /> */}
           <ProtectedRoute path="/me/update" component={UpdateProfile} exact />
           <ProtectedRoute
@@ -122,46 +95,21 @@ function App() {
             exact
           />
 
+          {/* Account */}
+          <Route path="/account/profile" component={AccountProfile} exact />
+          <Route path="/account/contact" component={AccountAddress} exact />
+          <Route path="/account/password" component={AccountPassword} exact />
+          <Route path="/account/worker" component={AccountWorker} exact />
+          <Route path="/account/worker/create" component={AccounCreatetWorker} exact />
+
           <ProtectedRoute path="/orders/me" component={ListOrders} exact />
           <ProtectedRoute path="/order/:id" component={OrderDetails} exact />
         </div>
-        <ProtectedRoute
-          path="/dashboard"
-          isAdmin={true}
-          component={Dashboard}
-          exact
-        />
-        <ProtectedRoute
-          path="/admin/products"
-          isAdmin={true}
-          component={ProductsList}
-          exact
-        />
-        <ProtectedRoute
-          path="/admin/product"
-          isAdmin={true}
-          component={NewProduct}
-          exact
-        />
-        <ProtectedRoute
-          path="/admin/product/:id"
-          isAdmin={true}
-          component={UpdateProduct}
-          exact
-        />
-
-        <ProtectedRoute
-          path="/admin/orders/"
-          isAdmin={true}
-          component={OrdersList}
-          exact
-        />
-        <ProtectedRoute
-          path="/admin/order/:id"
-          isAdmin={true}
-          component={ProcessOrder}
-          exact
-        />
+        <ProtectedRoute path="/dashboards" isAdmin={true} component={Dashboard} exact />
+        <ProtectedRoute path="/managetasks" component={AllTasksAndWorks} exact />
+        <ProtectedRoute path="/morejobs" component={NearbyJobs} exact />
+        <ProtectedRoute path="/payments" component={PaymentHistory} exact />
+        
         <ProtectedRoute
           path="/admin/users/"
           isAdmin={true}

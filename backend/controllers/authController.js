@@ -6,19 +6,23 @@ const sendToken = require('../utils/jwtToken');
 const sendEmail = require('../utils/sendEmail');
 
 const crypto = require('crypto');
-const cloudinary = require('cloudinary')
+const cloudinary = require('cloudinary');
+const Wallet = require('../models/wallet');
+const Worker = require('../models/worker');
+const Town = require('../models/address/town');
  
 // Register a user => /api/v1/register
 
 exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
 
-    const result = await cloudinary.v2.uploader.upload(req.body.avatar, {
+    const { firstName, lastName, phoneNumber, gender, email, password, avatar } = req.body;
+    
+    const result = await cloudinary.v2.uploader.upload(avatar, {
         folder: 'avatars',
         width: 150,
         crop: 'scale'
     })
 
-    const { firstName, lastName, phoneNumber, gender, email, password } = req.body;
 
     let user;
 
@@ -30,14 +34,22 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
             gender,
             email,
             password,
+            // avatar
             avatar: {
                 public_id: result.public_id,
                 url: result.secure_url
             }
         });
+
+        const wallet = await Wallet.create({
+            userId: user._id
+        })
+
+        user.walletId = wallet._id;
+        await user.save();
     } catch (error) {
         await cloudinary.v2.uploader.destroy(result.public_id); // Delete uploaded image
-        return next(error)
+        next(new ErrorHandler(error.message, 500));
     }
 
     sendToken(user, 200, res);
@@ -54,7 +66,7 @@ exports.loginUser = catchAsyncErrors( async (req, res, next)=>{
     }
 
     // Finding user in database
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email }).populate('workers', 'category', Worker).select('+password');
 
     if(!user){
         return next(new ErrorHandler('Invalid Email or Password', 401))
@@ -146,7 +158,6 @@ exports.resetPassword = catchAsyncErrors( async (req, res, next) => {
 
 // Get currently logged in user details => /api/v1/me
 exports.getUserProfile = catchAsyncErrors( async (req, res, next) => {
-    // const user = await User.findById(req.user.id);
     const user = req.user;
 
     res.status(200).json({
@@ -154,6 +165,25 @@ exports.getUserProfile = catchAsyncErrors( async (req, res, next) => {
         user
     });
 });
+
+exports.changeMode = catchAsyncErrors(async(req, res, next) => {
+    
+    const user = req.user;
+
+    if(user.role !== 'worker'){
+        return next(new ErrorHandler('Not Allowed', 403))
+    }
+    
+    user.userMode = !user.userMode;
+
+    await user.save()
+
+    res.status(200).json({
+        success: true,
+        message: 'Mode changed',
+        user,
+    })
+})
 
 // Update / change password => /api/v1/password/update
 exports.updatePassword = catchAsyncErrors( async (req, res, next) => {
@@ -175,29 +205,41 @@ exports.updatePassword = catchAsyncErrors( async (req, res, next) => {
 
 // Update user profile  => /api/v1/me/update
 exports.updateProfile = catchAsyncErrors( async (req, res, next) => {
-    const newUserData = {
-        name: req.body.name,
-        email: req.body.email
-    }
+    const newUserData = JSON.parse(req.body.data)
 
+    
     // Update avatar 
-
-    if(req.body.avatar !== ''){
+    if(newUserData.avatar){
         const user = await User.findById(req.user.id)
-
+        
         const image_id = user.avatar.public_id
-        const res = await cloudinary.v2.uploader.destroy(image_id)
-
+        
         const result = await cloudinary.v2.uploader.upload(req.body.avatar, {
             folder: 'avatars',
             width: 150,
             crop: 'scale'
-        })
-
+        });
+        
+        await cloudinary.v2.uploader.destroy(image_id)
+        
         newUserData.avatar = {
             public_id: result.public_id,
             url: result.secure_url
         }
+    }
+
+    if(newUserData.contact){
+        
+        const filter = {
+            name: newUserData.contact.town,
+            lga: newUserData.contact.lga,
+            state: newUserData.contact.state
+        }
+        const options = {upsert: true, new: true}
+
+        const town = await Town.findOneAndUpdate(filter, newUserData.contact, options);
+        
+        newUserData.contact.town = town._id;
     }
 
     const user = await User.findByIdAndUpdate(req.user.id, newUserData, {

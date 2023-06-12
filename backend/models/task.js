@@ -2,44 +2,79 @@ const mongoose = require('mongoose');
 
 const taskSchema = mongoose.Schema({
     title:{
-        type: String,
-        required: true
+        type: String
     },
     location: {
-        type: String,
-        required: true
-    },
-    duration: {
-        type: String,
-        required: true
-    },
-    waitTime: {
-        type: Date,
-        default: Date.now() + 30 * 60 * 1000
-    },
-    status: {
-        type: String,
-        default: 'Pending'
-    },
-    escrow: {
-        user: {
-            type: String,
-            default: 'Pending'
+        state: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'State'
         },
-        worker: {
+        lga: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Lga'
+        },
+        town: {
             type: String,
-            default: 'Pending'
+            required: true
         }
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    numberOfWorkers: {
+        type: Number,
+        default: 1
+    },
+    summary: {
+        type: String
+    },
+    budget: {
+        type: Number
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'User'
     },
-    worker: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+    status: {
+        type: String,
+        default: 'Pending'
     },
+    workers: [
+        {
+            worker: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Worker'
+            },
+            escrow: {
+                user: {
+                    enum: ['Pending', 'Cancelled', 'Completed'],
+                    type: String,
+                    default: 'Pending'
+                },
+                worker: {
+                    enum: ['Pending', 'Declined', 'Completed', 'Accepted','Abandoned'],
+                    type: String,
+                    default: 'Pending'
+                }
+            },
+            review: mongoose.Schema.Types.ObjectId
+        }
+    ],
+    applicants:{
+        type: [
+            {
+                worker: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'Worker'
+                },
+                message: String
+            }
+        ],
+        // select: false
+    },
+    review: mongoose.Schema.Types.ObjectId,
     finishedAt: {
         type: Date
     },

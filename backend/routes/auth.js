@@ -19,7 +19,8 @@ const {
     allUsers,
     getUserDetails,
     updateUser,
-    deleteUser
+    deleteUser,
+    changeMode
 } = require ('../controllers/authController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../midllewares/auth')
@@ -33,6 +34,7 @@ router.route('/login').post(loginUser);
 router.route('/password/forgot').post(forgotPassword);
 router.route('/password/reset/:token').put(resetPassword);
 router.route('/me').get(isAuthenticatedUser, getUserProfile);
+router.route('/me/changemode').get(isAuthenticatedUser,changeMode)
 router.route('/password/update').put(isAuthenticatedUser, updatePassword);
 router.route('/me/update').put(isAuthenticatedUser, updateProfile);
 

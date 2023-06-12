@@ -4,22 +4,17 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   clearErrors,
   myTasks,
-  updateTask,
   updateTaskProgress,
 } from "../../actions/taskAction";
 import PropTypes from "prop-types";
-import { useHistory, useLocation } from "react-router-dom";
 import { UPDATE_TASK_PROGRESS_RESET } from "../../constants/taskConstants";
 
 const Task = () => {
   const alert = useAlert();
   const dispatch = useDispatch();
-  const history = useHistory();
-  const location = useLocation();
 
   const { tasks, loading } = useSelector((state) => state.myTasks);
   const { error, isUpdated } = useSelector((state) => state.singleTask);
-  const { user } = useSelector((state) => state.auth);
 
   const getColor = (status) => {
     if (status === "In Progress") return "text-primary-1";
@@ -30,16 +25,6 @@ const Task = () => {
   };
 
   const getButtonText = (status) => {
-    // switch (status) {
-    //   case 'Canceled': return 'Report';
-    //   case 'Pending': return 'Cancel';
-
-    //     break;
-
-    //   default:
-    //     break;
-    // }
-    // if (status === "In Progress") return "Review";
     if (status === "Canceled") return "Report";
     if (status === "Pending") return "Cancel";
     return "Approve";
@@ -50,7 +35,7 @@ const Task = () => {
       case "Cancel":
         return "Cancelled";
       case "Approve":
-        return "Confirmed";
+        return "Completed";
       case "Accept":
         return "In Progress";
       case "Abandon":
@@ -62,8 +47,6 @@ const Task = () => {
   };
 
   const updateEscrow = (data) => {
-    data.uid = user._id;
-    data.role = 'user';
     dispatch(updateTaskProgress(data));
   };
 
@@ -78,8 +61,8 @@ const Task = () => {
       dispatch({ type: UPDATE_TASK_PROGRESS_RESET });
     }
 
-    dispatch(myTasks(location.pathname));
-  }, [alert, dispatch, location.pathname, isUpdated, error]);
+    dispatch(myTasks());
+  }, [alert, dispatch, isUpdated, error]);
 
   return (
     <Fragment>
@@ -92,17 +75,16 @@ const Task = () => {
         </div>
 
         {tasks &&
-          tasks.map((task) => (
+          tasks.map((task) => task.workers.length>0 && (
             <SingeTask
               key={task._id}
-              task={task}
-              {...task.user} {...task.worker}
+              {...task.workers[0].worker} {...task.workers[0]}
               {...task}
-              updateEscrow={updateEscrow}
-              history={history}
               getColor={getColor}
-              getStatusUpdate={getStatusUpdate}
+              updateEscrow={updateEscrow}
               getButtonText={getButtonText}
+              getStatusUpdate={getStatusUpdate}
+              loading={loading}
             />
           ))}
       </div>
@@ -111,25 +93,25 @@ const Task = () => {
 };
 
 const SingeTask = ({
-  task,
-  title,
+  description,
   _id,
-  getColor,
   escrow,
-  firstName, lastName, avatar,
+  workers,
+  getColor,
   updateEscrow,
   getButtonText,
   getStatusUpdate,
-  history,
+  loading
 }) => {
   const displayButton =
-    escrow.worker === "Pending" ||
-    (escrow.worker === "Finished" && escrow.user !== "Confirmed")
+    workers[0].escrow.worker === "Pending" ||
+    (workers[0].escrow.worker === "Finished" && escrow.user !== "Confirmed")
       ? ""
       : "d-none";
   const message = {
     taskId: _id,
-    status: getStatusUpdate(getButtonText(escrow.worker)),
+    workerId: workers[0]._id,
+    status: getStatusUpdate(getButtonText(workers[0].escrow.worker)),
   };
   return (
     <div
@@ -138,23 +120,23 @@ const SingeTask = ({
     >
       <div className=" col-3 text-center my-auto">
         <div className="avatar">
-          <img src={avatar.url} alt="" />
+          <img src={workers[0].worker.owner.avatar.url} alt="" />
         </div>
       </div>
       <div className="col-6 py-2 gx-1 my-auto">
         <h5 className="mb-0">
-          <small>{`${firstName} ${lastName}`}</small>
+          <small>{`${workers[0].worker.owner.firstName} ${workers[0].worker.owner.lastName}`}</small>
         </h5>
         <p className="mb-0 lh-sm fw-light">
-          <small>{`Work Order: ${title}`}</small>
+          <small>{`Work Order: ${description}`}</small>
         </p>
         <p className="mb-0 fw-light">
           <em>
-            <small>{escrow.worker}</small>
+            <small>{workers[0].escrow.worker}</small>
           </em>
           <i
-            className={`fa fa-circle ps-1 ${getColor(escrow.worker)}`}
-            style={{ "font-size": "10px" }}
+            className={`fa fa-circle ps-1 ${getColor(workers[0].escrow.worker)}`}
+            style={{ fontSize: "10px" }}
             aria-hidden="true"
           ></i>
         </p>
@@ -162,12 +144,12 @@ const SingeTask = ({
       <div className="col-3 text-center my-auto">
         <button
           type="button"
-          className={`btn btn-sm p-sm-2 px-sm-3 ${displayButton} ${
-            escrow.artisan === "Pending" ? "bg-dark-3" : "bg-primary-1"
+          className={`btn btn-sm p-sm-2 px-sm-3 ${loading?'loading':''} ${displayButton} ${
+            escrow.worker === "Pending" ? "bg-dark-3" : "bg-primary-1"
           } rounded-3`}
           onClick={() => updateEscrow(message)}
         >
-          {`${getButtonText(escrow.worker)}`}
+          {`${getButtonText(workers[0].escrow.worker)}`}
         </button>
       </div>
     </div>
@@ -175,13 +157,13 @@ const SingeTask = ({
 };
 
 SingeTask.propTypes = {
-  title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
   status: PropTypes.string.isRequired,
   artisan: PropTypes.object.isRequired,
 };
 
 SingeTask.defaultProps = {
-  title: "Default Title",
+  description: "Default Title",
   status: "Pending",
   artisan: {
     firstName: "Smart",

@@ -9,26 +9,39 @@ import {
     ALL_WORKERS_FAIL,
     WORKER_DETAILS_REQUEST,
     WORKER_DETAILS_SUCCESS,
-    WORKER_DETAILS_FAIL
+    WORKER_DETAILS_FAIL,
+    WORKERS_SETUP_REQUEST,
+    WORKERS_SETUP_SUCCESS,
+    WORKERS_SETUP_FAIL,
+    LOAD_USER_WORKERS_REQUEST,
+    LOAD_USER_WORKERS_SUCCESS,
+    LOAD_USER_WORKERS_FAIL,
+    WORKER_REVIEW_REQUEST,
+    WORKER_REVIEW_SUCCESS,
+    WORKER_REVIEW_FAIL,
+    WORKER_REVIEW_RESET
 } from "../constants/workerConstants";
 
 export const workerReducer = (state = {}, action) => {
   switch (action.type) {
     case CREATE_WORKER_REQUEST:
+    case WORKER_REVIEW_REQUEST:
       return {
         ...state,
         loading: true,
       };
       
     case CREATE_WORKER_SUCCESS:
+    case WORKER_REVIEW_SUCCESS:
       return {
         ...state,
         loading: false,
-        workerCreated: action.payload
+        success: action.payload
       };
 
 
     case CREATE_WORKER_FAIL:
+    case WORKER_REVIEW_FAIL:
       return {
         ...state,
         loading: false,
@@ -36,9 +49,10 @@ export const workerReducer = (state = {}, action) => {
       };
     
     case CREATE_WORKER_RESET:
+    case WORKER_REVIEW_RESET:
       return {
         ...state,
-        workerCreated: false
+        success: false
       }
 
     case CLEAR_ERRORS:
@@ -50,6 +64,51 @@ export const workerReducer = (state = {}, action) => {
       return state;
   }
 };
+
+export const workerSetupReducer = (state = {setup: {}}, action) =>{
+  switch (action.type) {
+    case WORKERS_SETUP_REQUEST:
+      return{
+        ...state
+      }
+    case WORKERS_SETUP_SUCCESS:
+      return {
+        setup: action.payload.setup
+      }
+    case WORKERS_SETUP_FAIL:
+      return{
+        ...state,
+        error: action.payload
+      }
+  
+    default:
+      return state
+  }
+}
+
+export const userWorkersReducer = (state = {workers: []}, action) =>{
+  switch (action.type) {
+    case LOAD_USER_WORKERS_REQUEST:
+      return{
+        ...state,
+        loading: true
+      }
+    case LOAD_USER_WORKERS_SUCCESS:
+      return {
+        workers: action.payload,
+        loading: false
+      }
+    case LOAD_USER_WORKERS_FAIL:
+      return{
+        ...state,
+        error: action.payload,
+        loading: false
+      }
+  
+    default:
+      return state
+  }
+}
 
 export const workersReducer = (state = { workers: [] }, action) => {
   switch (action.type) {

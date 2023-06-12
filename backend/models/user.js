@@ -3,6 +3,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const Wallet = require('./wallet');
 
 const userSchema = new mongoose.Schema({
     firstName: {
@@ -22,7 +23,7 @@ const userSchema = new mongoose.Schema({
         validate: [validator.isEmail, 'Please enter valide email address']
     },
     phoneNumber: {
-        type: Number,
+        type: String,
         required: true,
         minlength: [10, 'Phone number not complete']
     },
@@ -32,9 +33,10 @@ const userSchema = new mongoose.Schema({
     },
     contact: {
         address: String,
-        city: String,
-        lga: String,
-        state: String
+        town: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Town'
+        },
     },
     password: {
         type: String,
@@ -56,12 +58,19 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'user'
     },
+    userMode: {
+        type: Boolean,
+        default: true
+    },
     workers: [
         {
             type: mongoose.Schema.ObjectId,
             ref: 'Business'
         }
     ],
+    walletId:{
+        type: mongoose.Schema.Types.ObjectId
+    },
     createdAt:{
         type: Date,
         default: Date.now
@@ -72,11 +81,13 @@ const userSchema = new mongoose.Schema({
 
 // Encrypting password before saving
 userSchema.pre('save', async function (next){
+    
     if(!this.isModified('password')){
         next();
     }
 
     this.password = await bcrypt.hash(this.password, 10);
+
 });
 
 // Compare user password
@@ -104,5 +115,6 @@ userSchema.methods.getResetPasswordToken = function(){
 
     return resetToken;
 }
+
 
 module.exports = mongoose.model('User', userSchema);

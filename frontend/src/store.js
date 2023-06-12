@@ -17,6 +17,7 @@ import {
   forgotPasswordReducer,
   userDetailsReducer,
   userReducer,
+  walletReducer,
 } from "./reducers/userReducer";
 import { cartReducer } from "./reducers/cartReducers";
 import {
@@ -38,7 +39,8 @@ import {
   taskRequestReducer,
   tasksReducer,
 } from "./reducers/taskReducers";
-import { workerDetailsReducer, workerReducer, workersReducer } from "./reducers/workerReducer";
+import { userWorkersReducer, workerDetailsReducer, workerReducer, workerSetupReducer, workersReducer } from "./reducers/workerReducer";
+import { preferences } from "./reducers/prefsReducers";
 
 const reducer = combineReducers({
   products: productsReducer,
@@ -46,13 +48,17 @@ const reducer = combineReducers({
   worker: workerReducer,
   workers: workersReducer,
   workerDetails: workerDetailsReducer,
+  settings: workerSetupReducer,
   auth: authReducer,
   user: userReducer,
+  wallet: walletReducer,
+  userWorkers: userWorkersReducer,
   authArtisan: authArtisanReducer,
   artisan: artisanReducer,
   artisans: artisansReducer,
   artisanDetails: artisanDetailsReducer,
   tasks: tasksReducer,
+  prefs: preferences,
   singleTask: singleTaskReducer,
   myTasks: myTaskReducer,
   taskRequest: taskRequestReducer,

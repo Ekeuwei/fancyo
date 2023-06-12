@@ -1,6 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import Pagination from 'react-js-pagination'
-import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css'; // Import the default design of the slider
 
 import MetaData from './layout/MetaData'
@@ -10,33 +9,21 @@ import Loader from './layout/Loader'
 import { useAlert } from 'react-alert'
 import SearchComponent from './SearchComponent';
 import Search from './layout/Search';
-import { Route } from 'react-router-dom';
+import { Route, useHistory } from 'react-router-dom';
 import { getWorkers } from '../actions/workerActions';
 
-const { createSliderWithTooltip } = Slider;
-const Range = createSliderWithTooltip(Slider.Range);
 
 const Home = ({ match }) => {
 
     const [currentPage, setCurrentPage] = useState(1)
-    const [price, setPrice] = useState([1, 100000]);
-    const [category, setCategory] = useState('')
-    const [rating, setRating] = useState(0)
+    const history = useHistory();
 
     const categories = [
-        'Electronics',
-        'Camera',
-        'Laptop',
-        'Accessories',
-        'Headphones',
-        'Mobile Phones',
-        'Books',
-        'Food',
-        'Clothes/Shoes',
-        'Beauthy/Health',
-        'Sports',
-        'Outdoor',
-        'Home'
+        {name: 'General Labour', url: 'labour', image:'./images/labour.png'},
+        {name: 'Plumbing', url: 'plumbing', image:'./images/plumbing.png'},
+        {name: 'Electrician', url: 'electrician', image:'./images/electrician.png'},
+        {name: 'Make-up', url: 'makeup', image:'./images/makeup.png'},
+        {name: 'House Keeper', url: 'housekeeper', image:'./images/errand.png'},
     ]
 
     const alert = useAlert();
@@ -53,9 +40,9 @@ const Home = ({ match }) => {
             return  alert.error(error)
         }
          
-        dispatch(getWorkers(keyword, currentPage, price, category, rating))        
+        dispatch(getWorkers(keyword, currentPage))        
 
-    }, [dispatch, alert, error, keyword, currentPage, category, price, rating])
+    }, [dispatch, alert, error, keyword, currentPage])
 
     function setCurrentPageNo(pageNumber){
         setCurrentPage(pageNumber)
@@ -90,22 +77,12 @@ const Home = ({ match }) => {
                                 <div className="bg-white p-3">
                                     <h3 className="color-dark-2 mb-3">Popular Services</h3>
                                     <div className="container-fluid ps-0 overflow-auto row gx-3 pb-2 flex-nowrap">
-                                        <div className="col-10 col-sm-9 col-md-6 col-lg-4 col-xl-3 position-relative">
-                                            <h5 className="text-light position-absolute top-0 end-0 m-3">Plumbing</h5>
-                                            <img className="w-100 h-100 fit-cover rounded-3" src="./images/plumbing.png" alt=""/>
-                                        </div>
-                                        <div className="col-10 col-sm-9 col-md-6 col-lg-4 col-xl-3 position-relative">
-                                            <h5 className="text-light position-absolute top-0 end-0 m-3">Electrician</h5>
-                                            <img className="w-100 h-100 fit-cover rounded-3" src="./images/electrician.png" alt=""/>
-                                        </div>
-                                        <div className="col-10 col-sm-9 col-md-6 col-lg-4 col-xl-3 position-relative">
-                                            <h5 className="text-light position-absolute top-0 end-0 m-3">Make-up</h5>
-                                            <img className="w-100 h-100 fit-cover rounded-3" src="./images/makeup.png" alt=""/>
-                                        </div>
-                                        <div className="col-10 col-sm-9 col-md-6 col-lg-4 col-xl-3 position-relative">
-                                            <h5 className="text-light position-absolute top-0 end-0 m-3">General Labour</h5>
-                                            <img className="w-100 h-100 fit-cover rounded-3" src="./images/labour.png" alt=""/>
-                                        </div>
+                                        {categories.map(category => (
+                                            <div className="col-10 col-sm-9 col-md-6 col-lg-4 col-xl-3 position-relative" key={category.name} onClick={()=>history.push(`category/${category.url}`)}>
+                                                <h5 className="text-light position-absolute top-0 end-0 m-3">{category.name}</h5>
+                                                <img className="w-100 h-100 fit-cover rounded-3" src={category.image} alt={category.name}/>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             </section>

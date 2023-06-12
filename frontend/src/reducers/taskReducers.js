@@ -40,6 +40,18 @@ import {
   UPDATE_TASK_PROGRESS_SUCCESS,
   UPDATE_TASK_PROGRESS_FAIL,
   UPDATE_TASK_PROGRESS_RESET,
+  CREATE_TASK_REQUEST,
+  CREATE_TASK_SUCCESS,
+  CREATE_TASK_FAIL,
+  CREATE_TASK_RESET,
+  MY_WORKS_SUCCESS,
+  NEARBY_TASK_REQUEST,
+  NEARBY_TASK_SUCCESS,
+  NEARBY_TASK_FAIL,
+  TASK_WORKER_APPLICATION_REQUEST,
+  TASK_WORKER_APPLICATION_SUCCESS,
+  TASK_WORKER_APPLICATION_FAIL,
+  TASK_WORKER_APPLICATION_RESET,
 } from "../constants/taskConstants";
 
 export const tasksReducer = (state = { tasks: [] }, action) => {
@@ -119,24 +131,28 @@ export const taskDetailsReducer = (state = { task: {} }, action) => {
 export const taskRequestReducer = (state = { task: {} }, action) => {
   switch (action.type) {
     case NEW_TASK_REQUEST:
+    case CREATE_TASK_REQUEST:
       return {
         ...state,
         loading: true,
       };
 
     case NEW_TASK_SUCCESS:
+    case CREATE_TASK_SUCCESS:
       return {
         loading: false,
         success: action.payload.success,
       };
 
     case NEW_TASK_FAIL:
+    case CREATE_TASK_FAIL:
       return {
         ...state,
         loading: false,
         error: action.payload,
       };
     case NEW_TASK_RESET:
+    case CREATE_TASK_RESET:
       return {
         ...state,
         success: false,
@@ -158,6 +174,7 @@ export const singleTaskReducer = (state = {}, action) => {
     case DELETE_TASK_REQUEST:
     case UPDATE_TASK_REQUEST:
     case UPDATE_TASK_PROGRESS_REQUEST:
+    case TASK_WORKER_APPLICATION_REQUEST:
       return {
         ...state,
         loading: true,
@@ -169,7 +186,12 @@ export const singleTaskReducer = (state = {}, action) => {
         loading: false,
         isDeleted: action.payload,
       };
-
+    case TASK_WORKER_APPLICATION_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        success: action.payload,
+      };
     case UPDATE_TASK_SUCCESS:
     case UPDATE_TASK_PROGRESS_SUCCESS:
       return {
@@ -181,6 +203,7 @@ export const singleTaskReducer = (state = {}, action) => {
     case DELETE_TASK_FAIL:
     case UPDATE_TASK_FAIL:
     case UPDATE_TASK_PROGRESS_FAIL:
+    case TASK_WORKER_APPLICATION_FAIL:
       return {
         ...state,
         loading: false,
@@ -190,6 +213,11 @@ export const singleTaskReducer = (state = {}, action) => {
       return {
         ...state,
         isDeleted: false,
+      };
+    case TASK_WORKER_APPLICATION_RESET:
+      return {
+        ...state,
+        success: false,
       };
 
     case UPDATE_TASK_RESET:
@@ -213,17 +241,35 @@ export const singleTaskReducer = (state = {}, action) => {
 export const myTaskReducer = (state = { tasks: [] }, action) => {
   switch (action.type) {
     case MY_TASKS_REQUEST:
+    case NEARBY_TASK_REQUEST:
       return {
+        ...state,
         loading: true,
       };
 
     case MY_TASKS_SUCCESS:
       return {
+        ...state,
         loading: false,
         tasks: action.payload,
+        works: null
+      };
+    case NEARBY_TASK_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        nearbyTasks: action.payload,
+      };
+    case MY_WORKS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        works: action.payload,
+        tasks: null
       };
 
     case MY_TASKS_FAIL:
+    case NEARBY_TASK_FAIL:
       return {
         loading: false,
         error: action.payload,
@@ -231,7 +277,7 @@ export const myTaskReducer = (state = { tasks: [] }, action) => {
 
     case CLEAR_ERRORS:
       return {
-        loading: false,
+        ...state,
         error: null,
       };
 

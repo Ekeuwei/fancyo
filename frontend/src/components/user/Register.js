@@ -1,21 +1,23 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
 import MetaData from '../layout/MetaData';
 
-import { register, clearErrors, savePersonalInfo } from '../../actions/userActions'
+import { register, clearErrors } from '../../actions/userActions'
 
 const Register = ({ history }) => {
 
     const [user, setUser] = useState({
-        fistName: '',
+        firstName: '',
         lastName: '',
         email: '',
         phoneNumber: '',
         gender: '',
         password: ''
     })
+
+    const avatarRef = useRef();
 
     const { firstName, lastName, gender, email, phoneNumber, password } = user;
 
@@ -81,24 +83,24 @@ const Register = ({ history }) => {
             <section className='center-screen tile'>
                 <div className="auth">
                     <form onSubmit={ submitHandler} encType='multipart/form-data'>
-                        <div class="position-relative">
-                            <div class="avatar-preview">
-                            <img 
-                                class="rounded-circle w-100 mx-auto" 
-                                src={ avatarPreview } alt="Avatar Preview"
-                            />
+                        
+                        <div className="avatar-preview">
+                            <div class="avatar">
+                                <img src={ avatarPreview } alt="Avatar Preview" />
+                                <i className="fa fa-pencil-square-o edit-icon" onClick={() => avatarRef.current.click()} aria-hidden="true"></i>
                             </div>
                         </div>
                         <h3 class="py-3 text-start">Register</h3>
                         <div class="progress mb-3 rounded-pill">
-                            <div class="progress-bar bg-primary-2 rounded-pill" role="progressbar" style={{width: "33%"}} aria-valuenow="33" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-primary-2 rounded-pill" role="progressbar" style={{width: "100%"}} aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3 d-none">
                             <input 
                                 name="avatar"
                                 type="file" 
                                 class="form-control" 
                                 id="avatar"
+                                ref={avatarRef}
                                 onChange={onChange}
                             />
                         </div>

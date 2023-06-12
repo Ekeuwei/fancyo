@@ -1,9 +1,6 @@
 import axios from "axios";
 
 import {
-  ALL_TASKS_REQUEST,
-  ALL_TASKS_SUCCESS,
-  ALL_TASKS_FAIL,
   TASKS_DETAILS_REQUEST,
   TASKS_DETAILS_SUCCESS,
   TASKS_DETAILS_FAIL,
@@ -35,45 +32,44 @@ import {
   UPDATE_TASK_PROGRESS_REQUEST,
   UPDATE_TASK_PROGRESS_SUCCESS,
   UPDATE_TASK_PROGRESS_FAIL,
+  CREATE_TASK_FAIL,
+  CREATE_TASK_REQUEST,
+  CREATE_TASK_SUCCESS,
+  MY_WORKS_SUCCESS,
+  NEARBY_TASK_REQUEST,
+  NEARBY_TASK_SUCCESS,
+  NEARBY_TASK_FAIL
 } from "../constants/taskConstants";
 
-export const getTasks =
-  (keyword = "", currentPage = 1, price, category, ratings = 0) =>
-  async (dispatch) => {
-    try {
-      dispatch({ type: ALL_TASKS_REQUEST });
-
-      let link = `/api/v1/tasks?keyword=${keyword}&page=${currentPage}
-                    &price[lte]=${price[1]}&price[gte]=${price[0]}&ratings[gte]=${ratings}`;
-
-      if (category) {
-        link = `/api/v1/tasks?keyword=${keyword}&page=${currentPage}
-                    &price[lte]=${price[1]}&price[gte]=${price[0]}&category=${category}&ratings[gte]=${ratings}`;
-      }
-      const { data } = await axios.get(link);
-
-      dispatch({
-        type: ALL_TASKS_SUCCESS,
-        payload: data,
-      });
-    } catch (error) {
-      dispatch({
-        type: ALL_TASKS_FAIL,
-        payload: error.response.data.message,
-      });
-    }
-  };
-
 // Get currently logged user tasks
-export const myTasks = (path) => async (dispatch) => {
+export const myTasks = (keyword) => async (dispatch) => {
   try {
     dispatch({ type: MY_TASKS_REQUEST });
 
-    const { data } = await axios.get(`/api/v1${path}`);
+    const { data } = await axios.get(`/api/v1/tasks?keyword=${keyword}`);
 
     dispatch({
       type: MY_TASKS_SUCCESS,
       payload: data.tasks,
+    });
+  } catch (error) {
+    dispatch({
+      type: MY_TASKS_FAIL,
+      payload: error.response.data.message,
+    });
+  }
+};
+
+// Get currently logged user tasks
+export const myWorks = (keyword) => async (dispatch) => {
+  try {
+    dispatch({ type: MY_TASKS_REQUEST });
+
+    const { data } = await axios.get(`/api/v1/works?keyword=${keyword}`);
+
+    dispatch({
+      type: MY_WORKS_SUCCESS,
+      payload: data.works,
     });
   } catch (error) {
     dispatch({
@@ -106,6 +102,55 @@ export const newTask = (taskData) => async (dispatch) => {
   }
 };
 
+// Create task request 
+export const createTaskRequst = (details) => async (dispatch) => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }
+  try {
+    dispatch({type: CREATE_TASK_REQUEST})
+
+    const { data } = await axios.post('/api/v1/task/request', details, config);
+
+    dispatch({
+      type: CREATE_TASK_SUCCESS,
+      payload: data
+    })
+    
+  } catch (error) {
+    dispatch({
+      type: CREATE_TASK_FAIL,
+      payload: error.response.data.message
+    });
+  }
+}
+
+// Get nearby tasks requested by users => '/api/v1/tasks/nearby'
+export const getNearbyTasks = (details) => async (dispatch)=>{
+  const config = {
+    headers:{
+      'Content-Type':'application/json'
+    }
+  }
+  try {
+    dispatch({type: NEARBY_TASK_REQUEST});
+
+    const { data } = await axios.post(`/api/v1/tasks/nearby`, details, config);
+    
+    dispatch({
+      type: NEARBY_TASK_SUCCESS,
+      payload: data.nearbyTasks
+    })
+  } catch (error) {
+    dispatch({
+      type: NEARBY_TASK_FAIL,
+      payload: error.response.data.message
+    })
+  }
+}
+
 // Delete task (Admin)
 export const deleteTask = (id) => async (dispatch) => {
   try {
@@ -124,6 +169,28 @@ export const deleteTask = (id) => async (dispatch) => {
     });
   }
 };
+
+export const taskWorkerApplication = async (details)=>{
+  const config = {
+    headers: {
+      'Content-Type':'application/json'
+    }
+  }
+  try {
+
+    const { data } = await axios.put('/api/v1/task/request/apply', details, config);
+
+    return{
+      success: data.success,
+      error: null,
+    }
+  } catch (error) {
+    return{
+      error: error.response.data.message,
+      success: null,
+    }
+  }
+}
 
 // Update Task Progress
 export const updateTaskProgress = (message) => async (dispatch) => {
@@ -150,6 +217,27 @@ export const updateTaskProgress = (message) => async (dispatch) => {
       type: UPDATE_TASK_PROGRESS_FAIL,
       payload: error.response.data.message,
     });
+  }
+};
+
+// Update Task Progress
+export const updateTaskProgressLocal = async (message) => {
+  try {
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const { data } = await axios.put(
+      `/api/v1/task/${message.taskId}`,
+      message,
+      config
+    );
+
+    return { success: data.success }
+  } catch (error) {
+    return { error: error.response.data.message }
   }
 };
 

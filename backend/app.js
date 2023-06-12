@@ -22,6 +22,7 @@ app.use(cookieParser());
 app.use(fileUpload());
 
 //Import all routes 
+const settings = require('./routes/settings');
 const products = require('./routes/product');
 const artisans = require('./routes/artisan');
 const task = require('./routes/task');
@@ -30,6 +31,7 @@ const payment = require('./routes/payment');
 const order = require('./routes/order');
 const worker = require('./routes/worker')
 
+app.use('/api/v1', settings);
 app.use('/api/v1', products);
 app.use('/api/v1', artisans);
 app.use('/api/v1', task);

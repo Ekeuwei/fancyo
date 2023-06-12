@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React from "react";
 import { useLocation } from "react-router-dom";
+
 const TaskProgress = () => {
   const location = useLocation();
-  const [task, setTask] = useState(location.state);
-  //   const task = location.state;
+  
+  const task = location.state;
   return (
     <section>
       <div class="list-group m-3 list-group-flush">

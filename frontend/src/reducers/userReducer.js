@@ -39,6 +39,22 @@ import {
   LOGOUT_SUCCESS,
   LOGOUT_FAIL,
   CLEAR_ERRORS,
+  WALLET_BALANCE_REQUEST,
+  WALLET_BALANCE_SUCCESS,
+  WALLET_BALANCE_FAIL,
+  WALLET_TOPUP_REQUEST,
+  WALLET_TOPUP_SUCCESS,
+  WALLET_TOPUP_FAIL,
+  WALLET_TOPUP_LINK,
+  WALLET_TOPUP_LINK_RESET,
+  WALLET_TOPUP_VERIFY,
+  WALLET_TOPUP_RESET,
+  CHANGE_USER_MODE_REQUEST,
+  CHANGE_USER_MODE_SUCCESS,
+  CHANGE_USER_MODE_FAIL,
+  WALLET_TRANSACTIONS_REQUEST,
+  WALLET_TRANSACTIONS_SUCCESS,
+  WALLET_TRANSACTIONS_FAIL,
 } from "../constants/userConstants";
 
 export const authReducer = (state = { user: {} }, action) => {
@@ -52,9 +68,17 @@ export const authReducer = (state = { user: {} }, action) => {
         isAuthenticated: false,
       };
 
+    case CHANGE_USER_MODE_REQUEST:
+      return{
+        ...state,
+        loading: true
+      };
+
     case REGISTER_USER_SUCCESS:
     case LOGIN_SUCCESS:
     case LOAD_USER_SUCCESS:
+    case CHANGE_USER_MODE_SUCCESS:
+      localStorage.setItem('userMode', action.payload.userMode)
       return {
         ...state,
         loading: false,
@@ -68,7 +92,6 @@ export const authReducer = (state = { user: {} }, action) => {
         isAuthenticated: false,
         user: null,
       };
-
     case LOAD_USER_FAIL:
       return {
         loading: false,
@@ -78,8 +101,10 @@ export const authReducer = (state = { user: {} }, action) => {
       };
 
     case LOGOUT_FAIL:
+    case CHANGE_USER_MODE_FAIL:
       return {
         ...state,
+        loading: false,
         error: action.payload,
       };
 
@@ -165,6 +190,63 @@ export const userReducer = (state = {}, action) => {
       return state;
   }
 };
+
+export const walletReducer = (state = {}, action) => {
+  switch (action.type) {
+    case WALLET_BALANCE_REQUEST:
+    case WALLET_TRANSACTIONS_REQUEST:
+    case WALLET_TOPUP_REQUEST:
+    case WALLET_TOPUP_VERIFY:
+      return {
+        ...state,
+        loading: true
+      }
+    case WALLET_BALANCE_SUCCESS:
+      return{
+        ...state,
+        loading: false,
+        walletBalance: action.payload
+      }
+    case WALLET_TRANSACTIONS_SUCCESS:
+      return{
+        ...state,
+        loading: false,
+        transactions: action.payload
+      }
+    case WALLET_TOPUP_LINK:
+      return{
+        ...state,
+        loading: false,
+        link: action.payload
+      }
+    case WALLET_TOPUP_LINK_RESET:
+      return{
+        ...state,
+        link: null
+      }
+    case WALLET_TOPUP_SUCCESS:
+      return{
+        ...state,
+        loading: false,
+        topup: action.payload
+      }
+    case WALLET_BALANCE_FAIL:
+    case WALLET_TOPUP_FAIL:
+    case WALLET_TRANSACTIONS_FAIL:
+      return{
+        ...state,
+        loading: false,
+        error: action.payload
+      }
+    case WALLET_TOPUP_RESET:
+      return{
+        ...state,
+        topup: null
+      }
+    default:
+      return state;
+  }
+}
 
 export const forgotPasswordReducer = (state = {}, action) => {
   switch (action.type) {

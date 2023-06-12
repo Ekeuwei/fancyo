@@ -4,12 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 
 import Loader from "../layout/Loader";
 import MetaData from "../layout/MetaData";
-import EngageUser from "../modal/EngageUser";
 import { Modal } from "react-bootstrap";
 import { useAlert } from "react-alert";
 import { getWorkerDetails, clearErrors } from "../../actions/workerActions";
 import { newTask } from "../../actions/taskAction";
 import { NEW_TASK_RESET } from "../../constants/taskConstants";
+import dateFormat from "dateformat";
+import { formatAmount } from "../Utils";
 
 const WorkerContext = createContext();
 
@@ -22,11 +23,9 @@ const WorkerDetails = ({ match, history }) => {
     const alert = useAlert();
     const dispatch = useDispatch();
     
-    const { user } = useSelector((state) => state.auth);
     const { loading, worker, error } = useSelector((state) => state.workerDetails);
-    const { error: requestError, success } = useSelector((state) => state.taskRequest);
+    const { error: requestError, success, loading:loadingReq } = useSelector((state) => state.taskRequest);
     
-
     useEffect(() => {
     if (error) {
       alert.error(error);
@@ -35,12 +34,15 @@ const WorkerDetails = ({ match, history }) => {
     }
 
     if (requestError) {
-      alert.error(error);
+      alert.error(requestError);
       dispatch(clearErrors());
+      handleClose();
     }
 
     if (success) {
       alert.success("Request sent successfully");
+      handleClose();
+      setJobOrder({description: "", location: ""})
       dispatch({ type: NEW_TASK_RESET });
     }
 
@@ -49,13 +51,11 @@ const WorkerDetails = ({ match, history }) => {
 
     
     const [jobOrder, setJobOrder] = useState({
-        workOrder: "",
-        taskLocation: "",
-        duration: "",
-        waitTime: "",
+        description: "",
+        location: ""
     });
     
-    const { workOrder, taskLocation, duration, waitTime } = jobOrder;
+    const { description, location } = jobOrder;
     
     const onChange = (e) =>
     setJobOrder(prevJobOrders => ({...prevJobOrders, [e.target.name]: e.target.value }));
@@ -63,27 +63,25 @@ const WorkerDetails = ({ match, history }) => {
    
     const submitRequest = () => {
       const formData = new FormData();
-      formData.set("title", workOrder);
-      formData.set("location", taskLocation);
-      formData.set("duration", duration);
-      formData.set("waitTime", waitTime);
-      formData.set("worker", worker.owner._id);
+      formData.set("description", description);
+      formData.set("location", location);
+      formData.set("worker", worker._id);
   
       dispatch(newTask(formData));
   
-      handleClose();
     };
-
   
   return (
     <WorkerContext.Provider
       value={{
         handleClose,
         show,
-        workOrder,
+        pricing:worker?.pricing,
+        description,
         onChange,
-        taskLocation,
+        location,
         submitRequest,
+        loading: loadingReq
       }}
     >
       {loading || typeof loading === 'undefined'? (
@@ -91,57 +89,57 @@ const WorkerDetails = ({ match, history }) => {
       ) : (
           <Fragment>
             <MetaData title={"Worker Profile"} />
-            <div class="container-0">
-                <div class="rounded-bottom row g-0">
-                <div class="col-12 col-md-7">
-                    <div class="position-relative ms-lg-3">
-                    <img
-                        src={`${window.location.origin}/images/featured.png`}
-                        class="card-img-bottom"
-                        alt="..."
-                    />
-                    <div class="featured-graphics">
-                        <div className="avatar">
-                        <img
-                            src={worker.owner.avatar.url}
-                            alt={`${worker.displayName}_Photo`}
-                        />
-                        </div>
-                    </div>
-                    </div>
+            <div className="container-0">
+                <div className="rounded-bottom row g-0">
+                <div className="col-12 col-md-7">
+                  {/* Start */}
+                  <div className="featured-graphics">
+                    <img 
+                        src={worker.featuredGraphics?.url || `${window.location.origin}/images/featured.png`}
+                        alt="featured Graphics"
+                      />
+                  </div>
+                  <div className="featured-graphics-avatar">
+                    <img 
+                        src={worker.owner.avatar.url}
+                        name="avatar"
+                        onChange={onChange}
+                        alt={`${worker.displayName}_Photo`}
+                      />
+                </div>
+                  {/* End */}
 
-                    <div
-                    class="card-body featured-heading"
+                  <div
+                    className="card-body featured-heading"
                     style={{ width: "fit-content" }}
                     >
-                    <div class="row my-auto">
-                        <h5 class="card-title text-primary-1 col-12 mb-2">
+                    <div className="row my-auto">
+                        <h5 className="card-title text-primary-1 col-12 mb-2">
                         {`${worker.owner.firstName} ${worker.owner.lastName}`}
-                        <span class="text-dark-2">
-                            {" "}
-                            {`| ${worker.category}`}
+                        <span className="text-dark-2">
+                            {` | ${worker.category.name}`}
                         </span>
                         </h5>
                         <div className="d-flex mb-2">
                         <i
-                            class="fa fa-map-marker me-2 my-auto"
+                            className="fa fa-map-marker me-2 my-auto"
                             aria-hidden="true"
                         ></i>
-                        <p class="card-text col mb-0">{`${worker.owner.contact.address}, ${worker.owner.contact.city}, ${worker.owner.contact.state}`}</p>
+                        <p className="card-text col mb-0">{`${worker.owner.contact.address}, ${worker.owner.contact.town.name}, ${worker.owner.contact.town.lga.name}`}</p>
                         </div>
 
                         <div className="d-flex mb-2">
                         <i
-                            class="fa fa-phone me-2 my-auto"
+                            className="fa fa-phone me-2 my-auto"
                             aria-hidden="true"
                         ></i>
-                        <p class="card-text col mb-0">{`0${worker.owner.phoneNumber}`}</p>
+                        <p className="card-text col mb-0">{`0${worker.owner.phoneNumber}`}</p>
                         </div>
 
-                        <span class="col">
+                        <span className="col">
                         <button
                             type="button"
-                            class="btn btn-sm bg-primary-2 px-4 px-md-3 py-md-1 text-white rounded-pill"
+                            className="btn btn-sm bg-primary-2 px-4 px-md-3 py-md-1 text-white rounded-pill"
                             onClick={handleShow}
                         >
                             <strong>Engage</strong>
@@ -150,197 +148,158 @@ const WorkerDetails = ({ match, history }) => {
                     </div>
                     </div>
 
-                    <div class="card-body">
-                    <h5 class="card-text">Brief Intro</h5>
-                    <p class="card-text">
-                        Hi there, I’m 16 years old. I run errands and dispatch and I
-                        do it with pleasure. I’m very much familiar with the
-                        nooks... More
-                    </p>
-                    </div>
+                    {/* {worker.description&& <div className="card-body">
+                      <h5 className="card-text">Brief Intro</h5>
+                      <p className="card-text">{worker.description}
+                      </p>
+                    </div>}
 
-                    <div class="card-body">
-                    <h5 class="card-text">My Services</h5>
-                    <ul class="card-text d-flex flex-wrap list-unstyled text-center">
-                        <li
-                        class="bg-primary-2 badge rounded-pill col mt-1 me-1 px-3 text-nowrap"
-                        style={{ "max-width": "fit-content" }}
-                        >
-                        Dispatch
-                        </li>
-                        <li
-                        class="bg-secondary-1 badge rounded-pill col mt-1 me-1 px-3 text-nowrap"
-                        style={{ "max-width": "fit-content" }}
-                        >
-                        Errands
-                        </li>
-                        <li
-                        class="bg-secondary-3 badge rounded-pill col mt-1 me-1 px-3 text-nowrap"
-                        style={{ "max-width": "fit-content" }}
-                        >
-                        Delivery
-                        </li>
-                        <li
-                        class="bg-secondary-4 badge rounded-pill col mt-1 me-1 px-3 text-nowrap"
-                        style={{ "max-width": "fit-content" }}
-                        >
-                        Pick-up
-                        </li>
-                    </ul>
-                    </div>
+                    <div className="card-body">
+                      <h5 className="card-text">My Services</h5>
+                      <ul className="card-text d-flex flex-wrap list-unstyled text-center">
+                        {worker.serviceTags?.length > 0 && (
+                          worker.serviceTags.map(service =>(
+                            <li
+                            className="badge rounded-pill col mt-1 me-1 py-2 px-3 text-nowrap" 
+                            style={{ maxWidth: "fit-content", backgroundColor: randomDarkColor() }}
+                            > {service} </li>
+                          ))
+                        )}
+                      </ul>
+                    </div> */}
                 </div>
 
-                <div class="col-12 col-md-5">
-                    <div class="card-body pt-md-0 pe-md-0">
-                    <ul class="list-group">
-                        <li class="list-group-item active">Highights</li>
-                        <li class="d-flex list-group-item ">
-                        <div class="col me-2">Joined Since</div>
-                        <div class="col">7th April, 2022</div>
+                <div className="col-12 col-md-5">
+                    <div className="card-body pt-md-0 pe-md-0">
+                    <ul className="list-group">
+                        <li className="list-group-item active">Highights</li>
+                        <li className="d-flex list-group-item ">
+                          <div className="col">Joined Since</div>
+                          <div className="col">{dateFormat(worker.createdAt, "dS mmm, yyyy")}</div>
                         </li>
-                        <li class="d-flex list-group-item ">
-                        <div class="col me-2">Total Jobs</div>
-                        <div class="col">787</div>
+                        <li className="d-flex list-group-item ">
+                          <div className="col">Status</div>
+                          <div className="col">{worker.availability}</div>
                         </li>
-                        <li class="d-flex list-group-item ">
-                        <div class="col me-2">Last Job</div>
-                        <div class="col">5 hours ago</div>
+                        <li className="d-flex list-group-item ">
+                          <div className="col">KYC</div>
+                          <div className="col">
+                              {worker.status}
+                              <i className="fa fa-check-circle text-success ms-1" aria-hidden="true" ></i>
+                          </div>
                         </li>
-                        <li class="d-flex list-group-item ">
-                        <div class="col me-2">
-                            Average time to arrive job premises
-                        </div>
-                        <div class="col my-auto">30 minutes</div>
+                        <li className="d-flex list-group-item ">
+                          <div className="col">Pricing</div>
+                          <div className="col">{`${formatAmount(worker.pricing.minRate)} Per Job`}</div>
                         </li>
-                        <li class="d-flex list-group-item ">
-                        <div class="col me-2">Status</div>
-                        <div class="col">Available</div>
-                        </li>
-                        <li class="d-flex list-group-item ">
-                        <div class="col me-2">KYC</div>
-                        <div class="col">
-                            <i
-                            class="fa fa-check-circle text-success"
-                            aria-hidden="true"
-                            ></i>
-                            Verified
-                        </div>
-                        </li>
-                        <li class="d-flex list-group-item ">
-                        <div class="col me-2">Pricing</div>
-                        <div class="col">N3,000/Hr</div>
-                        </li>
-                        <li class="d-flex list-group-item ">
-                        <div class="col me-2">Rating</div>
-                        <div class="col">
-                            <i
-                            class="fa fa-star text-primary-1"
-                            aria-hidden="true"
-                            ></i>
+                        <li className="d-flex list-group-item ">
+                        <div className="col">Rating</div>
+                        <div className="col">
+                            <i className="fa fa-star text-primary-1 me-1" aria-hidden="true" ></i>
                             4.7 Rating (483)
                         </div>
                         </li>
                     </ul>
                     </div>
 
-                    <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
+                    <div className="card-body">
+                    <ul className="list-group list-group-flush">
+                        <li className="list-group-item">
                         <strong>RECENT REVIEWS</strong>
                         </li>
-                        <li class="list-group-item">
-                        <span class="col">
+                        <li className="list-group-item">
+                        <span className="col">
                             <strong>Dennis Igwe</strong>
                             <i
-                            class="fa fa-star text-primary-1"
+                            className="fa fa-star text-primary-1"
                             aria-hidden="true"
                             ></i>
                             <i
-                            class="fa fa-star text-primary-1"
+                            className="fa fa-star text-primary-1"
                             aria-hidden="true"
                             ></i>
                             <i
-                            class="fa fa-star text-primary-1"
+                            className="fa fa-star text-primary-1"
                             aria-hidden="true"
                             ></i>
                             <i
-                            class="fa fa-star text-primary-1"
+                            className="fa fa-star text-primary-1"
                             aria-hidden="true"
                             ></i>
                             <i
-                            class="fa fa-star text-primary-1"
+                            className="fa fa-star text-primary-1"
                             aria-hidden="true"
                             ></i>
                         </span>
-                        <p class="col">
+                        <p className="col">
                             Rebecca is simply amazing, she’s what I think of
                             whenever I want to get something done on time
                         </p>
                         </li>
-                        <li class="list-group-item">
-                        <span class="col">
+                        <li className="list-group-item">
+                        <span className="col">
                             <strong>Okafor Martins</strong>
                             <i
-                            class="fa fa-star text-primary-1"
+                            className="fa fa-star text-primary-1"
                             aria-hidden="true"
                             ></i>
                             <i
-                            class="fa fa-star text-primary-1"
+                            className="fa fa-star text-primary-1"
                             aria-hidden="true"
                             ></i>
                             <i
-                            class="fa fa-star text-primary-1"
+                            className="fa fa-star text-primary-1"
                             aria-hidden="true"
                             ></i>
                             <i
-                            class="fa fa-star text-primary-1"
+                            className="fa fa-star text-primary-1"
                             aria-hidden="true"
                             ></i>
                             <i
-                            class="fa fa-star text-primary-1"
+                            className="fa fa-star text-primary-1"
                             aria-hidden="true"
                             ></i>
                         </span>
-                        <p class="col">
+                        <p className="col">
                             This is demn fast, he got the job done about 3 times
                             faster than I thought.
                         </p>
                         </li>
-                        <li class="list-group-item">
-                        <span class="col">
+                        <li className="list-group-item">
+                        <span className="col">
                             <strong>Jennifer Austin</strong>
                             <i
-                            class="fa fa-star text-primary-1"
+                            className="fa fa-star text-primary-1"
                             aria-hidden="true"
                             ></i>
                             <i
-                            class="fa fa-star text-primary-1"
+                            className="fa fa-star text-primary-1"
                             aria-hidden="true"
                             ></i>
                             <i
-                            class="fa fa-star text-primary-1"
+                            className="fa fa-star text-primary-1"
                             aria-hidden="true"
                             ></i>
                             <i
-                            class="fa fa-star text-primary-1"
+                            className="fa fa-star text-primary-1"
                             aria-hidden="true"
                             ></i>
                             <i
-                            class="fa fa-star-half text-primary-1"
+                            className="fa fa-star-half text-primary-1"
                             aria-hidden="true"
                             ></i>
                         </span>
-                        <p class="col">
+                        <p className="col">
                             It was nice working with you, but you should work on
                             your appearance - it’s not professional
                         </p>
                         </li>
-                        <li class="list-group-item text-end mb-3 border-0">
+                        <li className="list-group-item text-end mb-3 border-0">
                         <Link to="#">More</Link>
                         </li>
                         <button
                         type="button"
-                        class="btn bg-primary-2 text-white"
+                        className="btn bg-primary-2 text-white"
                         onClick={handleShow}
                         >
                         <strong>Engage</strong>
@@ -361,9 +320,11 @@ const WorkOrderModal = () => {
   const {
     handleClose,
     show,
-    workOrder,
+    description,
     onChange,
-    taskLocation,
+    location,
+    loading,
+    pricing,
     submitRequest,
   } = useContext(WorkerContext);
   return (
@@ -372,143 +333,87 @@ const WorkOrderModal = () => {
         <Modal.Title>Work Order</Modal.Title>
         <button
           type="button"
-          class="btn-close"
+          className="btn-close"
           aria-label="Close"
           onClick={handleClose}
         ></button>
       </Modal.Header>
       <Modal.Body>
-        {/* <EngageUser /> */}
-        {/* <Fragment>             */}
-        <div class="mb-3">
-          <label for="workOder" class="form-label">
+        <div className="mb-3">
+          <label for="workOder" className="form-label">
             What I’m I doing for you?
           </label>
           <textarea
-            class="form-control"
+            className="form-control"
             id="workOder"
-            name="workOrder"
-            value={workOrder}
+            name="description"
+            value={description}
             onChange={onChange}
             rows="3"
           />
-          <ul class="card-text d-flex flex-wrap list-unstyled text-center">
+          <ul className="card-text d-flex flex-wrap list-unstyled text-center">
             <li
-              class="col mt-1 me-1 px-2 text-nowrap"
+              className="col mt-1 me-1 px-2 text-nowrap"
               style={{ "max-width": "fit-content" }}
             >
               Suggestion:
             </li>
             <li
-              class="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
+              className="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
               style={{ "max-width": "fit-content" }}
             >
               Dispatch Job
             </li>
             <li
-              class="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
+              className="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
               style={{ "max-width": "fit-content" }}
             >
               Errands Job
             </li>
             <li
-              class="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
+              className="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
               style={{ "max-width": "fit-content" }}
             >
               Delivery Job
             </li>
             <li
-              class="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
+              className="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
               style={{ "max-width": "fit-content" }}
             >
               Pick-up Job
             </li>
           </ul>
         </div>
-        <div class="mb-3">
-          <label for="taskLocation" class="form-label">
+        <div className="mb-3">
+          <label for="location" className="form-label">
             Where I’m I performing the job?
           </label>
           <input
             type="text"
-            class="form-control"
-            id="taskLocation"
-            name="taskLocation"
-            value={taskLocation}
+            className="form-control"
+            id="location"
+            name="location"
+            value={location}
             onChange={onChange}
             placeholder="Amarata"
           />
         </div>
-        <div class="mb-3">
-          <label class="d-block form-label">
-            How long do you want to engage me?
-          </label>
-          <div class="form-check form-check-inline">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="duration"
-              onChange={onChange}
-              id="fullDay"
-              value="Full Day"
-            />
-            <label class="form-check-label" for="fullDay">
-              Full Day
-            </label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="duration"
-              onChange={onChange}
-              id="asLongAsPossible"
-              value="As Long as possible"
-            />
-            <label class="form-check-label" for="asLongAsPossible">
-              As Long as possible
-            </label>
-          </div>
-        </div>
-        <div class="mb-3">
-          <label class="d-block form-label">
-            I'm currently completing a task! How long can you wait?
-          </label>
-          <div class="form-check form-check-inline">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="waitTime"
-              onChange={onChange}
-              id="30minutes"
-              value={Date.now() + 30 * 60 * 1000}
-            />
-            <label class="form-check-label" for="30minutes">
-              30 Minutes
-            </label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="waitTime"
-              onChange={onChange}
-              id="whenDone"
-              value={Date.now() + 24 * 60 * 60 * 1000}
-            />
-            <label class="form-check-label" for="whenDone">
-              Till you're done
-            </label>
-          </div>
-          {/* <p className="my-3">This worker is expected to arrive the job premises within 30 minutes from time of request. However, you can alter the timing to indicate the urgency of the job.</p> */}
+        <div className="mb-3 attention">
+          <h5>ATTENTION</h5>
+          <ul>
+            <li>{formatAmount(pricing.minRate)} is my minimum charge per job</li>
+            <li>I charge {formatAmount(pricing.dailyRate)} for full day jobs </li>
+            <li>Other payment arrangements are negotiable</li>
+          </ul>
+
         </div>
         {/* </Fragment> */}
       </Modal.Body>
       <Modal.Footer>
-        <button type="button" class="btn btn-secondary" onClick={handleClose}>
+        <button type="button" className="btn btn-secondary" onClick={handleClose}>
           Cancel
         </button>
-        <button type="button" class="btn bg-primary-1" onClick={submitRequest}>
+        <button type="button" className={`btn bg-primary-1 ${loading&&'loading'}`} onClick={submitRequest}>
           Send Request
         </button>
       </Modal.Footer>

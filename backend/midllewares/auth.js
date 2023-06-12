@@ -5,6 +5,7 @@ const user = require("../models/user");
 const artisan = require("../models/artisan");
 const ErrorHandler = require("../utils/errorHandler");
 const catchAsyncErrors = require("./catchAsyncErrors");
+const Worker = require("../models/worker");
 
 exports.isAuthenticatedUser = catchAsyncErrors( async (req, res, next)=>{
 
@@ -15,7 +16,10 @@ exports.isAuthenticatedUser = catchAsyncErrors( async (req, res, next)=>{
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await user.findById(decoded.id);
+    req.user = await user.findById(decoded.id)
+                .populate({path: 'contact.town', select: 'name lga state', populate:{path: 'lga state', select: 'name'}})
+                .populate('workers', 'category', Worker);
+    
 
     next();
 

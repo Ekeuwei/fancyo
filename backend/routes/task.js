@@ -6,11 +6,20 @@ const {
   myTasks,
   updateTask,
   myWorks,
+  newTaskRequest,
+  nearbyTasks,
+  requestApplication,
 } = require("../controllers/taskController");
 const { isAuthenticatedUser } = require("../midllewares/auth");
+const { classify, summarize } = require("../midllewares/chatgpt");
 
-router.route("/task/new").post(isAuthenticatedUser, newTask);
+router.route("/task/new").post(isAuthenticatedUser, classify, summarize, newTask);
+router.route("/task/request").post(isAuthenticatedUser, classify, summarize, newTaskRequest);
+router.route("/task/request/apply").put(isAuthenticatedUser, requestApplication);
 router.route("/tasks").get(isAuthenticatedUser, myTasks);
+router.route("/tasks/nearby")
+            .get(isAuthenticatedUser, nearbyTasks)
+            .post(isAuthenticatedUser, nearbyTasks);
 router.route("/works").get(isAuthenticatedUser, myWorks);
 router.route("/task/:id").put(isAuthenticatedUser, updateTask);
 

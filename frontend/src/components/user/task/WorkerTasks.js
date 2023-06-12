@@ -3,23 +3,20 @@ import { useAlert } from "react-alert";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearErrors,
-  myTasks,
-  updateTask,
+  myWorks,
   updateTaskProgress,
 } from "../../../actions/taskAction";
 import PropTypes from "prop-types";
-import { useHistory, useLocation } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { UPDATE_TASK_PROGRESS_RESET } from "../../../constants/taskConstants";
 
 const WorkerTask = () => {
   const alert = useAlert();
   const dispatch = useDispatch();
   const history = useHistory();
-  const location = useLocation();
 
-  const { tasks, loading } = useSelector((state) => state.myTasks);
+  const { works:tasks, loading } = useSelector((state) => state.myTasks);
   const { error, isUpdated } = useSelector((state) => state.singleTask);
-  const { user } = useSelector((state) => state.auth);
 
   const getColor = (status) => {
     if (status === "In Progress") return "text-primary-1";
@@ -30,16 +27,6 @@ const WorkerTask = () => {
   };
 
   const getButtonText = (status) => {
-    // switch (status) {
-    //   case 'Canceled': return 'Report';
-    //   case 'Pending': return 'Cancel';
-
-    //     break;
-
-    //   default:
-    //     break;
-    // }
-    // if (status === "In Progress") return "Review";
     if (status === "Canceled") return "Report";
     if (status === "Pending") return "Cancel";
     return "Approve";
@@ -77,8 +64,8 @@ const WorkerTask = () => {
       dispatch({ type: UPDATE_TASK_PROGRESS_RESET });
     }
 
-    dispatch(myTasks(location.pathname));
-  }, [alert, dispatch, location.pathname, isUpdated, error]);
+    dispatch(myWorks());
+  }, [alert, dispatch, isUpdated, error]);
 
   return (
     <Fragment>
@@ -97,6 +84,7 @@ const WorkerTask = () => {
               task={task}
               {...task.user} {...task.worker}
               {...task}
+              loading={loading}
               updateEscrow={updateEscrow}
               history={history}
               getColor={getColor}
@@ -115,13 +103,10 @@ const SingeTask = ({
   escrow,
   firstName, lastName, avatar,
   updateEscrow,
+  loading,
   getButtonText,
   getStatusUpdate
 }) => {
-  const message = {
-    taskId: _id,
-    status: getStatusUpdate(getButtonText(escrow.worker)),
-  };
 
   const displayStatus = "Accepted Declined Completed Abandoned".includes(escrow.worker) || escrow.user==="Cancelled";
   const displayActionBtn = "Pending Accepted".includes(escrow.worker) && escrow.user!=="Cancelled";
@@ -143,7 +128,7 @@ const SingeTask = ({
                 <small>{`${firstName} ${lastName}`}</small>
             </h5>
             <div className="ms-2">
-                <i class="fa fa-phone my-auto text-primary-1" aria-hidden="true"></i>
+                <i className="fa fa-phone my-auto text-primary-1" aria-hidden="true"></i>
             </div>
             <span className="ms-auto badge text-dark fst-italic my-auto fw-normal">5 mins ago</span>
         </div>
@@ -159,7 +144,7 @@ const SingeTask = ({
                     </em>
                     <i
                         className={`fa fa-circle ps-1 ${getColor(escrow.worker)}`}
-                        style={{ "font-size": "10px" }}
+                        style={{ fontSize: "10px" }}
                         aria-hidden="true"
                     ></i>
                 </p>}
@@ -167,14 +152,16 @@ const SingeTask = ({
             {displayActionBtn && 
             <div className="mt-1">
                 <button 
-                    type="button" 
-                    className={`btn btn-sm p-sm-2 px-sm-3 me-1 accept`} 
+                    type="button"
+                    disabled={loading}
+                    className={`btn btn-sm p-sm-2 px-sm-3 me-1 accept ${loading?'loading':''}`} 
                     onClick={()=>action(escrow.worker==='Pending'? 'Accepted':'Completed')}
                     > {escrow.worker==='Pending'? 'Accept':'Completed'}
                 </button>
                 <button 
-                    type="button" 
-                    className={`btn btn-sm p-sm-2 px-sm-3 me-1 decline`} 
+                    type="button"
+                    disabled={loading}
+                    className={`btn btn-sm p-sm-2 px-sm-3 me-1 decline ${loading?'loading':''}`} 
                     onClick={()=>action(escrow.worker==='Pending'? 'Declined':'Abandoned')}
                     > {escrow.worker==='Pending'? 'Decline':'Abandon'}
                 </button>

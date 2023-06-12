@@ -3,7 +3,7 @@ import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
 import MetaData from '../layout/MetaData';
 
-import { createWorker as create, clearErrors} from '../../actions/workerActions';
+import { createWorker as create, clearErrors, workerSetup} from '../../actions/workerActions';
 import { CREATE_WORKER_RESET } from '../../constants/workerConstants';
 
 const CreateWorker = ({ history }) => {
@@ -19,9 +19,9 @@ const CreateWorker = ({ history }) => {
     })
 
     const { error, loading, workerCreated } = useSelector(state => state.worker);
+    // const { categories, billingFormats } = useSelector(state => state.settings);
     const [avatar, setAvatar] = useState('');
     const [avatarPreview, setAvatarPreview] = useState('');
-
 
     useEffect(() => {
 
@@ -33,13 +33,21 @@ const CreateWorker = ({ history }) => {
         if(workerCreated){
             alert.success("REQUEST SUBMITTED")
             dispatch({type: CREATE_WORKER_RESET})
-            history.push('/')
+            history.goBack();
         }
 
     }, [dispatch, alert, error, workerCreated, history])
 
+    useEffect(()=>{
+        dispatch(workerSetup());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[])
+    
+
     const submitHandler = (e) => {
         e.preventDefault();
+
+        const category = categories.filter(el => el.key === worker.category);
 
         const formData = new FormData();
 
@@ -48,12 +56,19 @@ const CreateWorker = ({ history }) => {
         formData.set("billingFormat", worker.billingFormat)
         formData.set("billingAmount", worker.billingAmount)
         formData.set("serviceTags", worker.serviceTags)
-        formData.set("category", worker.category)
+        formData.set("category", JSON.stringify(category[0]))
 
         dispatch(create(formData))
     }
 
-    const categories = ["Make-up Artist", "Carpenter", "Electrician", "MC", "House Keeper", "Nanny"]
+    const categories = [
+        {key: 'makeup', name:"Make-up Artist"}, 
+        {key: "carpenter", name: "Carpenter"}, 
+        {key: "electrician", name: "Electrician"}, 
+        {key: "mc", name: "MC (Master of Ceremony)"}, 
+        {key: "housekeep", name: "House Keeper"},
+        {key: "nanny", name: "Nanny"}
+    ]
     const billingFormats = ["Hourly", "Daily", "Contract"]
 
     const onChange = e => {
@@ -102,21 +117,21 @@ const CreateWorker = ({ history }) => {
                                 />
                             </div>
                             <div class="mb-3">
-                                <label for="state" class="form-label">Category</label>
+                                <label for="category" class="form-label">Category</label>
                                 <select 
                                     class="form-select" 
-                                    aria-label="Select State" 
+                                    aria-label="Select category" 
                                     required
                                     name="category"
-                                    value={worker.state}
+                                    value={worker.category}
                                     onChange={onChange} >
                                     <option selected>select</option>
-                                    {categories.map(category => <option value={category}>{category}</option>)}
+                                    {categories.map(category => <option value={category.key}>{category.name}</option>)}
                                 </select>
                             </div>
                             <div class="mb-3">
                                 <span>
-                                    <label for="lastName" class="form-label">Amount</label>
+                                    <label for="lastName" class="form-label">Per Job Rate (least amount)</label>
                                     <input 
                                         name="billingAmount"
                                         type="billingAmount" 
@@ -143,7 +158,7 @@ const CreateWorker = ({ history }) => {
                                 </span>
                             </div>
                             <div class="mb-3 text-end">
-                                <button type="submit" class="btn bg-primary-1 px-3">Send</button>
+                                <button type="submit" class={`btn bg-primary-1 px-3 ${loading? 'loading':''}`}>Send</button>
                             </div>
                         </form>
                     </div>

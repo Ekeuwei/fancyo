@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { config } from 'dotenv'
 
 import {
     LOGIN_REQUEST,
@@ -52,9 +51,20 @@ import {
     CLEAR_ERRORS,
     SAVE_PERSONAL_INFO,
     SAVE_CONTACT_INFO,
-    CREATE_WORKER_FAIL,
-    CREATE_WORKER_REQUEST,
-    CREATE_WORKER_SUCCESS
+    WALLET_TOPUP_REQUEST,
+    WALLET_TOPUP_FAIL,
+    WALLET_BALANCE_FAIL,
+    WALLET_BALANCE_SUCCESS,
+    WALLET_BALANCE_REQUEST,
+    WALLET_TOPUP_SUCCESS,
+    WALLET_TOPUP_LINK,
+    WALLET_TOPUP_VERIFY,
+    CHANGE_USER_MODE_REQUEST,
+    CHANGE_USER_MODE_SUCCESS,
+    CHANGE_USER_MODE_FAIL,
+    WALLET_TRANSACTIONS_REQUEST,
+    WALLET_TRANSACTIONS_SUCCESS,
+    WALLET_TRANSACTIONS_FAIL
 } from '../constants/userConstants'
 
 // Login
@@ -243,12 +253,36 @@ export const loadUser = () => async (dispatch) =>{
     }
 }
 
+// Change user mode
+export const changeMode = () => async (dispatch) =>{
+    try {
+        dispatch({type: CHANGE_USER_MODE_REQUEST})
+
+        const { data } = await axios.get('/api/v1/me/changemode');
+        
+        window.location.reload();
+
+        dispatch({
+            type: CHANGE_USER_MODE_SUCCESS,
+            payload: data.user
+        })
+
+    } catch (error) {
+        dispatch({
+            type: CHANGE_USER_MODE_FAIL,
+            payload: error.response.data.message
+        })
+    }
+}
+
 // Logout User
 export const logout = () => async (dispatch) =>{
     try {
 
         await axios.get('/api/v1/logout')
 
+        localStorage.removeItem('userMode')
+        
         dispatch({
             type: LOGOUT_SUCCESS
         })
@@ -256,6 +290,89 @@ export const logout = () => async (dispatch) =>{
     } catch (error) {
         dispatch({
             type: LOGOUT_FAIL,
+            payload: error.response.data.message
+        })
+    }
+}
+
+export const accountTopupRequest = (amount) => async (dispatch) =>{
+    const config = {
+        headers: {'content-Type': 'application/json'}
+    }
+    try {
+
+        dispatch({ type: WALLET_TOPUP_REQUEST })
+        
+        const { data } = await axios.post('/api/v1/flwpayment/process', amount, config);
+
+        dispatch({
+            type: WALLET_TOPUP_LINK,
+            payload: data.data.link
+        })
+
+    } catch (error) {
+        dispatch({
+            type: WALLET_TOPUP_FAIL,
+            payload: error.response.data.message
+        })
+    }
+}
+
+export const verifyTopup = (query) => async (dispatch) =>{
+    const config = {
+        headers: {'content-Type': 'application/json'}
+    }
+    try {
+
+        dispatch({ type: WALLET_TOPUP_VERIFY })
+        
+        const { data } = await axios.get(`/api/v1/flwpayment/callback${query}`, config);
+
+        dispatch({
+            type: WALLET_TOPUP_SUCCESS,
+            payload: data.topup
+        })
+
+    } catch (error) {
+        dispatch({
+            type: WALLET_TOPUP_FAIL,
+            payload: error.response.data.message
+        })
+    }
+}
+
+export const getWallet = () => async (dispatch) =>{
+    try {
+
+        dispatch({type: WALLET_BALANCE_REQUEST})
+
+        const { data } = await axios.get('/api/v1/wallet')
+        
+        dispatch({
+            type: WALLET_BALANCE_SUCCESS,
+            payload: data.balance
+        })
+    } catch (error) {
+        dispatch({
+            type: WALLET_BALANCE_FAIL,
+            payload: error.response.data.message
+        })
+    }
+}
+
+export const walletTransactions = (date={from:'', to:''})=> async(dispatch)=>{
+    try {
+        dispatch({type: WALLET_TRANSACTIONS_REQUEST})
+
+        const { data } = await axios.get(`/api/v1/wallet/transactions?from=${date.from}&to${date.to}`);
+
+        dispatch({
+            type: WALLET_TRANSACTIONS_SUCCESS,
+            payload: data.transactions
+        })
+    } catch (error) {
+        dispatch({
+            type: WALLET_TRANSACTIONS_FAIL,
             payload: error.response.data.message
         })
     }

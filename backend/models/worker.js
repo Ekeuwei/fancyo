@@ -20,7 +20,7 @@ const workerSchema = new mongoose.Schema({
       // required: true
     },
   },
-  bio: {
+  description: {
     type: String,
   },
   avgResponseTime: {
@@ -33,22 +33,31 @@ const workerSchema = new mongoose.Schema({
   },
   availability: {
     type: String,
+    enum: ["Available", "Unavailable"],
     default: "Available",
   },
   pricing: {
-    amount: {
+    minRate: {
         type: Number,
-        default: 500
+        min: [1000, 'The minimum rate should be at least ₦1,000']
     },
-    billingCycle:{
-        type: String,
-        default: "Hourly"
+    dailyRate:{
+        type: Number,
+        required: true
     }
   },
-  serviceTags: [],
+  localities: [{
+    type: String
+  }],
   category: {
-    type: String,
-    required: true
+    name:{
+      type: String,
+      required: true
+    },
+    key:{
+      type: String,
+      required: true
+    }
   },
   myTasks: [
     {
@@ -59,33 +68,18 @@ const workerSchema = new mongoose.Schema({
       },
     },
   ],
-  reviews: [
-    {
-      user: {
-        type: mongoose.Schema.ObjectId,
-        ref: "User",
-        required: true,
-      },
-      name: {
-        type: String,
-        required: true,
-      },
-      rating: {
-        type: Number,
-        required: true,
-      },
-      comment: {
-        type: String,
-        required: true,
-      },
-    },
-  ],
+  numOfReviews: {
+    type: Number,
+    default: 0
+  },
+  ratings:{
+    type: Number,
+    default: 0
+  },
   createdAt: {
     type: Date,
     default: Date.now,
-  },
-  resetPasswordToken: String,
-  resetPasswordExpires: Date,
+  }
 });
 
 
