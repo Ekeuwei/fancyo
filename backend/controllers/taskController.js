@@ -21,6 +21,13 @@ exports.newTask = catchAsyncErrors(async (req, res, next) => {
   if(task && task.workers.length > 0){
     //Send a WhatsApp notification to the worker, where he can accept or reject the request
 
+    // create a whatsapp chat identifier
+    /* 
+    {
+      taskId, workerId, waId
+    }
+    */
+
     const message = {
       "type": "interactive",
       "interactive": {
