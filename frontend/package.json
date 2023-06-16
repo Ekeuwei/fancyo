@@ -53,5 +53,6 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://127.0.0.1:8080"
+  "proxy_": "http://127.0.0.1:4000",
+  "proxy": "https://coral-thankful-moonstone.glitch.me"
 }

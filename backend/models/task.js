@@ -15,7 +15,6 @@ const taskSchema = mongoose.Schema({
         },
         town: {
             type: String,
-            required: true
         }
     },
     description: {

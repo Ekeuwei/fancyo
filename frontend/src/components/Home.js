@@ -5,7 +5,6 @@ import 'rc-slider/assets/index.css'; // Import the default design of the slider
 import MetaData from './layout/MetaData'
 
 import { useDispatch, useSelector } from 'react-redux'
-import Loader from './layout/Loader'
 import { useAlert } from 'react-alert'
 import SearchComponent from './SearchComponent';
 import Search from './layout/Search';
@@ -57,7 +56,7 @@ const Home = ({ match }) => {
 
     return (
         <Fragment>
-            {loading? <Loader /> : (            
+            {!loading&& (            
                 <Fragment>        
                     <MetaData title= {'Getting Things Done with Good Help'} />
                     {keyword? <SearchComponent keyword = {keyword} workers = {workers} count = {count}/> : (

@@ -11,7 +11,8 @@ const NearbyJobsLayout = () => {
     const history = useHistory();
 
     const { nearbyTasks } = useSelector(state => state.myTasks);
-    const { user } = useSelector(state => state.auth)
+    // const { user } = useSelector(state => state.auth)
+    const user = JSON.parse(localStorage.getItem('user'))
 
     useEffect(()=>{
         if(user.contact !== undefined){
@@ -21,7 +22,7 @@ const NearbyJobsLayout = () => {
                 }
             }))
         }
-    }, [dispatch, user?.contact])
+    }, [])
 
     return (
         <>

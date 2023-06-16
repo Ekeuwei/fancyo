@@ -14,7 +14,66 @@ const FuzzySearch = require("../utils/FuzzySearch");
 exports.newTask = catchAsyncErrors(async (req, res, next) => {
   req.body.user = req.user.id
   req.body.workers = req.body.worker? [{worker: req.body.worker}]:[]
-  await Task.create(req.body);
+
+  const task = await Task.create(req.body);
+
+
+  if(task && task.workers.length > 0){
+    //Send a WhatsApp notification to the worker, where he can accept or reject the request
+
+    const message = {
+      "type": "interactive",
+      "interactive": {
+          "type": "list",
+          "header": {
+          "type": "text",
+          "text": "HEADER_TEXT"
+          },
+          "body": {
+          "text": "BODY_TEXT"
+          },
+          "footer": {
+          "text": "FOOTER_TEXT"
+          },
+          "action": {
+          "button": "BUTTON_TEXT",
+          "sections": [
+              {
+              "title": "SECTION_1_TITLE",
+              "rows": [
+                  {
+                  "id": "SECTION_1_ROW_1_ID",
+                  "title": "SECTION_1_ROW_1_TITLE",
+                  "description": "SECTION_1_ROW_1_DESCRIPTION"
+                  },
+                  {
+                  "id": "SECTION_1_ROW_2_ID",
+                  "title": "SECTION_1_ROW_2_TITLE",
+                  "description": "SECTION_1_ROW_2_DESCRIPTION"
+                  }
+              ]
+              },
+              {
+              "title": "SECTION_2_TITLE",
+              "rows": [
+                  {
+                  "id": "SECTION_2_ROW_1_ID",
+                  "title": "SECTION_2_ROW_1_TITLE",
+                  "description": "SECTION_2_ROW_1_DESCRIPTION"
+                  },
+                  {
+                  "id": "SECTION_2_ROW_2_ID",
+                  "title": "SECTION_2_ROW_2_TITLE",
+                  "description": "SECTION_2_ROW_2_DESCRIPTION"
+                  }
+              ]
+              }
+          ]
+          }
+      }
+    }
+
+  }
 
   res.status(201).json({
     success: true,

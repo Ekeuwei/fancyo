@@ -11,6 +11,8 @@ import { newTask } from "../../actions/taskAction";
 import { NEW_TASK_RESET } from "../../constants/taskConstants";
 import dateFormat from "dateformat";
 import { formatAmount } from "../Utils";
+import SearchDropdown from "../layout/SearchDropdown";
+import { getTowns } from "../../actions/prefsAction";
 
 const WorkerContext = createContext();
 
@@ -42,34 +44,38 @@ const WorkerDetails = ({ match, history }) => {
     if (success) {
       alert.success("Request sent successfully");
       handleClose();
-      setJobOrder({description: "", location: ""})
       dispatch({ type: NEW_TASK_RESET });
     }
 
     dispatch(getWorkerDetails(match.params.id));
   }, [dispatch, alert, error, success, requestError, history, match.params.id]);
 
+  const { towns } = useSelector(state => state.prefs);
     
-    const [jobOrder, setJobOrder] = useState({
-        description: "",
-        location: ""
-    });
-    
-    const { description, location } = jobOrder;
-    
-    const onChange = (e) =>
-    setJobOrder(prevJobOrders => ({...prevJobOrders, [e.target.name]: e.target.value }));
-    
+  const user = JSON.parse(localStorage.getItem('user'));
+  const [description, setDescription] = useState("");
+  const [location, setLocation] = useState({
+    state:user.contact.town.state, 
+    lga:user.contact.town.lga, 
+    town:user.contact.town});
+
    
-    const submitRequest = () => {
-      const formData = new FormData();
-      formData.set("description", description);
-      formData.set("location", location);
-      formData.set("worker", worker._id);
-  
-      dispatch(newTask(formData));
-  
-    };
+  useEffect(()=>dispatch(getTowns(location.lga)), [dispatch, location.lga])
+
+  const submitRequest = () => {
+    const data = {
+      location: {
+        state:location.state._id, 
+        lga:location.lga._id, 
+        town:location.town.name
+      },
+      description,
+      worker: worker._id
+    }
+
+    dispatch(newTask(data));
+
+  };
   
   return (
     <WorkerContext.Provider
@@ -78,8 +84,10 @@ const WorkerDetails = ({ match, history }) => {
         show,
         pricing:worker?.pricing,
         description,
-        onChange,
+        setDescription,
         location,
+        towns,
+        setLocation,
         submitRequest,
         loading: loadingReq
       }}
@@ -103,7 +111,6 @@ const WorkerDetails = ({ match, history }) => {
                     <img 
                         src={worker.owner.avatar.url}
                         name="avatar"
-                        onChange={onChange}
                         alt={`${worker.displayName}_Photo`}
                       />
                 </div>
@@ -125,7 +132,7 @@ const WorkerDetails = ({ match, history }) => {
                             className="fa fa-map-marker me-2 my-auto"
                             aria-hidden="true"
                         ></i>
-                        <p className="card-text col mb-0">{`${worker.owner.contact.address}, ${worker.owner.contact.town.name}, ${worker.owner.contact.town.lga.name}`}</p>
+                        <p className="card-text col mb-0">{`${worker.owner?.contact?.address}, ${worker.owner?.contact?.town?.name}, ${worker.owner?.contact?.town?.lga?.name}`}</p>
                         </div>
 
                         <div className="d-flex mb-2">
@@ -147,26 +154,6 @@ const WorkerDetails = ({ match, history }) => {
                         </span>
                     </div>
                     </div>
-
-                    {/* {worker.description&& <div className="card-body">
-                      <h5 className="card-text">Brief Intro</h5>
-                      <p className="card-text">{worker.description}
-                      </p>
-                    </div>}
-
-                    <div className="card-body">
-                      <h5 className="card-text">My Services</h5>
-                      <ul className="card-text d-flex flex-wrap list-unstyled text-center">
-                        {worker.serviceTags?.length > 0 && (
-                          worker.serviceTags.map(service =>(
-                            <li
-                            className="badge rounded-pill col mt-1 me-1 py-2 px-3 text-nowrap" 
-                            style={{ maxWidth: "fit-content", backgroundColor: randomDarkColor() }}
-                            > {service} </li>
-                          ))
-                        )}
-                      </ul>
-                    </div> */}
                 </div>
 
                 <div className="col-12 col-md-5">
@@ -321,12 +308,17 @@ const WorkOrderModal = () => {
     handleClose,
     show,
     description,
-    onChange,
+    setDescription,
     location,
+    setLocation,
+    towns,
     loading,
     pricing,
     submitRequest,
   } = useContext(WorkerContext);
+  
+  const onChange = (value, name) => setLocation(prev => ({...prev, [name]:value}))
+
   return (
     <Modal show={show} onHide={handleClose} backdrop="static" keyboard={false}>
       <Modal.Header>
@@ -340,7 +332,7 @@ const WorkOrderModal = () => {
       </Modal.Header>
       <Modal.Body>
         <div className="mb-3">
-          <label for="workOder" className="form-label">
+          <label htmlFor="workOder" className="form-label">
             What I’m I doing for you?
           </label>
           <textarea
@@ -348,55 +340,57 @@ const WorkOrderModal = () => {
             id="workOder"
             name="description"
             value={description}
-            onChange={onChange}
+            onChange={e => setDescription(e.target.value)}
             rows="3"
           />
           <ul className="card-text d-flex flex-wrap list-unstyled text-center">
             <li
               className="col mt-1 me-1 px-2 text-nowrap"
-              style={{ "max-width": "fit-content" }}
+              style={{ maxWidth: "fit-content" }}
             >
               Suggestion:
             </li>
             <li
               className="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
-              style={{ "max-width": "fit-content" }}
+              style={{ maxWidth: "fit-content" }}
             >
               Dispatch Job
             </li>
             <li
               className="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
-              style={{ "max-width": "fit-content" }}
+              style={{ maxWidth: "fit-content" }}
             >
               Errands Job
             </li>
             <li
               className="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
-              style={{ "max-width": "fit-content" }}
+              style={{ maxWidth: "fit-content" }}
             >
               Delivery Job
             </li>
             <li
               className="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
-              style={{ "max-width": "fit-content" }}
+              style={{ maxWidth: "fit-content" }}
             >
               Pick-up Job
             </li>
           </ul>
         </div>
         <div className="mb-3">
-          <label for="location" className="form-label">
+          <label htmlFor="location" className="form-label">
             Where I’m I performing the job?
           </label>
-          <input
-            type="text"
-            className="form-control"
-            id="location"
-            name="location"
-            value={location}
-            onChange={onChange}
-            placeholder="Amarata"
-          />
+          <div className="input">
+            <SearchDropdown 
+              suggestions={towns}
+              itemSelected={onChange}
+              value={location.town}
+              name={'town'}
+              placeholder={'Location'}
+              onChange={onChange}
+            />
+            <span className="text-secondary">{` | ${location?.lga?.name}, ${location?.state?.name} State.`}</span>
+          </div>
         </div>
         <div className="mb-3 attention">
           <h5>ATTENTION</h5>

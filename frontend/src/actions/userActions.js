@@ -78,6 +78,8 @@ export const login = (email, password) => async (dispatch) =>{
 
         const { data } = await axios.post('/api/v1/login', {email, password}, config)
 
+        localStorage.setItem('user', JSON.stringify(data.user))
+
         dispatch({
             type: LOGIN_SUCCESS,
             payload: data.user
@@ -239,6 +241,8 @@ export const loadUser = () => async (dispatch) =>{
         dispatch({ type: LOAD_USER_REQUEST})
 
         const { data } = await axios.get('/api/v1/me')
+        
+        localStorage.setItem('user', JSON.stringify(data.user))
 
         dispatch({
             type: LOAD_USER_SUCCESS,
@@ -282,6 +286,7 @@ export const logout = () => async (dispatch) =>{
         await axios.get('/api/v1/logout')
 
         localStorage.removeItem('userMode')
+        localStorage.removeItem('user')
         
         dispatch({
             type: LOGOUT_SUCCESS

@@ -3,6 +3,7 @@ import { Tabs } from './AccountProfile'
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min'
 import { useDispatch, useSelector } from 'react-redux';
 import { loadUserWorkers } from '../../actions/workerActions';
+import Loader from '../layout/Loader';
 
 const AccountWorker = () => {
   const dispatch = useDispatch();
@@ -22,7 +23,7 @@ const AccountWorker = () => {
             </div>
         </div>
         <Tabs history={history} />
-        {!loading&& <div className="">
+        {loading? <Loader /> : <>
           {workers.length ===0 ? <div className="no-work-profile">
             <p>{`${error || 'You have no work profile'}`}</p>
             <button className='btn btn-secondary' onClick={()=>history.push('/account/worker/create')} >
@@ -35,7 +36,7 @@ const AccountWorker = () => {
               <i className="fa fa-plus me-1" aria-hidden="true"></i>
               Add another profile</button>
           </div>}
-        </div>}
+        </>}
     </Fragment>
   )
 }

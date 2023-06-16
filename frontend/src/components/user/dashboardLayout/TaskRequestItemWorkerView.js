@@ -33,7 +33,7 @@ const TaskRequestItemWorkerView = ({task, userMode, tabDirection})=>{
                         {pendingConfirmation?"Pending confirmation":view.txt}</h6></em>):
                 <h5>
                     <i className="fa fa-map-marker me-1 text-danger" aria-hidden="true"></i>
-                    {task.location.town}
+                    {task.location?.town}
                 </h5>}
                 <div className={`jobrequest--action ${taskConcluded? 'd-none':''}`}>
                     <UpdateButton updateDetails={{...details, status:view.action.confirm}} view={{ txt:view.txt.confirm, btn:view.btn }} commission={commission} userMode={userMode} tabDirection={tabDirection} />

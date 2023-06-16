@@ -58,11 +58,11 @@ exports.classify = catchAsyncErrors(async(req, res, next)=>{
 })
 
 exports.summarize = catchAsyncErrors(async(req, res, next)=>{
-    const isRequest = req.body.numberOfWorkers !== undefined;
+    const isDircectRequest = req.body.worker;
     const request = `The intention of the user is to find someone to perform 
                         a certain task, summarize what the user wants to get done. 
                         Your response should be as though its from the user and 
-                        should prompt an action[${isRequest?'apply':'respond'}]. 
+                        should prompt an action[${isDircectRequest?'show of interest or availability':'apply'}]. 
                         Limit your response to 15 words`
        
     try {
