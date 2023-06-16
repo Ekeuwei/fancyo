@@ -2,6 +2,8 @@ const express = require('express');
 
 const app = express();
 
+const cors = require('cors')
+
 const cookieParser = require('cookie-parser')
 const bodyparser = require('body-parser')
 const fileUpload = require('express-fileupload')
@@ -9,6 +11,9 @@ const fileUpload = require('express-fileupload')
 const path = require('path')
 
 const errorMiddleware = require('./midllewares/errors');
+
+// Enable CORS using the cors middleware
+app.use(cors())
 
 // Setting up config file
 // dotenv.config({ path: 'backend/config/config.env' });

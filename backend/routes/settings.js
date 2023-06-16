@@ -1,7 +1,16 @@
 const express = require('express');
 const router = express.Router();
 
-const { getSettings, createSettings, updateSettings, getStates, getLgas, getTowns, getCategories } = require('../controllers/settingsController');
+const { 
+    getSettings, 
+    createSettings, 
+    updateSettings, 
+    getStates, 
+    getLgas, 
+    getTowns, 
+    getCategories 
+} = require('../controllers/settingsController');
+
 const { isAuthenticatedUser, authorizeRoles } = require('../midllewares/auth');
 
 router.route('/settings').get(getSettings);
