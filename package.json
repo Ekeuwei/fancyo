@@ -1,5 +1,5 @@
 {
-  "name": "Ebiwani",
+  "name": "ebiwani",
   "version": "1.0.0",
   "description": "Ebiwani - A Work Management App",
   "main": "server.js",
@@ -24,6 +24,7 @@
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
+    "eslint": "^7.11.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
     "flutterwave-node-v3": "^1.1.5",

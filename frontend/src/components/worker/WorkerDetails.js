@@ -55,9 +55,9 @@ const WorkerDetails = ({ match, history }) => {
   const user = JSON.parse(localStorage.getItem('user'));
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState({
-    state:user.contact.town.state, 
-    lga:user.contact.town.lga, 
-    town:user.contact.town});
+    state:user.contact?.town?.state, 
+    lga:user.contact?.town?.lga, 
+    town:user.contact?.town});
 
    
   useEffect(()=>dispatch(getTowns(location.lga)), [dispatch, location.lga])

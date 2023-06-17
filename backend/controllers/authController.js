@@ -46,7 +46,11 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
         })
 
         user.walletId = wallet._id;
-        await user.save();
+
+        user = (await user.save())
+                .populate({path: 'contact.town', select: 'name lga state', populate:{path: 'lga state', select: 'name'}})
+                .populate('workers', 'category', Worker);
+
     } catch (error) {
         await cloudinary.v2.uploader.destroy(result.public_id); // Delete uploaded image
         next(new ErrorHandler(error.message, 500));
@@ -66,7 +70,10 @@ exports.loginUser = catchAsyncErrors( async (req, res, next)=>{
     }
 
     // Finding user in database
-    const user = await User.findOne({ email }).populate('workers', 'category', Worker).select('+password');
+    const user = await User.findOne({ email })
+                .populate({path: 'contact.town', select: 'name lga state', populate:{path: 'lga state', select: 'name'}})
+                .populate('workers', 'category', Worker)
+                .select('+password');
 
     if(!user){
         return next(new ErrorHandler('Invalid Email or Password', 401))
