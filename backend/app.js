@@ -35,6 +35,7 @@ const auth = require('./routes/auth');
 const payment = require('./routes/payment');
 const order = require('./routes/order');
 const worker = require('./routes/worker')
+const webhooks = require('./routes/webhooks')
 
 app.use('/api/v1', settings);
 app.use('/api/v1', products);
@@ -44,6 +45,7 @@ app.use('/api/v1', auth);
 app.use('/api/v1', payment)
 app.use('/api/v1', order)
 app.use('/api/v1', worker)
+app.use('/api/v1', webhooks)
 
 if(process.env.NODE_ENV === 'PRODUCTION'){
     app.use(express.static(path.join(__dirname, '../frontend/build')))
