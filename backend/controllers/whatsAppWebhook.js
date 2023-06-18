@@ -4,6 +4,7 @@ const WhatsAppTempId = require("../models/whatAppTempId");
 const { debitWallet } = require("./paymentController");
 const token = process.env.WHATSAPP_TOKEN;
 // Accepts POST requests at /webhook endpoint
+
 exports.whatsApp = catchAsyncErrors(async (req, res, next)=>{
 
     // Parse the request body from the POST
@@ -27,7 +28,7 @@ exports.whatsApp = catchAsyncErrors(async (req, res, next)=>{
       
       // Check if it is an interactive button reply
       const { type, interactive } = req.body.entry[0].changes[0].value.messages[0];
-      if(interactive?.type === 'button_reply'){
+      if(interactive?.type === 'button_reply_del'){
         const { id, title } = interactive.button_reply;
         // Get the whatsApp task
         const whatsAppTempId = await WhatsAppTempId.findById(id.split('+')[0])
@@ -81,7 +82,6 @@ exports.whatsApp = catchAsyncErrors(async (req, res, next)=>{
   
 
       }
-
 
 
 
