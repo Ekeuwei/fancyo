@@ -3,8 +3,9 @@ import { Route, useHistory } from "react-router-dom";
 import Search from "./layout/Search";
 import SearchItem from "./SearchItem";
 import WorkRequestModal from "./modal/WorkRequestModel";
+import Loader from "./layout/Loader";
 
-const SearchComponent = ({ keyword, workers, count }) => {
+const SearchComponent = ({ keyword, workers, count, loading }) => {
   const history = useHistory();
   const viewArtisan = (e) => {
     const uid = e.currentTarget.getAttribute("uid");
@@ -16,9 +17,6 @@ const SearchComponent = ({ keyword, workers, count }) => {
   return (
     <Fragment>
       <div className="container">
-        <div className="m-3 text-center">
-          <h4>Electrician</h4>
-        </div>
         <div className="m-3">
           <Route render={({ history }) => <Search history={history} />} />
           <div className="d-flex">
@@ -32,14 +30,18 @@ const SearchComponent = ({ keyword, workers, count }) => {
               create work request</button>
           </div>
         </div>
-        <h5 className="py-3">{`${count} worker${count>1?"s":""} found near you`}</h5>
         
-        <div className="row gx-3">
-          {workers &&
-            workers.map((worker) => (
-              <SearchItem worker={worker} viewArtisan={viewArtisan} key={worker._id} />
-            ))}
-        </div>
+        {loading? <Loader /> : <Fragment>
+          <h5 className="py-3">{`${count===0?'No':count} worker${count>1?"s":""} found near you`}</h5>
+          
+          <div className="row gx-3">
+            {workers &&
+              workers.map((worker) => (
+                <SearchItem worker={worker} viewArtisan={viewArtisan} key={worker._id} />
+              ))}
+          </div>
+        
+        </Fragment>}
       </div>
       <WorkRequestModal show={show} handleClose={hideWorkRequestModal}/>
     </Fragment>

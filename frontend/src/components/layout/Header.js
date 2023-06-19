@@ -1,9 +1,9 @@
-import React, { Fragment, useEffect } from 'react'
+import React, { Fragment } from 'react'
 import { Link } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useAlert } from 'react-alert'
 
-import { changeMode, clearErrors, logout } from '../../actions/userActions'
+import { changeMode, logout } from '../../actions/userActions'
 
 import '../../App.css'
 
@@ -13,7 +13,7 @@ const Header = () => {
     const alert = useAlert()
     const dispatch = useDispatch()
 
-    const { isAuthenticated, user, loading, error } = useSelector(state => state.auth)
+    const user = JSON.parse(localStorage.getItem('user'));
 
     const logoutHandler = ()=>{
         dispatch(logout());
@@ -22,26 +22,19 @@ const Header = () => {
     const switchMode = ()=> dispatch(changeMode());
     const userMode = JSON.parse(localStorage.getItem('userMode'));
 
-    useEffect(()=>{
-        if(error){
-            alert.error(error)
-            dispatch(clearErrors())
-        }
-    },[error, dispatch, alert])
-
     return (
         <Fragment>
             <nav className="navbar navbar-expand-lg navbar-light bg-primary-1 sticky-top">
-                <div className={`container-fluid ${loading&& 'loading'}`}>
+                <div className={`container-fluid`}>
                     <button className="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                         <i className="text-white fa fa-bars" aria-hidden="true"></i>
                     </button>
                     <Link to={'/'} className="text-white navbar-brand flex-md-grow-0 flex-grow-1 ps-2" >Ebiwani</Link>
                     <div className="order-1 ms-auto">
-                        {isAuthenticated ? <NavLinks {...user} logoutHandler={logoutHandler} switchMode={switchMode} userMode={userMode}/>:
+                        {user?.role? <NavLinks {...user} logoutHandler={logoutHandler} switchMode={switchMode} userMode={userMode}/>:
                                 (<Fragment>
-                                    <Link className="navbar-brand fs-6 text-white" to='/login'>{!loading&& 'Login'}</Link>
-                                    <Link className="navbar-brand fs-6 text-white" to='/register'>{!loading&& 'Register'}</Link>
+                                    <Link className="navbar-brand fs-6 text-white" to='/login'>Login</Link>
+                                    <Link className="navbar-brand fs-6 text-white" to='/register'>Register</Link>
                                 </Fragment>)
                         }
                         {/* <img src="./frontend/img/avatar.png" alt=""> */}

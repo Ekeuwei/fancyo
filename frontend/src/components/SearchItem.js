@@ -51,7 +51,7 @@ const SearchItem = ({worker, viewArtisan})=> {
               ></i>
             </span>
           </p>
-          <p className="mb-1">{`Location: ${worker.owner.contact.city}`}</p>
+          <p className="mb-1">{`Location: ${worker.owner.contact?.town?.name}`}</p>
           <p>Experience: 20yrs+</p>
         </div>
       </div>

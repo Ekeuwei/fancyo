@@ -99,7 +99,15 @@ exports.getWorkers = catchAsyncErrors(async (req, res, next) => {
  
 
 
-  const documents = await Worker.find().populate('owner', 'firstName lastName avatar contact', User).lean();
+  const documents = await Worker.find()
+                    .populate({
+                      path: 'owner',
+                      select: 'firstName lastName avatar',
+                      populate: {
+                        path: 'contact.town', select: 'name'
+                      }
+                    }).lean()
+                    
   const fuzzySearch = new FuzzySearch(documents, req.query, searchFields)
                     .search()
                     .pagination(resPerPage);

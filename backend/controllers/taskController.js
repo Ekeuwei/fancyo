@@ -1,3 +1,4 @@
+const got = require("got");
 const Task = require("../models/task");
 const Town = require("../models/address/town");
 const User = require("../models/user");
@@ -9,6 +10,7 @@ const Worker = require("../models/worker");
 const { debitWallet } = require("./paymentController");
 const Review = require("../models/review");
 const FuzzySearch = require("../utils/FuzzySearch");
+const WhatAppTempId = require("../models/whatAppTempId");
 
 //Create new task => /api/v1/task/new
 exports.newTask = catchAsyncErrors(async (req, res, next) => {
@@ -22,62 +24,67 @@ exports.newTask = catchAsyncErrors(async (req, res, next) => {
     //Send a WhatsApp notification to the worker, where he can accept or reject the request
 
     // create a whatsapp chat identifier
-    /* 
-    {
-      taskId, workerId, waId
-    }
-    */
+    const worker = await Worker.findById(req.body.worker).populate({path:'owner', select:'phoneNumber'});
+    
+    const waId = `234${worker.owner.phoneNumber.slice(-10)}`
 
+    const whatsAppTempId = await WhatAppTempId.create({
+      taskId:task._id, workerId:req.body.worker, waId
+    })
+    
     const message = {
+      "messaging_product": "whatsapp",
+      "recipient_type": "individual",
+      "to": `${whatsAppTempId.waId}`,
       "type": "interactive",
       "interactive": {
-          "type": "list",
+          "type": "button",
           "header": {
-          "type": "text",
-          "text": "HEADER_TEXT"
+              "type": "text",
+              "text": "TASK ALERT!!!"
           },
           "body": {
-          "text": "BODY_TEXT"
+              "text": `${task.summary}. \n\nNOTE: to accept this task, your account will be debited ₦100 service fee.\n`
           },
           "footer": {
-          "text": "FOOTER_TEXT"
+              "text": `Location: ${task.location.town}`
           },
           "action": {
-          "button": "BUTTON_TEXT",
-          "sections": [
-              {
-              "title": "SECTION_1_TITLE",
-              "rows": [
+              "buttons": [
                   {
-                  "id": "SECTION_1_ROW_1_ID",
-                  "title": "SECTION_1_ROW_1_TITLE",
-                  "description": "SECTION_1_ROW_1_DESCRIPTION"
+                      "type": "reply",
+                      "reply": {
+                          "id": `${whatsAppTempId._id}+1`,
+                          "title": "Yes"
+                      }
                   },
                   {
-                  "id": "SECTION_1_ROW_2_ID",
-                  "title": "SECTION_1_ROW_2_TITLE",
-                  "description": "SECTION_1_ROW_2_DESCRIPTION"
+                      "type": "reply",
+                      "reply": {
+                          "id": `${whatsAppTempId._id}+2`,
+                          "title": "No"
+                      }
                   }
               ]
-              },
-              {
-              "title": "SECTION_2_TITLE",
-              "rows": [
-                  {
-                  "id": "SECTION_2_ROW_1_ID",
-                  "title": "SECTION_2_ROW_1_TITLE",
-                  "description": "SECTION_2_ROW_1_DESCRIPTION"
-                  },
-                  {
-                  "id": "SECTION_2_ROW_2_ID",
-                  "title": "SECTION_2_ROW_2_TITLE",
-                  "description": "SECTION_2_ROW_2_DESCRIPTION"
-                  }
-              ]
-              }
-          ]
           }
       }
+    }
+
+    const options = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.WHATSAPP_TOKEN}`
+      },
+      json: message,
+      responseType: 'json'
+    };
+
+    try {
+      const phoneNumberId = '114237478363942';
+      await got.post(`https://graph.facebook.com/v12.0/${phoneNumberId}/messages`, options)
+      
+    } catch (error) {
+      console.error(error.message)
     }
 
   }

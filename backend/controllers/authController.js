@@ -47,9 +47,7 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
 
         user.walletId = wallet._id;
 
-        user = (await user.save())
-                .populate({path: 'contact.town', select: 'name lga state', populate:{path: 'lga state', select: 'name'}})
-                .populate('workers', 'category', Worker);
+        user = await user.save();
 
     } catch (error) {
         await cloudinary.v2.uploader.destroy(result.public_id); // Delete uploaded image

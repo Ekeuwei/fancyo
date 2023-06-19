@@ -18,8 +18,17 @@ exports.isAuthenticatedUser = catchAsyncErrors( async (req, res, next)=>{
     req.user = await User.findById(decoded.id)
                 .populate({path: 'contact.town', select: 'name lga state', populate:{path: 'lga state', select: 'name'}})
                 .populate('workers', 'category', Worker);
-    
 
+    if(!req.user){
+        
+        res.cookie('token', null, {
+            expires: new Date(Date.now()),
+            httpOnly: true
+        })
+
+        return next(new ErrorHandler('Login first to access the resource', 401));
+    }
+    
     next();
 
 });

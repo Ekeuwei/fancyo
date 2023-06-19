@@ -2,7 +2,7 @@ import React from 'react'
 
 const Loader = () => {
     return (
-        <div className="loading" style={{height: "100%"}}></div>
+        <div className="loading" style={{minHeight: "6.125rem"}}></div>
     )
 }
 

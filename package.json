@@ -18,6 +18,7 @@
   "author": "Alfred Ekeuwei",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.4",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cloudinary": "^1.27.0",
