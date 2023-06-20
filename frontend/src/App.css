@@ -668,7 +668,7 @@ input[type="password"]:focus{
   height: 100%;
   border-left: var(--primary02) 3px solid;
 }
-.timeline-list :last-child::after{
+.timeline-list .timeline-item:last-child::after{
   display: none;
 }
 .timeline-bullet::before {
@@ -985,6 +985,7 @@ input[type="password"]:focus{
 /* Spinner */
 .loading {
   position: relative;
+  width: fit-content;
   color: transparent !important;
 }
 .loading::after{

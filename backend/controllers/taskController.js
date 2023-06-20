@@ -249,7 +249,7 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
 
   }
 
-  // await task.save();
+  await task.save();
 
   res.status(200).json({
     success: true,
