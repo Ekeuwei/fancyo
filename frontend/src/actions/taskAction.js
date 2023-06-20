@@ -43,6 +43,7 @@ import {
 
 // Get currently logged user tasks
 export const myTasks = (keyword) => async (dispatch) => {
+  keyword = keyword==='pending'? `${keyword}_request`:keyword
   try {
     dispatch({ type: MY_TASKS_REQUEST });
 

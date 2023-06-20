@@ -5,7 +5,7 @@ class APIFeatures {
         this.searchFields = searchFields;
     }
 
-    search(){
+    search_(){
         const keywordSingleField = this.queryStr.keyword? {
             firstName: {
                 $regex: this.queryStr.keyword, 
@@ -29,6 +29,25 @@ class APIFeatures {
         
         return this;
     }
+
+    search() {
+        const keywords = this.queryStr.keyword ? this.queryStr.keyword.split("_") : [];
+        
+        const keywordFields = keywords.length > 0 ? this.searchFields.map(field => ({
+            [field]: {
+            $in: keywords.map(keyword => new RegExp(keyword, "i"))
+            }
+        })) : [{}];
+        
+        const category = this.queryStr.category ? {
+            "category.key": { $regex: this.queryStr.category, $options: "i" }
+        } : {};
+        
+        this.query = this.query.find({ $and: [...keywordFields, { ...category }] });
+
+        return this;
+    }
+
 
     filter(){
         let queryCopy = {...this.queryStr};

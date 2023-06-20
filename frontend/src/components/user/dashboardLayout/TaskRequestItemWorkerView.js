@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { formatTime } from "../../Utils";
 import UpdateButton from "../../layout/UpdateButton";
 
@@ -15,12 +16,17 @@ const TaskRequestItemWorkerView = ({task, userMode, tabDirection})=>{
     }
 
     const commission = task.budget * 0.1 || task.worker.pricing.minRate * 0.1;
-    
+    const [showImage, setShowImage] = useState(true)
     return (
         <div className="jobrequest-item">
-            <div className="avatar">
-                <img src="/images/avatar.png" alt="" />
-            </div>
+            {showImage&& <div className="avatar">
+                <img 
+                    src={task.user.avatar.url} 
+                    alt={task.user.firstName} 
+                    onLoad={()=>setShowImage(true)} 
+                    onError={()=>setShowImage(false)}
+                />
+            </div>}
             <div className="jobrequest--content">
                 <div className="title-containter">
                     <h5 className='single-line'>{task.title}</h5>

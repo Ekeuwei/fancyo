@@ -68,7 +68,7 @@ const UpdateButton = ({view, updateDetails, commission, userMode, tabDirection, 
     
     return(
         <>
-            <button className={`${view.btn} ${loading&&'loading'}`} 
+            <button className={`${view.btn} ${loading?'loading':''}`} 
                 onClick={buttonClicked} 
                 disabled={loading}>
 
@@ -117,7 +117,7 @@ const DebitConfirmationModal = ({show, loading, handleConfirm, handleCancel, com
                 <button type="button" className="btn btn-secondary" onClick={handleCancel}>
                 Cancel
                 </button>
-                <button type="button" className={`btn bg-primary-1 ${loading&& 'loading'}`} disabled={loading} onClick={handleConfirm}>
+                <button type="button" className={`btn bg-primary-1 ${loading? 'loading':''}`} disabled={loading} onClick={handleConfirm}>
                 Confirm
                 </button>
             </Modal.Footer>

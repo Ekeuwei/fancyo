@@ -65,6 +65,7 @@ const TaskApplicationModal = ({workerProfiles, taskId, show, handleClose}) => {
             <textarea
             id="message"
             name="message"
+            placeholder="Sure, I'd be happy to take on the job!"
             value={details.message}
             onChange={onChange}
             rows="2"

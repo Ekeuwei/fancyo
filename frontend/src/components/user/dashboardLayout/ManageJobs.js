@@ -36,7 +36,7 @@ const ManageJobs = () => {
     let size = works?.length || tasks?.length
     
     useEffect(()=>{
-        dispatch(userMode? myTasks('Pending'):myWorks('Pending'))
+        dispatch(userMode? myTasks('pending'):myWorks('pending'))
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 

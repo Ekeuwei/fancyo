@@ -68,7 +68,14 @@ const taskSchema = mongoose.Schema({
                     type: mongoose.Schema.Types.ObjectId,
                     ref: 'Worker'
                 },
-                message: String
+                message: {
+                    type: String,
+                    default: "Sure, I'd be happy to take on the job!"
+                },
+                createdAt: {
+                    type: Date,
+                    default: Date.now
+                }
             }
         ],
         // select: false

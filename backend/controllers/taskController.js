@@ -11,6 +11,7 @@ const { debitWallet } = require("./paymentController");
 const Review = require("../models/review");
 const FuzzySearch = require("../utils/FuzzySearch");
 const WhatAppTempId = require("../models/whatAppTempId");
+const sendWhatsAppMessage = require("../utils/taskNotification");
 
 //Create new task => /api/v1/task/new
 exports.newTask = catchAsyncErrors(async (req, res, next) => {
@@ -28,64 +29,7 @@ exports.newTask = catchAsyncErrors(async (req, res, next) => {
     
     const waId = `234${worker.owner.phoneNumber.slice(-10)}`
 
-    const whatsAppTempId = await WhatAppTempId.create({
-      taskId:task._id, workerId:req.body.worker, waId
-    })
-    
-    const message = {
-      "messaging_product": "whatsapp",
-      "recipient_type": "individual",
-      "to": `${whatsAppTempId.waId}`,
-      "type": "interactive",
-      "interactive": {
-          "type": "button",
-          "header": {
-              "type": "text",
-              "text": "TASK ALERT!!!"
-          },
-          "body": {
-              "text": `${task.summary}. \n\nNOTE: to accept this task, your account will be debited ₦100 service fee.\n`
-          },
-          "footer": {
-              "text": `Location: ${task.location.town}`
-          },
-          "action": {
-              "buttons": [
-                  {
-                      "type": "reply",
-                      "reply": {
-                          "id": `${whatsAppTempId._id}+1`,
-                          "title": "Yes"
-                      }
-                  },
-                  {
-                      "type": "reply",
-                      "reply": {
-                          "id": `${whatsAppTempId._id}+2`,
-                          "title": "No"
-                      }
-                  }
-              ]
-          }
-      }
-    }
-
-    const options = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.WHATSAPP_TOKEN}`
-      },
-      json: message,
-      responseType: 'json'
-    };
-
-    try {
-      const phoneNumberId = '114237478363942';
-      await got.post(`https://graph.facebook.com/v12.0/${phoneNumberId}/messages`, options)
-      
-    } catch (error) {
-      console.error(error.message)
-    }
+    await sendWhatsAppMessage(waId, req.body.workerId, task);
 
   }
 
@@ -121,6 +65,14 @@ exports.myTasks = catchAsyncErrors(async (req, res, next) => {
   const searchQuery = req.query.keyword==='undefined'?'':req.query;
   const apiFeatures = new APIFeatures(Task.find({ user: req.user.id })
     .populate("workers.review", "name comment rating", Review)
+    .populate({
+      path:"applicants.worker",
+      select:"message createdAt",
+      populate:{
+        path: "owner", 
+        select:"firstName lastName avatar"
+      }
+    })
     .populate({
       path:"workers.worker",
       select:"pricing",
@@ -224,18 +176,47 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
   let workerIndex = task.workers.findIndex(workersObj => workersObj._id.equals(req.body.workerId))
   
   const isUser = task.user.equals(req.user.id);
+
+  // const tasksBelongsToUser = task.user.equals(req.user._id);
+  // if(tasksBelongsToUser){
+  //   return next(new ErrorHandler("You cannot apply to self!", 403))
+  // }
+
   
   // const loggedWorkerIndex = task.workers.findIndex(workerObj => workerObj.worker.equals(req.user.id));
   const loggedWorkerIndex = task.workers.findIndex(workerObj => {
     return req.user.workers.some(profile => profile._id.equals(workerObj.worker._id))
   });
   
-  let allCompleted = task.workers.map(taskObj => taskObj.escrow.user === 'Completed' && taskObj.escrow.worker === 'Completed');
+  let allCompleted = task.workers.map(taskObj => 
+      taskObj.escrow.user === 'Completed' && taskObj.escrow.worker === 'Completed')
+    .every(status => status === true);
   
-  allCompleted = allCompleted.every(status => status === true);
+  // allCompleted = allCompleted.every(status => status === true);
+
+  
   
   if (isUser) {
-    task.workers[workerIndex].escrow.user = req.body.status;
+    if(task.status === "Request"){
+      //Make sure the worker index is also the applicant index
+      const applicantId = req.body.workerId;
+
+      let applicantExist = task.workers.find(worker => worker._id.toString() === applicantId)
+      
+      if(!applicantExist){
+        task.workers = [...task.workers, applicantId]
+
+        const applicant = await Worker.findById(applicantId).populate({path:'owner', select:'phoneNumber'});
+        const waId = `234${applicant.owner.phoneNumber.slice(-10)}`
+        
+        // Notify the applicant to accept the work
+        // TODO: check if worker has opted to receive whatsApp notification
+        await sendWhatsAppMessage(waId, applicantId, task)
+      }
+
+    }else{
+      task.workers[workerIndex].escrow.user = req.body.status;
+    }
   }else if(loggedWorkerIndex !== -1) {
     
     const debitWorker = task.workers[loggedWorkerIndex].escrow.worker === 'Pending' && req.body.status === 'Accepted'
@@ -256,9 +237,19 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Unauthorized Action", 400));
   }
 
-  task.status = allCompleted? 'Completed': req.body.status
+  if(task.workers.length >= task.numberOfWorkers){
+    
+    if(task.status === "Request"){
+      // Delete all applicants
+      // task.applicants = []
+    }
 
-  await task.save();
+    // task.status = req.body.status
+    task.status = allCompleted? 'Completed': req.body.status
+
+  }
+
+  // await task.save();
 
   res.status(200).json({
     success: true,
