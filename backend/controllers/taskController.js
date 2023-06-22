@@ -11,7 +11,7 @@ const { debitWallet } = require("./paymentController");
 const Review = require("../models/review");
 const FuzzySearch = require("../utils/FuzzySearch");
 const WhatAppTempId = require("../models/whatAppTempId");
-const sendWhatsAppMessage = require("../utils/taskNotification");
+const { sendWhatsAppMessage } = require("../utils/taskNotification");
 
 //Create new task => /api/v1/task/new
 exports.newTask = catchAsyncErrors(async (req, res, next) => {
@@ -112,7 +112,11 @@ exports.requestApplication = catchAsyncErrors(async(req, res, next)=>{
       return next(new ErrorHandler("This business profile has already applied", 409))
     }
 
-    task.applicants.push({worker: workerProfile._id, message: req.body.message});
+    let { message } = req.body;
+    
+    message = message?.length > 7? message : "Sure, I'd be happy to take on the job!";
+
+    task.applicants.push({worker: workerProfile._id, message});
 
 
     await task.save();
@@ -176,12 +180,6 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
   let workerIndex = task.workers.findIndex(workersObj => workersObj._id.equals(req.body.workerId))
   
   const isUser = task.user.equals(req.user.id);
-
-  // const tasksBelongsToUser = task.user.equals(req.user._id);
-  // if(tasksBelongsToUser){
-  //   return next(new ErrorHandler("You cannot apply to self!", 403))
-  // }
-
   
   // const loggedWorkerIndex = task.workers.findIndex(workerObj => workerObj.worker.equals(req.user.id));
   const loggedWorkerIndex = task.workers.findIndex(workerObj => {
@@ -201,11 +199,14 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
       //Make sure the worker index is also the applicant index
       const applicantId = req.body.workerId;
 
-      let applicantExist = task.workers.find(worker => worker._id.toString() === applicantId)
+      let applicantExist = task.workers.find(workerObj => workerObj.worker._id.toString() === applicantId)
       
       if(!applicantExist){
-        task.workers = [...task.workers, applicantId]
+        task.workers = [...task.workers, {worker: applicantId}]
 
+        // Delete the applicant's ID
+        task.applicants = task.applicants.filter(applicant => applicant.worker.toString() !== applicantId)
+        
         const applicant = await Worker.findById(applicantId).populate({path:'owner', select:'phoneNumber'});
         const waId = `234${applicant.owner.phoneNumber.slice(-10)}`
         
@@ -244,12 +245,11 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
       // task.applicants = []
     }
 
-    // task.status = req.body.status
-    task.status = allCompleted? 'Completed': req.body.status
+    task.status = allCompleted && task.status!=='Request'? 'Completed': req.body.status
 
   }
 
-  // await task.save();
+  await task.save();
 
   res.status(200).json({
     success: true,

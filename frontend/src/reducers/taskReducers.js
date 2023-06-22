@@ -241,6 +241,13 @@ export const singleTaskReducer = (state = {}, action) => {
 export const myTaskReducer = (state = { tasks: [] }, action) => {
   switch (action.type) {
     case MY_TASKS_REQUEST:
+      return{
+        ...state,
+        tasks: null,
+        works: null,
+        loading: true
+      }
+
     case NEARBY_TASK_REQUEST:
       return {
         ...state,

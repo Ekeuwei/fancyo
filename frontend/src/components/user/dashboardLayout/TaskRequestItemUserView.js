@@ -156,7 +156,6 @@ const SingleWorker = ({singleWorker, taskId, description, displayButton, time, u
     }
 
     const [showImage, setShowImage] = useState(true)
-    // const { userMode, tabDirection } = useContext(ManageJobsContext)
 
     return(
         <div className="jobrequest-item">
@@ -223,7 +222,7 @@ const label = (status)=>{
                 btn: 'btn ms-auto bg-secondary-3',
                 txt: 'Assign Task',
                 status,
-                action: 'Assigned'
+                action: 'Pending'
             }
     
         default:

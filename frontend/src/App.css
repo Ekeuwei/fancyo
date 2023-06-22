@@ -615,6 +615,8 @@ input[type="password"]:focus{
   display: flex;
   width: 100%;
   column-gap: 5px;
+}
+.list-- .jobrequest--action{
   align-items: center;
 }
 .jobrequest--action .btn{
@@ -985,7 +987,6 @@ input[type="password"]:focus{
 /* Spinner */
 .loading {
   position: relative;
-  width: fit-content;
   color: transparent !important;
 }
 .loading::after{

@@ -3,6 +3,7 @@ const catchAsyncErrors = require("../midllewares/catchAsyncErrors");
 const Task = require("../models/task");
 const WhatsAppTempId = require("../models/whatAppTempId");
 const { debitWallet } = require("./paymentController");
+const { sendWhatsAppMessage, interactiveResponse, whatsAppMessage } = require('../utils/taskNotification');
 const token = process.env.WHATSAPP_TOKEN;
 // Accepts POST requests at /webhook endpoint
 
@@ -29,10 +30,10 @@ exports.whatsApp = catchAsyncErrors(async (req, res, next)=>{
       
       // Check if it is an interactive button reply
       const { type, interactive } = req.body.entry[0].changes[0].value.messages[0];
-      if(interactive?.type === 'button_reply_del'){
+      if(interactive?.type === 'button_reply'){
         const { id, title } = interactive.button_reply;
         // Get the whatsApp task
-        const whatsAppTempId = await WhatsAppTempId.findById(id.split('+')[0])
+        const whatsAppTempId = await WhatsAppTempId.findById(id.split('_')[0])
 
         if(!whatsAppTempId){
 
@@ -46,9 +47,16 @@ exports.whatsApp = catchAsyncErrors(async (req, res, next)=>{
             select: 'pricing',
             populate: {
             path: 'owner',
-            select: 'firstName, lastName'
+            select: 'firstName, lastName phoneNumber'
             }
-        });
+        }).populate({
+          path: 'location.lga',
+          select: 'name',
+          populate: {
+            path: 'state',
+            select: 'name'
+          }
+        }).populate('user', 'firstName lastName phoneNumber', User);
 
         let workerIndex = task.workers.findIndex(workersObj => workersObj._id.equals(whatsAppTempId.workerId))
   
@@ -67,6 +75,22 @@ exports.whatsApp = catchAsyncErrors(async (req, res, next)=>{
             task.workers[workerIndex].escrow.worker = 'Accepted';
             // Respond back with the task requester's contact details
 
+            // send user contacts details
+            const response = {
+              title: `${task.title} Needed`,
+              contact: `Alfred Ekeuwei\n Contact: 08030572700\n`,
+              footer: 'Edepie, Yenagoa',
+              message: 'I want to deliver an item for me'
+            }
+            const simpleMessage = `Mr. ${task.user.firstName} needs your ${task.title} skills.\n
+                                    Contact Number:${task.user.phoneNumber}\n
+                                    location:${task.location.name}, ${task.location.lga.name}, ${task.location.lga.state.name}\n
+                                    Prescription: ${task.summary}`
+            
+            // Send the users contact;
+            console.log('Task contact: ', task.contact);
+            await whatsAppMessage(simpleMessage, from)
+
             
             
         }else{
@@ -79,7 +103,7 @@ exports.whatsApp = catchAsyncErrors(async (req, res, next)=>{
 
 
         // Delete the whatsApp Temporal Id
-        await WhatsAppTempId.findByIdAndDelete(whatsAppTempId._id);
+        // await WhatsAppTempId.findByIdAndDelete(whatsAppTempId._id);
   
 
       }
@@ -127,3 +151,52 @@ exports.whatsAppVerify = ((req, res) => {
     }
   }
 });
+
+
+const interactiveReply = {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "106336799163414",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "15550690648",
+              "phone_number_id": "114237478363942"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Alfred Ekeuwei"
+                },
+                "wa_id": "2348030572700"
+              }
+            ],
+            "messages": [
+              {
+                "context": {
+                  "from": "15550690648",
+                  "id": "wamid.HBgNMjM0ODAzMDU3MjcwMBUCABEYEjBCQ0FDMkVGQUVGMjJBRTJERAA="
+                },
+                "from": "2348030572700",
+                "id": "wamid.HBgNMjM0ODAzMDU3MjcwMBUCABIYIEIzQ0FGRkJGQTBCQkI1Q0FGODkyMEUzM0JDOTk4MEFDAA==",
+                "timestamp": "1687363362",
+                "type": "interactive",
+                "interactive": {
+                  "type": "button_reply",
+                  "button_reply": {
+                    "id": "6491e024c9576e6bf986ad81+1",
+                    "title": "Yes"
+                  }
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}
