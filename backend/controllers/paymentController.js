@@ -141,6 +141,10 @@ exports.creditWallet = async (amount, title, userId)=>{
 exports.debitWallet = async (amount, title, userId)=>{
     const wallet = await Wallet.findOne({userId});
 
+    if(wallet.balance < amount){
+        return 'insufficient'
+    }
+
     const transaction = await Transaction.create({
         title,
         userId,
@@ -183,7 +187,7 @@ exports.flwPayment = catchAsyncErrors( async(req, res, next)=>{
                 tx_ref: transaction.reference,
                 amount: transaction.amount,
                 currency: "NGN",
-                redirect_url: "http://localhost:3000/dashboard",
+                redirect_url: `${process.env.FRONTEND_URL}/dashboard`,
                 // meta: {
                 //     consumer_id: 23,
                 //     consumer_mac: "92a3-912ba-1192a"

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import MetaData from '../layout/MetaData';
 
 import { forgotPassword, clearErrors } from '../../actions/userActions'
+import { Link } from 'react-router-dom/cjs/react-router-dom.min';
 
 const ForgotPassword = () => {
 
@@ -40,11 +41,12 @@ const ForgotPassword = () => {
         <Fragment>
             <MetaData title={'Forgot Pasword'} />
 
-            <div className="row wrapper">
-                <div className="col-10 col-lg-5">
-                    <form className="shadow-lg" onSubmit={submitHandler}>
-                        <h1 className="mb-3">Forgot Password</h1>
-                        <div className="form-group">
+            <div className="center-screen tile">
+                
+                <div className="auth shadow-lg">
+                    <form onSubmit={submitHandler}>
+                        <h3 className="mb-3 text-start">Forgot Password</h3>
+                        <div className="mb-3">
                             <label htmlFor="email_field">Enter Email</label>
                             <input
                                 type="email"
@@ -54,14 +56,10 @@ const ForgotPassword = () => {
                                 onChange={(e)=> setEmail(e.target.value)}
                             />
                         </div>
-
-                        <button
-                            id="forgot_password_button"
-                            type="submit"
-                            className="btn btn-block py-3"
-                            disabled={loading} >
-                            Send Email
-                    </button>
+                        <div class="mb-3 text-end">
+                            <Link to="/login" className="btn btn-link text-dark-1">Back to login</Link>
+                            <button type="submit" disabled={loading} className={`btn bg-primary-1 px-3 ${loading? 'loading':''}`}>Send Email</button>
+                        </div>
 
                     </form>
                 </div>

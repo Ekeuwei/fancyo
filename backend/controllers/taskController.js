@@ -24,12 +24,40 @@ exports.newTask = catchAsyncErrors(async (req, res, next) => {
   if(task && task.workers.length > 0){
     //Send a WhatsApp notification to the worker, where he can accept or reject the request
 
+    const moreTask = await Task.findById(task._id)
+            .populate({
+              path: "workers.worker",
+              select: "pricing",
+              populate: {
+                path: "owner",
+                select: "firstName lastName phoneNumber",
+              },
+            })
+            .populate({
+              path: "location.lga",
+              select: "name",
+              populate: {
+                path: "state",
+                select: "name",
+              },
+            })
+            .populate("user", "firstName lastName phoneNumber", User);
+
+    const header = `${moreTask.title} Job Request`.toUpperCase();
+    const message = `Hello ${moreTask.workers[0].worker.owner.firstName},
+        You have a ${moreTask.title} job request from ${moreTask.user.firstName} ${moreTask.user.lastName}. Please confirm your availability within 30 minutes to receive the task owner's contact info.\n
+        Confirming availability incurs a N100 service fee.\n
+        For more details, log in to your dashboard on our web platform.
+        https://www.ebiwon.com`;
+      
+    const location = `Task location: ${moreTask.location.town}, ${moreTask.location.lga.name}, ${moreTask.location.lga.state.name} State.`
+
     // create a whatsapp chat identifier
     const worker = await Worker.findById(req.body.worker).populate({path:'owner', select:'phoneNumber'});
     
     const waId = `234${worker.owner.phoneNumber.slice(-10)}`
 
-    await sendWhatsAppMessage(waId, req.body.workerId, task);
+    await sendWhatsAppMessage(waId, worker._id, {id:moreTask._id, header, message, location});
 
   }
 
@@ -169,13 +197,22 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
   
   const task = await Task.findById(req.params.id)
   .populate({
-    path: 'workers.worker',
-    select: 'pricing',
-    populate: {
-      path: 'owner',
-      select: 'firstName, lastName'
-    }
-  })
+      path: "workers.worker",
+      select: "pricing",
+      populate: {
+        path: "owner",
+        select: "firstName lastName phoneNumber",
+      },
+    })
+    .populate({
+      path: "location.lga",
+      select: "name",
+      populate: {
+        path: "state",
+        select: "name",
+      },
+    })
+    .populate("user", "firstName lastName phoneNumber", User);
 
   let workerIndex = task.workers.findIndex(workersObj => workersObj._id.equals(req.body.workerId))
   
@@ -198,21 +235,35 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
     if(task.status === "Request"){
       //Make sure the worker index is also the applicant index
       const applicantId = req.body.workerId;
+      
+      const worker = await Worker.findById(applicantId)
+      const platformCommission = task.budget? 
+          parseFloat(task.budget * 0.1) : 
+          parseFloat(worker.pricing.minRate * 0.1)
 
       let applicantExist = task.workers.find(workerObj => workerObj.worker._id.toString() === applicantId)
       
       if(!applicantExist){
         task.workers = [...task.workers, {worker: applicantId}]
 
-        // Delete the applicant's ID
+        // Delete the applicant's ID from the list of applicants
         task.applicants = task.applicants.filter(applicant => applicant.worker.toString() !== applicantId)
         
-        const applicant = await Worker.findById(applicantId).populate({path:'owner', select:'phoneNumber'});
+        const applicant = await Worker.findById(applicantId).populate({path:'owner', select:'firstName phoneNumber'});
         const waId = `234${applicant.owner.phoneNumber.slice(-10)}`
         
+        const header = `${task.title} Job Approval Notice`.toUpperCase();
+        const message = `Hi ${applicant.owner.firstName},
+            Congrats on being approved for the ${task.title} job! Please confirm your availability within 30 minutes to receive the task owner's contact info.\n
+            Confirming availability incurs a N${platformCommission} service fee.\n
+            For more details, log in to your dashboard on our web platform.
+            https://www.ebiwon.com`;
+
+        const location = `Task location: ${task.location.town}, ${task.location.lga.name}, ${task.location.lga.state.name} State.`
+
         // Notify the applicant to accept the work
         // TODO: check if worker has opted to receive whatsApp notification
-        await sendWhatsAppMessage(waId, applicantId, task)
+        await sendWhatsAppMessage(waId, applicantId, {id:task._id, header, message, location})
       }
 
     }else{

@@ -4,7 +4,7 @@ const WhatAppTempId = require("../models/whatAppTempId");
 exports.sendWhatsAppMessage = async (waId, workerId, task) =>{
 
   const whatsAppTempId = await WhatAppTempId.create({
-    taskId:task._id, workerId, waId
+    taskId:task.id, workerId, waId
   })
   
   const message = {
@@ -16,13 +16,13 @@ exports.sendWhatsAppMessage = async (waId, workerId, task) =>{
         "type": "button",
         "header": {
             "type": "text",
-            "text": "TASK ALERT!!!"
+            "text": `${task.header}`
         },
         "body": {
-            "text": `${task.summary}. \n\nNOTE: to accept this task, your account will be debited ₦100 service fee.\n`
+            "text": task.message.replace(/^[ \t]+/gm, '')
         },
         "footer": {
-            "text": `Location: ${task.location.town}`
+            "text": task.location
         },
         "action": {
             "buttons": [
@@ -30,14 +30,14 @@ exports.sendWhatsAppMessage = async (waId, workerId, task) =>{
                     "type": "reply",
                     "reply": {
                         "id": `${whatsAppTempId._id}_1`,
-                        "title": "Yes"
+                        "title": "Available"
                     }
                 },
                 {
                     "type": "reply",
                     "reply": {
                         "id": `${whatsAppTempId._id}_2`,
-                        "title": "No"
+                        "title": "Unavailable"
                     }
                 }
             ]
@@ -73,7 +73,7 @@ exports.interactiveResponse = async (response, to) =>{
     "to": `${to}`,
     "type": "text",
     "text": {
-        "body": response.message
+        "body": response.message.replace(/^[ \t]+/gm, '')
     }
   }
 
@@ -97,18 +97,19 @@ exports.interactiveResponse = async (response, to) =>{
   return status;
 }
 
-exports.whatsAppMessage = async (message, to) =>{
+exports.whatsAppMessage = async (message, to, context) =>{
   let status;
   const payload = {
+    context,
     "messaging_product": "whatsapp",
     "recipient_type": "individual",
     "to": `${to}`,
     "type": "text",
     "text": {
-        "body": message
+        "body": message.replace(/^[ \t]+/gm, '')
     }
   }
-
+  
   const options = {
     headers: {
       'Content-Type': 'application/json',
@@ -124,6 +125,65 @@ exports.whatsAppMessage = async (message, to) =>{
     
   } catch (error) {
     console.error(error.message)
+  }
+
+  return status;
+}
+
+exports.sendWhatsAppContact = async (contact, to) =>{
+  let status;
+  const payload = {
+    "to": `${to}`,
+    "type": "contacts",
+    "contacts": [
+      {
+        "addresses": [
+            {
+                "city": contact.lga,
+                "country": "Nigeria",
+                "country_code": "ng",
+                "state": contact.state,
+                "street": contact.town,
+                "type": "HOME"
+            }
+        ],
+        "emails": [
+            {
+                "email": contact.email,
+                "type": "WORK"
+            }
+        ],
+        "name": {
+            "first_name": contact.firstName,
+            "formatted_name": `${contact.firstName} ${contact.lastName}`,
+            "last_name": contact.lastName
+        },
+        "phones": [
+            {
+                "phone": `+${contact.phoneNumber}`,
+                "type": "WORK",
+                "wa_id": contact.phoneNumber
+            }
+        ]
+      }
+    ]
+}
+
+  const options = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.WHATSAPP_TOKEN}`
+    },
+    json: payload,
+    responseType: 'json'
+  };
+
+  try {
+    const phoneNumberId = '114237478363942';
+    status = await got.post(`https://graph.facebook.com/v12.0/${phoneNumberId}/messages`, options)
+    
+  } catch (error) {
+    console.error(error)
   }
 
   return status;

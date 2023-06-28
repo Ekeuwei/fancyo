@@ -38,7 +38,7 @@ const taskSchema = mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Pending', 'Cancelled', 'Declined', 'Completed', 'Accepted','Abandoned'],
+        enum: ['Request', 'Pending', 'Cancelled', 'Declined', 'Completed', 'Accepted','Abandoned'],
         default: 'Pending'
     },
     workers: [

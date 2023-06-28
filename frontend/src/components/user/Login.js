@@ -44,37 +44,37 @@ const Login = ({ history, location }) => {
                 <Fragment>
                     <MetaData title={'Login'} />
 
-                    <section class="center-screen tile">
-                        <div class="auth">
+                    <section className="center-screen tile">
+                        <div className="auth">
                             <form onSubmit={submitHandler}>
-                                <h3 class="mb-3 text-start">Login</h3>
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
+                                <h3 className="mb-3 text-start">Login</h3>
+                                <div className="mb-3">
+                                    <label for="email" className="form-label">Email</label>
                                     <input 
                                         type="email" 
-                                        class="form-control" 
+                                        className="form-control" 
                                         id="email" 
                                         placeholder="name@example.com"
                                         value={email}
                                         onChange={(e)=> setEmail(e.target.value)}
                                     />
                                 </div>
-                                <div class="mb-3">
-                                    <label for="password" class="form-label">Password</label>
+                                <div className="mb-3">
+                                    <label for="password" className="form-label">Password</label>
                                     <input 
                                         type="password" 
-                                        class="form-control" 
+                                        className="form-control" 
                                         id="password"
                                         value={password}
                                         onChange={(e)=> setPassword(e.target.value)}
                                     />
-                                    <div class="text-end">
-                                        <a href="/forgot" class="navbar-brand fs-6 text-dark-1 text-end">Forgot Password</a>
+                                    <div className="text-end">
+                                        <a href="/password/forgot" className="navbar-brand fs-6 text-dark-1 text-end">Forgot Password</a>
                                     </div>
                                 </div>
-                                <div class="mb-3 text-end">
+                                <div className="mb-3 text-end">
                                     <Link to="/register" className="btn btn-link text-dark-1">Register</Link>
-                                    <button type="submit" class="btn bg-primary-1 px-3">Login</button>
+                                    <button type="submit" className="btn bg-primary-1 px-3">Login</button>
                                 </div>
                             </form>
                         </div>
