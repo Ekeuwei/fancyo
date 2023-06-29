@@ -23,7 +23,6 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
         crop: 'scale'
     })
 
-
     let user;
 
     try {

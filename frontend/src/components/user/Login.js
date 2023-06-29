@@ -3,7 +3,6 @@ import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import Loader from '../layout/Loader'
 import MetaData from '../layout/MetaData';
 
 import { login, clearErrors } from '../../actions/userActions'
@@ -40,7 +39,7 @@ const Login = ({ history, location }) => {
     }
     return (
         <Fragment>
-            {loading ? <Loader /> : (
+            {/* {loading ? <Loader /> : ( */}
                 <Fragment>
                     <MetaData title={'Login'} />
 
@@ -74,13 +73,12 @@ const Login = ({ history, location }) => {
                                 </div>
                                 <div className="mb-3 text-end">
                                     <Link to="/register" className="btn btn-link text-dark-1">Register</Link>
-                                    <button type="submit" className="btn bg-primary-1 px-3">Login</button>
+                                    <button type="submit" disabled={loading} className={`btn bg-primary-1 px-3 ${loading?'loading':''}`}>Login</button>
                                 </div>
                             </form>
                         </div>
                     </section>
                 </Fragment>
-            )}
         </Fragment>
     )
 }

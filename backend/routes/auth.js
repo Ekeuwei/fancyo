@@ -25,8 +25,8 @@ const {
 
 const { isAuthenticatedUser, authorizeRoles } = require('../midllewares/auth')
 
-router.route('/artisan/register').post(registerArtisan);
-router.route('/artisan/login').post(loginArtisan);
+// router.route('/artisan/register').post(registerArtisan);
+// router.route('/artisan/login').post(loginArtisan);
 
 router.route('/register').post(registerUser);
 router.route('/login').post(loginUser);

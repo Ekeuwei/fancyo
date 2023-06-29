@@ -46,16 +46,17 @@ const Register = ({ history }) => {
     const submitHandler = (e) => {
         e.preventDefault();
 
-        const formData = new FormData();
-        formData.set('firstName', firstName)
-        formData.set('lastName', lastName)
-        formData.set('email', email)
-        formData.set('password', password)
-        formData.set('phoneNumber', phoneNumber)
-        formData.set('gender', gender)
-        formData.set('avatar', avatar)
+        const data = {
+            firstName,
+            lastName,
+            email,
+            password,
+            phoneNumber,
+            gender,
+            avatar,
+        }
 
-        dispatch(register(formData))
+        dispatch(register(data))
     }
 
     const onChange = e => {
@@ -177,7 +178,7 @@ const Register = ({ history }) => {
                         </div>
                         <div class="mb-3 text-end">
                             <Link to="/login" class="btn btn-link text-dark-1" >Login</Link>
-                            <button type="submit" class={`${loading && 'disabled'} btn bg-primary-1 px-3`}>Submit</button>
+                            <button disabled={loading} type="submit" class={`${loading? 'loading':''} btn bg-primary-1 px-3`}>Submit</button>
                         </div>
                     </form>
                 </div>

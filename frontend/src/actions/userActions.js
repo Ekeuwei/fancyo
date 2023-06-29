@@ -100,10 +100,12 @@ export const register = (userData) => async (dispatch) =>{
         dispatch({ type: REGISTER_USER_REQUEST})
 
         const config = {
-            headers: {'content-Type': 'multipart/form-data'}
+            headers: {'content-Type': 'application/json'}
         }
 
         const { data } = await axios.post('/api/v1/register', userData, config)
+        
+        localStorage.setItem('user', JSON.stringify(data.user))
 
         dispatch({
             type: REGISTER_USER_SUCCESS,
