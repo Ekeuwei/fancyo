@@ -1,7 +1,7 @@
 const cloudinary = require('cloudinary')
 const serverless = require('serverless-http');
-const app = require('../../backend/app');
-const connectDatabase = require('../../backend/config/database')
+const app = require('../backend/app');
+const connectDatabase = require('../backend/config/database')
 
 // if(process.env.NODE_ENV !== 'PRODUCTION') {
 //     require('dotenv').config({ path: 'backend/config/config.env' });
@@ -15,4 +15,4 @@ cloudinary.config({
 
 connectDatabase();
 
-module.exports.handler = serverless(app);
+// module.exports.handler = serverless(app);

@@ -1,4 +1,5 @@
 const express = require('express');
+const serverless = require('serverless-http');
 
 const app = express();
 
@@ -59,3 +60,5 @@ if(process.env.NODE_ENV === 'PRODUCTION'){
 app.use(errorMiddleware);
 
 module.exports = app; 
+
+module.exports.handler = serverless(app);

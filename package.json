@@ -14,8 +14,8 @@
     "prod": "SET NODE_ENV=PRODUCTION& nodemon backend/server",
     "seeder": "SET NODE_ENV=DEVELOPMENT& node backend/utils/seeder",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false && npm install --prefix frontend && npm run build --prefix frontend",
-    "build": "./node_modules/.bin/netlify-lambda build src",
-    "start": "./node_modules/.bin/netlify-lambda serve src"
+    "build_": "./node_modules/.bin/netlify-lambda build src",
+    "start_": "./node_modules/.bin/netlify-lambda serve src"
   },
   "author": "Alfred Ekeuwei",
   "license": "ISC",
