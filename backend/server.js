@@ -1,5 +1,5 @@
 const app = require('./app');
-const serverless = require('serverless-http');
+
 // const dotenv = require('dotenv');
 
 const cloudinary = require('cloudinary')
@@ -32,8 +32,6 @@ cloudinary.config({
 const server = app.listen(process.env.PORT, () => {
     console.log(`Server started on PORT: ${process.env.PORT} in ${process.env.NODE_ENV} mode`);
 }); 
-
-exports.handler = serverless(app);
 
 // Handle Unhandled Promise rejection
 process.on('unhandledRejection', err => {
