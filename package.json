@@ -18,7 +18,6 @@
   "author": "Alfred Ekeuwei",
   "license": "ISC",
   "dependencies": {
-    "@netlify/functions": "^1.6.0",
     "axios": "^0.21.4",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
