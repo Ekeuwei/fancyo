@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Ebiwani - A Work Management App",
   "main": "server.js",
-  "engines": {
+  "enginesxx": {
     "node": "16.x"
   },
   "scripts": {
