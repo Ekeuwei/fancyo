@@ -1,7 +1,7 @@
 const cloudinary = require('cloudinary')
 const serverless = require('serverless-http');
-const app = require('../../backend/app');
-const connectDatabase = require('../../backend/config/database')
+const app = require('../backend/app');
+const connectDatabase = require('../backend/config/database')
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
