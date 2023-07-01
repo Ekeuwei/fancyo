@@ -42,12 +42,15 @@ exports.classify = catchAsyncErrors(async(req, res, next)=>{
         req.body.title = title;
 
         try {
+
+            let category = await Category.findOne({name: title});
             
-            await Category.findOneAndUpdate({name: title}, 
-                {name: title}, {new: true, upsert: true})
+            if(!category){
+                await Category.create({ name: title })
+            }
 
         } catch (error) {
-            
+            console.log(error)
         }
 
         next();

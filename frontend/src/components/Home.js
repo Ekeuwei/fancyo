@@ -10,6 +10,8 @@ import SearchComponent from './SearchComponent';
 import Search from './layout/Search';
 import { Route, useHistory } from 'react-router-dom';
 import { getWorkers } from '../actions/workerActions';
+import { getCategories } from '../actions/prefsAction';
+import howItWorks from "./data/howItWorks.json";
 
 
 const Home = ({ match }) => {
@@ -17,19 +19,20 @@ const Home = ({ match }) => {
     const [currentPage, setCurrentPage] = useState(1)
     const history = useHistory();
 
-    const categories = [
-        {name: 'General Labour', url: 'labour', image:'./images/labour.png'},
-        {name: 'Plumbing', url: 'plumbing', image:'./images/plumbing.png'},
-        {name: 'Electrician', url: 'electrician', image:'./images/electrician.png'},
-        {name: 'Make-up', url: 'makeup', image:'./images/makeup.png'},
-        {name: 'House Keeper', url: 'housekeeper', image:'./images/errand.png'},
-    ]
+    // const categories = [
+    //     {name: 'General Labour', url: 'labour', image:'./images/labour.png'},
+    //     {name: 'Plumbing', url: 'plumbing', image:'./images/plumbing.png'},
+    //     {name: 'Electrician', url: 'electrician', image:'./images/electrician.png'},
+    //     {name: 'Make-up', url: 'makeup', image:'./images/makeup.png'},
+    //     {name: 'House Keeper', url: 'housekeeper', image:'./images/errand.png'},
+    // ]
 
     const alert = useAlert();
     
     const dispatch = useDispatch();
 
     const {  loading, workers, error, workersCount, resPerPage, filteredWorkersCount } = useSelector(state => state.workers)
+    const { categories } = useSelector(state => state.prefs)
 
     const keyword = match.params.keyword
 
@@ -43,6 +46,10 @@ const Home = ({ match }) => {
 
     }, [dispatch, alert, error, keyword, currentPage])
 
+    useEffect(()=>dispatch(getCategories()), 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []);
+
     function setCurrentPageNo(pageNumber){
         setCurrentPage(pageNumber)
     }
@@ -51,8 +58,6 @@ const Home = ({ match }) => {
     if(keyword){
         count = filteredWorkersCount
     }
-
-
 
     return (
         <Fragment>     
@@ -70,63 +75,31 @@ const Home = ({ match }) => {
                         </div>
                     </section>
 
-                    <section>
+                    {categories?.length >0 && <section>
                         <div className="bg-white p-3">
                             <h3 className="color-dark-2 mb-3">Popular Services</h3>
                             <div className="container-fluid ps-0 overflow-auto row gx-3 pb-2 flex-nowrap">
-                                {categories.map(category => (
-                                    <div className="col-10 col-sm-9 col-md-6 col-lg-4 col-xl-3 position-relative" key={category.name} onClick={()=>history.push(`category/${category.url}`)}>
+                                {categories.map((category, index) => (
+                                    index<6 && <div className="col-10 col-sm-9 col-md-6 col-lg-4 col-xl-3 position-relative" key={category.sn} onClick={()=>history.push(`category/${category.sn}`)}>
                                         <h5 className="text-light position-absolute top-0 end-0 m-3">{category.name}</h5>
-                                        <img className="w-100 h-100 fit-cover rounded-3" src={category.image} alt={category.name}/>
+                                        <img className="w-100 h-100 fit-cover rounded-3" src={category.image.url} alt={category.name}/>
                                     </div>
                                 ))}
                             </div>
                         </div>
-                    </section>
+                    </section>}
 
                     <section>
-                        <div className="row bg-secondary-4 p-3 text-dark-2">
-                            <h3 className="text-md-center mb-3">You’re just one call away from getting that job done.</h3>
+                        <div className="bg-secondary-4 p-3 text-dark-2">
+                            <h3 className="text-md-center mb-3">How it Works</h3>
                             <div className="col-12 col-lg-6">
-                                <div>            
+                                {howItWorks.map(how =>(<>            
                                     <h5 className="mb-1">
-                                        <i className="fa fa-check-circle" aria-hidden="true"></i>
-                                        Find a taskman or post a job
+                                        <i className="fa fa-check-circle me-2" aria-hidden="true"></i>
+                                        {how.step}
                                     </h5>
-                                    <p>Find someone with the skill set for the job, e.g “carpenter” or make a job post for workers to bid.</p>
-                                </div>
-
-                                <div>            
-                                    <h5 className="mb-1">
-                                        <i className="fa fa-check-circle" aria-hidden="true"></i>
-                                        Assign the Job
-                                    </h5>
-                                    <p>Engage a taskman to perform the job within the specified time.</p>
-                                </div>
-
-                                <div>            
-                                    <h5 className="mb-1">
-                                        <i className="fa fa-check-circle" aria-hidden="true"></i>
-                                        Job Gets Done
-                                    </h5>
-                                    <p>The taskman performs the job as specified.</p>
-                                </div>
-
-                                <div>            
-                                    <h5 className="mb-1">
-                                        <i className="fa fa-check-circle" aria-hidden="true"></i>
-                                        Job Gets Inspected
-                                    </h5>
-                                    <p>Inpsect your job and ensure performance meets your expectations.</p>
-                                </div>
-
-                                <div>            
-                                    <h5 className="mb-1">
-                                        <i className="fa fa-check-circle" aria-hidden="true"></i>
-                                        Payment Disbursment
-                                    </h5>
-                                    <p>Cash payment is made and remitted to the task worker.</p>
-                                </div>
+                                    <p>{how.details}</p>
+                                </>))}
                             </div>
 
                             <div className="col-12 col-lg-6 col-md-9 my-auto">

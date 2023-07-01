@@ -108,7 +108,7 @@ const WorkerDetails = ({ match, history }) => {
 
         {loading || loading === undefined? <Loader /> : <div className="container-0">
             <div className="rounded-bottom row g-0">
-            <div className="col-12 col-md-7">
+            {worker?.length>0&&<div className="col-12 col-md-7">
               {/* Start */}
               <div className="featured-graphics">
                 <img 
@@ -163,7 +163,7 @@ const WorkerDetails = ({ match, history }) => {
                     </span>
                 </div>
                 </div>
-            </div>
+            </div>}
 
             <div className="col-12 col-md-5">
                 <div className="card-body pt-md-0 pe-md-0">

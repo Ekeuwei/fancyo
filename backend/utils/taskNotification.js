@@ -59,7 +59,7 @@ exports.sendWhatsAppMessage = async (waId, workerId, task) =>{
     await got.post(`https://graph.facebook.com/v12.0/${phoneNumberId}/messages`, options)
     
   } catch (error) {
-    console.error(error.message)
+    console.error("util taskNotification",error.message)
   }
 
   return whatsAppTempId;
@@ -91,7 +91,7 @@ exports.interactiveResponse = async (response, to) =>{
     status = await got.post(`https://graph.facebook.com/v12.0/${phoneNumberId}/messages`, options)
     
   } catch (error) {
-    console.error(error.message)
+    console.error("util taskNotification",error.message)
   }
 
   return status;
@@ -124,7 +124,7 @@ exports.whatsAppMessage = async (message, to, context) =>{
     status = await got.post(`https://graph.facebook.com/v12.0/${phoneNumberId}/messages`, options)
     
   } catch (error) {
-    console.error(error.message)
+    console.error("util taskNotification",error.message)
   }
 
   return status;

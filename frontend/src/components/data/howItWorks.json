@@ -1,0 +1,22 @@
+[
+    {
+        "step":"Find a Worker or Post a Job",
+        "details": "Search for the specific type of worker you need (e.g., \"carpenter\"). \nAlternatively, post a job by describing the task you want to be done."
+    },
+    {
+        "step":"Engage the Best-Suited Worker",
+        "details":"Select the worker who is closest to the job location and best suited for the task."
+    },
+    {
+        "step":"Job Gets Done",
+        "details":"Sit back and relax as the worker completes the job according to your requirements."
+    },
+    {
+        "step":"Job Gets Inspected",
+        "details":"Take a look at the finished job and ensure it meets your expectations."
+    },
+    {
+        "step":"Submit a Review and Earn Points",
+        "details": "Share your feedback by submitting a review about the completed task."
+    }
+]
