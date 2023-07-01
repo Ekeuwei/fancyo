@@ -9,6 +9,6 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 })
 
-// connectDatabase();
+connectDatabase();
 
 module.exports.handler = serverless(app);
