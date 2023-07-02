@@ -1,5 +1,6 @@
 // import express, { Router } from 'express';
 
+import app from '../../backend/app';
 import { myTasks } from '../../backend/controllers/taskController';
 import { isAuthenticatedUser } from '../../backend/midllewares/auth';
 import task from '../../backend/routes/task';
@@ -17,4 +18,4 @@ router.route("/tasks").get(isAuthenticatedUser, myTasks);
 
 api.use('/api/', router);
 
-export const handler = serverless(api);
+export const handler = serverless(app);
