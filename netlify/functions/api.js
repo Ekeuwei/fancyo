@@ -19,17 +19,15 @@ cloudinary.config({
     api_key: process.env.CLOUDINARY_API_KEY, 
     api_secret: process.env.CLOUDINARY_API_SECRET
 })
-// const api = express();
 
-// const router = express.Router();
+const api = express();
+
+const router = express.Router();
 // router.get('/hello', (req, res) => res.send('Hello World!'));
 // router.get('/tas', task)
-// router.route("/tasks").get(isAuthenticatedUser, myTasks);
+router.route("/tasks").get(isAuthenticatedUser, myTasks);
+router.route('/login').post(loginUser);
 
-// api.use('/api/', router);
+api.use('/api/v1/', router);
 
-export const handler = serverless(app);
-// module.exports.handler = async (event, context) => {
-//   const result = await handler(event, context);
-//   return result;
-// };
+export const handler = serverless(api);
