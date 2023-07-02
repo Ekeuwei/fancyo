@@ -5,6 +5,8 @@ import connectDatabase from '../../backend/config/database';
 import { loginUser } from '../../backend/controllers/authController';
 import { myTasks } from '../../backend/controllers/taskController';
 import { isAuthenticatedUser } from '../../backend/midllewares/auth';
+import task from '../../backend/routes/task';
+import auth from '../../backend/routes/auth';
 
 // import serverless from 'serverless-http';
 const express = require('express');
@@ -36,9 +38,16 @@ api.use(fileUpload());
 const router = express.Router();
 // router.get('/hello', (req, res) => res.send('Hello World!'));
 
-router.route("/tasks").get(isAuthenticatedUser, myTasks);
+
+app.use('/api/v1', task);
+// app.use('/api/v1', auth);
+
+// router.route("/tasks").get(isAuthenticatedUser, myTasks);
 router.route('/login').post(loginUser);
 
 api.use('/api/v1/', router);
 
+
+// Middleware to handle errors
+api.use(errorMiddleware);
 export const handler = serverless(api);
