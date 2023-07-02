@@ -9,10 +9,16 @@ import task from '../../backend/routes/task';
 // import serverless from 'serverless-http';
 const express = require('express');
 const serverless = require('serverless-http')
-
+const cloudinary = require('cloudinary')
 // Connecting to database
 connectDatabase();
 
+// Setting up cloudinary configuration
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+    api_key: process.env.CLOUDINARY_API_KEY, 
+    api_secret: process.env.CLOUDINARY_API_SECRET
+})
 // const api = express();
 
 // const router = express.Router();
@@ -22,8 +28,8 @@ connectDatabase();
 
 // api.use('/api/', router);
 
-const handler = serverless(app);
-module.exports.handler = async (event, context) => {
-  const result = await handler(event, context);
-  return result;
-};
+export const handler = serverless(app);
+// module.exports.handler = async (event, context) => {
+//   const result = await handler(event, context);
+//   return result;
+// };
