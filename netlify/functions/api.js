@@ -1,6 +1,7 @@
 // import express, { Router } from 'express';
 
 import { myTasks } from '../../backend/controllers/taskController';
+import task from '../../backend/routes/task';
 
 // import serverless from 'serverless-http';
 const express = require('express');
@@ -10,7 +11,7 @@ const api = express();
 
 const router = express.Router();
 router.get('/hello', (req, res) => res.send('Hello World!'));
-router.get('/tasks', myTasks)
+router.get('/tas', task)
 
 api.use('/api/', router);
 
