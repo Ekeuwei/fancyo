@@ -22,4 +22,8 @@ connectDatabase();
 
 // api.use('/api/', router);
 
-export const handler = serverless(app);
+const handler = serverless(app);
+module.exports.handler = async (event, context) => {
+  const result = await handler(event, context);
+  return result;
+};
