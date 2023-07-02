@@ -20,6 +20,6 @@ connectDatabase();
 // router.get('/tas', task)
 // router.route("/tasks").get(isAuthenticatedUser, myTasks);
 
-api.use('/api/', router);
+// api.use('/api/', router);
 
 export const handler = serverless(app);
