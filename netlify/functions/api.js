@@ -39,10 +39,10 @@ const router = express.Router();
 // router.get('/hello', (req, res) => res.send('Hello World!'));
 
 
-app.use('/api/v1', task);
+// app.use('/api/v1', task);
 // app.use('/api/v1', auth);
 
-// router.route("/tasks").get(isAuthenticatedUser, myTasks);
+router.route("/tasks").get(isAuthenticatedUser, myTasks);
 router.route('/login').post(loginUser);
 
 api.use('/api/v1/', router);
