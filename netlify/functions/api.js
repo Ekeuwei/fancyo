@@ -1,6 +1,7 @@
 // import express, { Router } from 'express';
 
 import app from '../../backend/app';
+import connectDatabase from '../../backend/config/database';
 import { myTasks } from '../../backend/controllers/taskController';
 import { isAuthenticatedUser } from '../../backend/midllewares/auth';
 import task from '../../backend/routes/task';
