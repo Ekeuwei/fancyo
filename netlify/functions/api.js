@@ -10,6 +10,11 @@ import { isAuthenticatedUser } from '../../backend/midllewares/auth';
 const express = require('express');
 const serverless = require('serverless-http')
 const cloudinary = require('cloudinary')
+
+const cookieParser = require('cookie-parser')
+const bodyparser = require('body-parser')
+const fileUpload = require('express-fileupload')
+
 // Connecting to database
 connectDatabase();
 
@@ -21,6 +26,12 @@ cloudinary.config({
 })
 
 const api = express();
+
+api.use(express.json({limit: "50mb"}));
+api.use(bodyparser.urlencoded({limit: "50mb", extended: true}))
+api.use(cookieParser());
+api.use(fileUpload());
+
 
 const router = express.Router();
 // router.get('/hello', (req, res) => res.send('Hello World!'));
