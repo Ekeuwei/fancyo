@@ -4,7 +4,7 @@ const serverless = require('serverless-http')
 const cloudinary = require('cloudinary')
 
 import app from '../../backend/app';
-import connectDatabase, { connectToDatabasePool } from '../../backend/config/database';
+import connectDatabase from '../../backend/config/database';
 
 // Connecting to database
 // connectDatabase();
