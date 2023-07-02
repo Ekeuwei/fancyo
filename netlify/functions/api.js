@@ -7,7 +7,7 @@ import app from '../../backend/app';
 import connectDatabase from '../../backend/config/database';
 
 // Connecting to database
-// connectDatabase();
+connectDatabase();
 
 // Setting up cloudinary configuration
 cloudinary.config({
