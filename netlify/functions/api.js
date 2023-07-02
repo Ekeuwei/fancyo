@@ -7,7 +7,7 @@ import { myTasks } from '../../backend/controllers/taskController';
 import { isAuthenticatedUser } from '../../backend/midllewares/auth';
 import task from '../../backend/routes/task';
 import auth from '../../backend/routes/auth';
-
+import errorMiddleware from '../../backend/midllewares/errors'
 // import serverless from 'serverless-http';
 const express = require('express');
 const serverless = require('serverless-http')
