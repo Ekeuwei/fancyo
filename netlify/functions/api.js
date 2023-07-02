@@ -50,4 +50,4 @@ api.use('/api/v1/', router);
 
 // Middleware to handle errors
 // api.use(errorMiddleware);
-export const handler = serverless(api);
+export const handler = serverless(app);
