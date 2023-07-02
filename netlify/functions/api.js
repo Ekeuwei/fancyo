@@ -9,12 +9,15 @@ import task from '../../backend/routes/task';
 const express = require('express');
 const serverless = require('serverless-http')
 
-const api = express();
+// Connecting to database
+connectDatabase();
 
-const router = express.Router();
-router.get('/hello', (req, res) => res.send('Hello World!'));
-router.get('/tas', task)
-router.route("/tasks").get(isAuthenticatedUser, myTasks);
+// const api = express();
+
+// const router = express.Router();
+// router.get('/hello', (req, res) => res.send('Hello World!'));
+// router.get('/tas', task)
+// router.route("/tasks").get(isAuthenticatedUser, myTasks);
 
 api.use('/api/', router);
 
