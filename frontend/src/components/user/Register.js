@@ -82,11 +82,11 @@ const Register = ({ history }) => {
             <section className='center-screen tile'>
                 <div className="auth">
                     <form onSubmit={ submitHandler} encType='multipart/form-data'>
-                        <h3 class="form-title"><strong>REGISTER USER</strong></h3>
+                        <h3 class="form-title"><strong>REGISTER</strong></h3>
                         
                         <div className="avatar-preview mb-3">
                             <div class={`avatar ${shakeFields.includes('avatar')?'shake':''}`}>
-                                <img src={ user.avatar || '/images/default_avatar.jpeg' } alt="Avatar Preview" />
+                                <img src={ user.avatar || '/images/default_avatar.png' } alt="Avatar Preview" />
                                 <i className="fa fa-pencil-square-o edit-icon" onClick={() => avatarRef.current.click()} aria-hidden="true"></i>
                             </div>
                             {shakeFields.includes('avatar')&&<span className={'input-warning'}>Please upload a picture</span>}
