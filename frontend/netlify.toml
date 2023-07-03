@@ -7,7 +7,7 @@
   force = true
   from = "/api/*"
   status = 200
-  to = "https://ebiwoni-api.netlify.app/api/:splat"
+  to = "https://coral-thankful-moonstone.glitch.me/api/:splat"
   
   
-  #to = "https://coral-thankful-moonstone.glitch.me/api/:splat"
+  #to = "https://ebiwoni-api.netlify.app/api/:splat"
