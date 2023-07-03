@@ -223,6 +223,19 @@
   height: 100%;
 }
 
+.form-title {
+  margin-top: -0.625em;
+  text-align: center;
+  color: #000000b0;
+}
+.input-warning{
+  color: var(--red);
+  font-weight: 500;
+  text-align: right;
+  display: block;
+  margin-bottom: -0.625em;
+}
+
 /* Input starts */
 
 input, textarea{
@@ -416,7 +429,7 @@ input[type="password"]:focus{
 .featured-graphics-avatar .edit-icon, 
 .avatar .edit-icon{
   position: absolute;
-  top: 5px;
+  top: 80%;
   left: calc(75% + 25px);
   padding: 5px;
   margin: 10px;

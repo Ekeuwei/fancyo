@@ -14,15 +14,16 @@ const Register = ({ history }) => {
         email: '',
         phoneNumber: '',
         gender: '',
-        password: ''
+        password: '',
+        avatar: ''
     })
 
     const avatarRef = useRef();
 
-    const { firstName, lastName, gender, email, phoneNumber, password } = user;
+    // const { firstName, lastName, gender, email, phoneNumber, password, avatar } = user;
 
-    const [avatar, setAvatar] = useState('');
-    const [avatarPreview, setAvatarPreview] = useState('/images/default_avatar.jpg');
+    // const [avatar, setAvatar] = useState('/images/default_avatar.jpg');
+    const[shakeFields, setShakeFields] = useState([]);
 
     const alert = useAlert();
     const dispatch = useDispatch()
@@ -46,35 +47,32 @@ const Register = ({ history }) => {
     const submitHandler = (e) => {
         e.preventDefault();
 
-        const data = {
-            firstName,
-            lastName,
-            email,
-            password,
-            phoneNumber,
-            gender,
-            avatar,
+        const emptyFields = Object.keys(user).filter(key => user[key] === "");
+        setShakeFields(emptyFields);
+
+        if(emptyFields.length === 0){
+            dispatch(register(user))
         }
 
-        dispatch(register(data))
     }
 
     const onChange = e => {
+        let value = e.target.value;
         if(e.target.name === 'avatar'){
             const reader = new FileReader();
 
             reader.onload = () => {
                 if(reader.readyState === 2){
-                    setAvatarPreview(reader.result)
-                    setAvatar(reader.result)
+                    setUser(prev => ({...prev, avatar:reader.result}))
                 }
             }
 
             reader.readAsDataURL(e.target.files[0])
-        } else {
-
-            setUser({ ...user, [e.target.name]: e.target.value })
+        }else{
+            setUser(prev => ({ ...prev, [e.target.name]: value }))
         }
+
+        setShakeFields([])
     }
 
     return (
@@ -84,97 +82,96 @@ const Register = ({ history }) => {
             <section className='center-screen tile'>
                 <div className="auth">
                     <form onSubmit={ submitHandler} encType='multipart/form-data'>
+                        <h3 class="form-title"><strong>REGISTER USER</strong></h3>
                         
-                        <div className="avatar-preview">
-                            <div class="avatar">
-                                <img src={ avatarPreview } alt="Avatar Preview" />
+                        <div className="avatar-preview mb-3">
+                            <div class={`avatar ${shakeFields.includes('avatar')?'shake':''}`}>
+                                <img src={ user.avatar || '/images/default_avatar.jpeg' } alt="Avatar Preview" />
                                 <i className="fa fa-pencil-square-o edit-icon" onClick={() => avatarRef.current.click()} aria-hidden="true"></i>
                             </div>
+                            {shakeFields.includes('avatar')&&<span className={'input-warning'}>Please upload a picture</span>}
                         </div>
-                        <h3 class="py-3 text-start">Register</h3>
-                        <div class="progress mb-3 rounded-pill">
-                            <div class="progress-bar bg-primary-2 rounded-pill" role="progressbar" style={{width: "100%"}} aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <div class="mb-3 d-none">
+                        <div class="d-none">
                             <input 
                                 name="avatar"
                                 type="file" 
-                                class="form-control" 
+                                class="d-none" 
                                 id="avatar"
                                 ref={avatarRef}
                                 onChange={onChange}
                             />
                         </div>
-                        <div class="mb-3">
-                            <label for="firstName" class="form-label">First Name</label>
+                        <div className={`mb-3 ${shakeFields.includes('firstName')?'shake':''}`}>
                             <input 
                                 type="name" 
                                 name="firstName" 
-                                class="form-control" 
+                                class={`form-control `} 
                                 id="firstName" 
                                 placeholder="First Name"
-                                value={firstName}
+                                value={user.firstName}
                                 onChange={onChange}
                             />
+                            {shakeFields.includes('firstName')&&<label className={'input-warning'}>First name required</label>}
                         </div>
-                        <div class="mb-3">
-                            <label for="lastName" class="form-label">Last Name</label>
+                        <div class={`mb-3 ${shakeFields.includes('lastName')?'shake':''}`} >
                             <input 
                                 name="lastName"
                                 type="name" 
                                 class="form-control" 
                                 id="lastName" 
                                 placeholder="Last Name"
-                                value={lastName}
+                                value={user.lastName}
                                 onChange={onChange}
                             />
+                            {shakeFields.includes('lastName') && <label for="lastName" class="input-warning">Last name required</label>}
                         </div>
-                        <div class="mb-3">
-                            <label for="state" class="form-label">Gender</label>
+                        <div class={`mb-3 ${shakeFields.includes('gender')?'shake':''}`}>
                             <select 
                                 class="form-select" 
                                 aria-label="Select State" 
                                 name="gender"
-                                value={gender}
+                                value={user.gender}
                                 onChange={onChange} >
-                                <option selected>Gender</option>
+                                <option selected></option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
                             </select>
+                            {shakeFields.includes('gender') && <label for="gender" class="input-warning">Select your gender</label>}
                         </div>
-                        <div class="mb-3">
-                            <label for="number" class="form-label">Phone Number</label>
+                        <div class={`mb-3 ${shakeFields.includes('phoneNumber')?'shake':''}`} >
                             <input 
                                 name="phoneNumber"
                                 type="phone" 
-                                class="form-control" 
-                                id="number"
-                                value={phoneNumber}
+                                class="form-control"
+                                id="phoneNumber"
+                                placeholder='08030000000'
+                                value={user.phoneNumber}
                                 onChange={onChange}
                             />
+                            {shakeFields.includes('phoneNumber') && <label for="phoneNumber" class="input-warning">Enter a valid phone number</label>}
                         </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
+                        <div class={`mb-3 ${shakeFields.includes('email')?'shake':''}`} >
                             <input 
                                 name="email"
                                 type="email" 
-                                class="form-control" 
+                                class={`form-control ${shakeFields.includes('email')?'shake':''}`} 
                                 id="email" 
                                 placeholder="name@example.com"
-                                value={email}
+                                value={user.email}
                                 onChange={onChange}
                             />
+                            {shakeFields.includes('email') && <label for="email" class="input-warning">Enter a valid email</label>}
                         </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
+                        <div class={`mb-3 ${shakeFields.includes('password')?'shake':''}`} >
                             <input 
                                 name='password'
                                 type="password" 
-                                class="form-control" 
+                                class={`form-control ${shakeFields.includes('password')?'shake':''}`}
                                 id="password"
-                                value={password}
+                                value={user.password}
                                 onChange={onChange}
                             />
+                            {shakeFields.includes('password') && <label for="password" class="input-warning">Enter password</label>}
                         </div>
                         <div class="mb-3 text-end">
                             <Link to="/login" class="btn btn-link text-dark-1" >Login</Link>

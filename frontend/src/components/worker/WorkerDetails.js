@@ -108,7 +108,7 @@ const WorkerDetails = ({ match, history }) => {
 
         {loading || loading === undefined? <Loader /> : <div className="container-0">
             <div className="rounded-bottom row g-0">
-            {worker?.length>0&&<div className="col-12 col-md-7">
+            {worker&&<div className="col-12 col-md-7">
               {/* Start */}
               <div className="featured-graphics">
                 <img 
