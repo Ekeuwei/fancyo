@@ -218,7 +218,7 @@ const WorkerDetails = ({ match, history }) => {
                           {review.comment}
                       </p>
                     </li>))}
-                    {reviews.length > 5&&<li className="list-group-item text-end mb-3 border-0">
+                    {reviews?.length > 5&&<li className="list-group-item text-end mb-3 border-0">
                       <Link to="#">More</Link>
                     </li>}
                     <button
