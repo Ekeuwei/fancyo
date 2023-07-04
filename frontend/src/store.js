@@ -9,7 +9,6 @@ import {
   newProductReducer,
   productReducer,
   productReviewReducer,
-  reviewReducer,
 } from "./reducers/productReducers";
 import {
   allUsersReducer,
@@ -39,7 +38,7 @@ import {
   taskRequestReducer,
   tasksReducer,
 } from "./reducers/taskReducers";
-import { userWorkersReducer, workerDetailsReducer, workerReducer, workerSetupReducer, workersReducer } from "./reducers/workerReducer";
+import { reviewReducer, userWorkersReducer, workerDetailsReducer, workerReducer, workerSetupReducer, workersReducer } from "./reducers/workerReducer";
 import { preferences } from "./reducers/prefsReducers";
 
 const reducer = combineReducers({

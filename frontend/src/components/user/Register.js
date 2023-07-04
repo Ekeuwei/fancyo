@@ -20,9 +20,6 @@ const Register = ({ history }) => {
 
     const avatarRef = useRef();
 
-    // const { firstName, lastName, gender, email, phoneNumber, password, avatar } = user;
-
-    // const [avatar, setAvatar] = useState('/images/default_avatar.jpg');
     const[shakeFields, setShakeFields] = useState([]);
 
     const alert = useAlert();
@@ -168,6 +165,7 @@ const Register = ({ history }) => {
                                 type="password" 
                                 class={`form-control ${shakeFields.includes('password')?'shake':''}`}
                                 id="password"
+                                placeholder='password'
                                 value={user.password}
                                 onChange={onChange}
                             />

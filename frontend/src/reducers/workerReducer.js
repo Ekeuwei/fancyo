@@ -1,3 +1,4 @@
+import { GET_REVIEWS_FAIL, GET_REVIEWS_REQUEST, GET_REVIEWS_SUCCESS, REVIEW_FAIL, REVIEW_REQUEST, REVIEW_SUCCESS } from "../constants/taskConstants";
 import { 
     CLEAR_ERRORS, 
     CREATE_WORKER_FAIL, 
@@ -175,3 +176,35 @@ export const workerDetailsReducer = (state = { worker: {} }, action) => {
       return state;
   }
 };
+
+export const reviewReducer = (state = { }, action) =>{
+  switch (action.type) {
+    case REVIEW_REQUEST:
+    case GET_REVIEWS_REQUEST:
+      return {
+        ...state,
+        loading: true
+      }
+    case REVIEW_SUCCESS:
+      return {
+        ...state,
+        review: action.payload
+      }
+    case GET_REVIEWS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        reviews: action.payload
+      }
+    case REVIEW_FAIL:
+    case GET_REVIEWS_FAIL:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      }
+  
+    default:
+      return {...state}
+  }
+}

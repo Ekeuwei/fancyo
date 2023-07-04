@@ -6,13 +6,14 @@ import Loader from "../layout/Loader";
 import MetaData from "../layout/MetaData";
 import { Modal } from "react-bootstrap";
 import { useAlert } from "react-alert";
-import { getWorkerDetails, clearErrors } from "../../actions/workerActions";
-import { newTask } from "../../actions/taskAction";
+import { getWorkerDetails, clearErrors, getWorkerReviews } from "../../actions/workerActions";
+import { getTasksReviews, newTask } from "../../actions/taskAction";
 import { NEW_TASK_RESET } from "../../constants/taskConstants";
 import dateFormat from "dateformat";
 import { formatAmount } from "../Utils";
 import SearchDropdown from "../layout/SearchDropdown";
 import { getTowns } from "../../actions/prefsAction";
+import RatingStars from "../layout/RatingStars";
 
 const WorkerContext = createContext();
 
@@ -27,8 +28,9 @@ const WorkerDetails = ({ match, history }) => {
     
     const { loading, worker, error } = useSelector((state) => state.workerDetails);
     const { error: requestError, success, loading:loadingReq } = useSelector((state) => state.taskRequest);
+    const { reviews } = useSelector(state => state.review)
     
-    useEffect(() => {
+  useEffect(() => {
     if (error) {
       alert.error(error);
       history.push("/");
@@ -49,6 +51,10 @@ const WorkerDetails = ({ match, history }) => {
 
     dispatch(getWorkerDetails(match.params.id));
   }, [dispatch, alert, error, success, requestError, history, match.params.id]);
+
+  useEffect(()=>{
+    dispatch(getWorkerReviews(match.params.id))
+  }, [])
 
   const { towns } = useSelector(state => state.prefs);
     
@@ -149,7 +155,7 @@ const WorkerDetails = ({ match, history }) => {
                         className="fa fa-phone me-2 my-auto"
                         aria-hidden="true"
                     ></i>
-                    <p className="card-text col mb-0">{`0${worker.owner.phoneNumber}`}</p>
+                    <p className="card-text col mb-0">{`${worker.owner.phoneNumber}`}</p>
                     </div>
 
                     <span className="col">
@@ -181,7 +187,7 @@ const WorkerDetails = ({ match, history }) => {
                       <div className="col">KYC</div>
                       <div className="col">
                           {worker.status}
-                          <i className="fa fa-check-circle text-success ms-1" aria-hidden="true" ></i>
+                          {worker.status === "verified"&&<i className="fa fa-check-circle text-success ms-1" aria-hidden="true" ></i>}
                       </div>
                     </li>
                     <li className="d-flex list-group-item ">
@@ -192,7 +198,7 @@ const WorkerDetails = ({ match, history }) => {
                     <div className="col">Rating</div>
                     <div className="col">
                         <i className="fa fa-star text-primary-1 me-1" aria-hidden="true" ></i>
-                        4.7 Rating (483)
+                        {`${worker.ratings} Rating (${worker.numOfReviews})`}
                     </div>
                     </li>
                 </ul>
@@ -203,96 +209,18 @@ const WorkerDetails = ({ match, history }) => {
                     <li className="list-group-item">
                     <strong>RECENT REVIEWS</strong>
                     </li>
-                    <li className="list-group-item">
-                    <span className="col">
-                        <strong>Dennis Igwe</strong>
-                        <i
-                        className="fa fa-star text-primary-1"
-                        aria-hidden="true"
-                        ></i>
-                        <i
-                        className="fa fa-star text-primary-1"
-                        aria-hidden="true"
-                        ></i>
-                        <i
-                        className="fa fa-star text-primary-1"
-                        aria-hidden="true"
-                        ></i>
-                        <i
-                        className="fa fa-star text-primary-1"
-                        aria-hidden="true"
-                        ></i>
-                        <i
-                        className="fa fa-star text-primary-1"
-                        aria-hidden="true"
-                        ></i>
-                    </span>
-                    <p className="col">
-                        Rebecca is simply amazing, she’s what I think of
-                        whenever I want to get something done on time
-                    </p>
-                    </li>
-                    <li className="list-group-item">
-                    <span className="col">
-                        <strong>Okafor Martins</strong>
-                        <i
-                        className="fa fa-star text-primary-1"
-                        aria-hidden="true"
-                        ></i>
-                        <i
-                        className="fa fa-star text-primary-1"
-                        aria-hidden="true"
-                        ></i>
-                        <i
-                        className="fa fa-star text-primary-1"
-                        aria-hidden="true"
-                        ></i>
-                        <i
-                        className="fa fa-star text-primary-1"
-                        aria-hidden="true"
-                        ></i>
-                        <i
-                        className="fa fa-star text-primary-1"
-                        aria-hidden="true"
-                        ></i>
-                    </span>
-                    <p className="col">
-                        This is demn fast, he got the job done about 3 times
-                        faster than I thought.
-                    </p>
-                    </li>
-                    <li className="list-group-item">
-                    <span className="col">
-                        <strong>Jennifer Austin</strong>
-                        <i
-                        className="fa fa-star text-primary-1"
-                        aria-hidden="true"
-                        ></i>
-                        <i
-                        className="fa fa-star text-primary-1"
-                        aria-hidden="true"
-                        ></i>
-                        <i
-                        className="fa fa-star text-primary-1"
-                        aria-hidden="true"
-                        ></i>
-                        <i
-                        className="fa fa-star text-primary-1"
-                        aria-hidden="true"
-                        ></i>
-                        <i
-                        className="fa fa-star-half text-primary-1"
-                        aria-hidden="true"
-                        ></i>
-                    </span>
-                    <p className="col">
-                        It was nice working with you, but you should work on
-                        your appearance - it’s not professional
-                    </p>
-                    </li>
-                    <li className="list-group-item text-end mb-3 border-0">
-                    <Link to="#">More</Link>
-                    </li>
+                    {reviews&& reviews.map(review => (<li className="list-group-item">
+                      <span className="col">
+                          <strong className="me-1">{review.name}</strong>
+                          <RatingStars rating={review.rating}/>
+                      </span>
+                      <p className="col">
+                          {review.comment}
+                      </p>
+                    </li>))}
+                    {reviews.length > 5&&<li className="list-group-item text-end mb-3 border-0">
+                      <Link to="#">More</Link>
+                    </li>}
                     <button
                     type="button"
                     className="btn bg-primary-2 text-white"

@@ -217,11 +217,11 @@ exports.createWorkertReview = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Get Worker Reviews   =>  /api/v1/reviews
-exports.getWorkerReviews = catchAsyncErrors( async (req, res, next) => {
-    const worker = await Worker.findById(req.query.id);
+exports.workerReviews = catchAsyncErrors( async (req, res, next) => {
+    const reviews = await Review.find({workerId: req.params.id});
 
     res.status(200).json({
         success: true,
-        reviews: worker.reviews
+        reviews
     })
 })

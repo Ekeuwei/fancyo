@@ -22,6 +22,7 @@ import {
     WORKER_REVIEW_SUCCESS,
     WORKER_REVIEW_FAIL
 } from '../constants/workerConstants';
+import { GET_REVIEWS_FAIL, GET_REVIEWS_REQUEST, GET_REVIEWS_SUCCESS } from '../constants/taskConstants';
 
 // Create business request
 export const createWorker = (workerData) => async (dispatch) => {
@@ -148,6 +149,25 @@ export const getWorkerDetails = (id) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: WORKER_DETAILS_FAIL,
+      payload: error.response.data.message,
+    });
+  }
+};
+
+// Get Worker reviews
+export const getWorkerReviews = (id) => async (dispatch) => {
+  try {
+    dispatch({ type: GET_REVIEWS_REQUEST });
+
+    const { data } = await axios.get(`/api/v1/worker/reviews/${id}`);
+
+    dispatch({
+      type: GET_REVIEWS_SUCCESS,
+      payload: data.reviews,
+    });
+  } catch (error) {
+    dispatch({
+      type: GET_REVIEWS_FAIL,
       payload: error.response.data.message,
     });
   }
