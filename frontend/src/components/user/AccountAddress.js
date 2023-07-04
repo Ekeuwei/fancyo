@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react'
-import { Tabs } from './AccountProfile';
+import { SectionBreadcrumbs, Tabs } from './AccountProfile';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { useAlert } from 'react-alert';
 import { useSelector, useDispatch } from 'react-redux';
@@ -12,9 +12,10 @@ const AccountAddress = () => {
     const history = useHistory();
     const dispatch = useDispatch();
     const alert = useAlert();
-    const { user:currentUser } = useSelector(state => state.auth);
     const {error, loading, isUpdated } = useSelector(state => state.user);
     const { states, lgas, towns } = useSelector(state => state.prefs);
+    
+    const currentUser = JSON.parse(localStorage.getItem('user'))
 
     const [contact, setContact] = useState({
         state: {...currentUser?.contact?.town?.state},
@@ -90,13 +91,7 @@ const AccountAddress = () => {
 
   return (
     <Fragment>
-        <div className="account-breadcrumbs">
-            <img className="rounded-circle me-2" src="/images/avatar.png" style={{height: "3em"}} alt="" />
-            <div className="breadcrumbs-title">
-                <span><strong>Alfred Ekeuwei</strong> / <strong>Edit Profile</strong></span>
-                <p className='mb-0'>Setup your presence and hiring needs</p>
-            </div>
-        </div>
+        <SectionBreadcrumbs section={{title:'Contact', subTitle: 'Setup your contact address'}}/>
         <Tabs history={history} />
         <form className='mx-3' onSubmit={submitHandler}>
             <div className={`input mb-3 ${!contact.state.name ?'shake':''}`}>

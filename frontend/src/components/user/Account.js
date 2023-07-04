@@ -1,12 +1,13 @@
 import React, { Fragment } from 'react'
 
 const Account = () => {
+  const user = JSON.parse(localStorage.getItem("user"))
   return (
     <Fragment>
         <div className="account-breadcrumbs">
-            <img className="rounded-circle me-2" src="/images/avatar.png" style={{height: "3em"}} alt="" />
+            <img className="rounded-circle me-2" src={user.avatar.url} style={{height: "3em"}} alt="" />
             <div className="breadcrumbs-title">
-                <span><strong>Alfred Ekeuwei</strong> / <strong>Edit Profile</strong></span>
+                <span><strong>{`${user.firstName} ${user.lastName}`}</strong> / <strong>Edit Profile</strong></span>
                 <p className='mb-0'>Setup your presence and hiring needs</p>
             </div>
         </div>

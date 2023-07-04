@@ -18,28 +18,33 @@ const AccounCreatetWorker = () => {
   const [hasFG, setHasFG] = useState(false);
   
   const { error, loading, success } = useSelector(state => state.worker);
-  const { user } = useSelector(state => state.auth);
   const { towns } = useSelector(state => state.prefs);
 
-  const [images, setImages] = useState({
-    avatar: user?.avatar?.url || `${window.location.origin}/images/default_avatar.jpg`,
-    featured: ''
-  });
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  // const [images, setImages] = useState({
+  //   avatar: user?.avatar?.url || `${window.location.origin}/images/default_avatar.png`,
+  //   featured: ''
+  // });
 
   const [worker, setWorker] = useState({
+        avatar: user?.avatar?.url,
+        featuredGraphics: '',
         category: '',
         minRate: '',
         dailyRate: '',
         description: '',
     })
+  const [shakeFields, setShakeFields] = useState([]);
 
     const onChange = e => {
-      if('avatar, featured'.includes(e.target.name)){
+      setShakeFields([])
+      if('avatar, featuredGraphics'.includes(e.target.name)){
         const reader = new FileReader();
 
         reader.onload = () => {
             if(reader.readyState === 2){
-              setImages(prevData => ({...prevData, [e.target.name]: reader.result}));
+              setWorker(prevData => ({...prevData, [e.target.name]: reader.result}));
             }
         }
 
@@ -58,18 +63,20 @@ const AccounCreatetWorker = () => {
     
     const submitHandler = (e)=>{
       e.preventDefault();
-      const category = categories.filter(el => el.key === worker.category);
 
-        const formData = new FormData();
+      // formData.set("featuredGraphics", images.featured)
+      // formData.set("category", JSON.stringify(category[0]))
+      // formData.set("minRate", worker.minRate)
+      // formData.set("dailyRate", worker.dailyRate)
+      // formData.set("localities", JSON.stringify(localities))
+      // formData.set("description", worker.description)
 
-        formData.set("featuredGraphics", images.featured)
-        formData.set("category", JSON.stringify(category[0]))
-        formData.set("minRate", worker.minRate)
-        formData.set("dailyRate", worker.dailyRate)
-        formData.set("localities", JSON.stringify(localities))
-        formData.set("description", worker.description)
+      const emptyFields = Object.keys(worker).filter(key => worker[key]==="");
+      setShakeFields(emptyFields);
 
-        dispatch(createWorker(formData))
+      if(emptyFields.length === 0){
+        dispatch(createWorker({...worker, localities}))
+      }
     }
 
     const categories = [
@@ -81,14 +88,16 @@ const AccounCreatetWorker = () => {
         {key: "nanny", name: "Nanny"}
     ];
 
-    useEffect(()=>setHasFG(images.featured), [images.featured]);
+    useEffect(()=>setHasFG(worker.featuredGraphics), [worker.featuredGraphics]);
     
     useEffect(()=>dispatch(getTowns("647744b487968b971280e108")), 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [dispatch]);
-
-
+    
+    
+    // eslint-disable-next-line no-unused-vars
     const [ suggestions, setSuggestions ] = useState(towns)
+    // eslint-disable-next-line no-unused-vars
     const [localities, setLocalities] = useState([])
 
     useEffect(()=>{
@@ -113,24 +122,26 @@ const AccounCreatetWorker = () => {
       <form onSubmit={submitHandler}>
         <div className="featured-graphics">
           <div className={`featured-graphics-button ${hasFG && 'd-none'}`}>
-            <input className='d-none' type='file' ref={featureInputRef} name="featured" onChange={onChange}/>
-            <button className='btn btn-secondary mx-4' onClick={()=> featureInputRef.current.click()}>
+            <input className='d-none' type='file' ref={featureInputRef} name="featuredGraphics" onChange={onChange}/>
+            <button className={`btn btn-secondary ${shakeFields.includes('featuredGraphics')? 'shake':''}`} onClick={()=> featureInputRef.current.click()}>
               <i className="fa fa-plus me-1" aria-hidden="true"></i>
-              Add Display Picture</button>
+              Add Display Picture
+            </button>
+            {shakeFields.includes('featuredGraphics')&&<div className='input-warning'>upload feature graphics</div>}
           </div>
           <img 
-              src={images.featured} 
+              src={worker.featuredGraphics} 
               className={`${!hasFG && 'd-none'}`}
               alt="featured Graphics"
             />
-          <div className={`clear-btn ${!hasFG && 'd-none'}`} onClick={()=>setImages(prevData=>({...prevData, featured:''}))}>
+          <div className={`clear-btn ${!hasFG && 'd-none'}`} onClick={()=>setWorker(prevData=>({...prevData, featuredGraphics:''}))}>
             <i className="fa fa-minus-circle p-2" aria-hidden="true"></i>
           </div>
         </div>
         <div className="featured-graphics-avatar">
             <input className='d-none' name='avatar' ref={avatarInputRef} type="file" onChange={onChange} />
             <img 
-                src={images.avatar}
+                src={worker.avatar || `${window.location.origin}/images/default_avatar.png`}
                 name="avatar"
                 onChange={onChange}
                 alt=""
@@ -142,9 +153,8 @@ const AccounCreatetWorker = () => {
           <div className="mb-3">
             <label for="category" className="form-label">Category / Service Type </label>
             <select 
-              className="form-select" 
-              aria-label="Select category" 
-              required
+              className={`form-select ${shakeFields.includes('category')? 'shake':''}`} 
+              aria-label="Select category"
               name="category"
               value={worker.category}
               onChange={onChange} >
@@ -158,8 +168,7 @@ const AccounCreatetWorker = () => {
             <input 
                 name="minRate"
                 type="text" 
-                required
-                className="input" 
+                className={`input ${shakeFields.includes('minRate')? 'shake':''}`} 
                 id="minRate" 
                 value={worker.minRate}
                 onChange={onChange}
@@ -170,27 +179,26 @@ const AccounCreatetWorker = () => {
               <input 
                   name="dailyRate"
                   type="text" 
-                  required
-                  className="input" 
+                  className={`input ${shakeFields.includes('dailyRate')? 'shake':''}`} 
                   id="dailyRate" 
                   value={worker.dailyRate}
                   onChange={onChange}
               />
           </div>
 
-          <MultipleInput 
+          {/* <MultipleInput 
             suggestions={suggestions} 
             setSuggestions={setSuggestions}
             myChoices={localities}
             setMychoices={setLocalities}
-            suggestionTitle="Localities" />
+            suggestionTitle="Localities" /> */}
 
           <div className="mb-3">
             <label for="description" className="form-label">Description</label>
             <textarea 
                 type="text" 
                 name="description" 
-                className="input" 
+                className={`input ${shakeFields.includes('description')? 'shake':''}`} 
                 id="description"
                 value={worker.description}
                 onChange={onChange}
@@ -198,8 +206,8 @@ const AccounCreatetWorker = () => {
             <label for="description" className="form-label text-secondary">Describe the servies you perform</label>
           </div>
         </div>
-        <div className="mb-3 text-center">
-            <button disabled={loading} type="submit" className={`btn bg-primary-1 px-3`}>Create Account</button>
+        <div className={`mb-3 text-center`}>
+            <button disabled={loading} type="submit" className={`btn bg-primary-1 px-3 ${loading?'loading':''}`}>Create Account</button>
         </div>
       </form>
     </Fragment>

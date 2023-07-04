@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { clearErrors, updatePassword } from '../../actions/userActions';
-import { Tabs } from './AccountProfile';
+import { SectionBreadcrumbs, Tabs } from './AccountProfile';
 import { useAlert } from 'react-alert';
 import { UPDATE_PASSWORD_RESET } from '../../constants/userConstants';
 
@@ -59,13 +59,7 @@ const AccountPassword = () => {
             
   return (
     <Fragment>
-        <div className="account-breadcrumbs">
-            <img className="rounded-circle me-2" src="/images/avatar.png" style={{height: "3em"}} alt="" />
-            <div className="breadcrumbs-title">
-                <span><strong>Alfred Ekeuwei</strong> / <strong>Edit Profile</strong></span>
-                <p className='mb-0'>Setup your presence and hiring needs</p>
-            </div>
-        </div>
+        <SectionBreadcrumbs section={{title:'Password', subTitle: 'Update your password'}}/>
         <Tabs history={history}/>
         <form className='mx-3' onSubmit={submitHandler}>
             <div className="mb-3">

@@ -10,9 +10,9 @@ const AccountProfile = () => {
     const alert = useAlert();
     const history = useHistory();
     const dispatch = useDispatch();
-    const { user:currentUser } = useSelector(state => state.auth);
     const { loading, error, isUpdated } = useSelector(state => state.user);
-
+    const currentUser = JSON.parse(localStorage.getItem('user'))
+    
     const [user, setUser] = useState({
         firstName: currentUser?.firstName,
         lastName: currentUser?.lastName,
@@ -43,13 +43,7 @@ const AccountProfile = () => {
     }
   return (
     <Fragment>
-        <div className="account-breadcrumbs">
-            <img className="rounded-circle me-2" src="/images/avatar.png" style={{height: "3em"}} alt="" />
-            <div className="breadcrumbs-title">
-                <span><strong>Alfred Ekeuwei</strong> / <strong>Edit Profile</strong></span>
-                <p className='mb-0'>Setup your presence and hiring needs</p>
-            </div>
-        </div>
+        <SectionBreadcrumbs section={{title:'Profile', subTitle:'Update your profile details'}}/>
         <Tabs history={history}/>
         <form className='mx-3' onSubmit={submitHandler}>
             <div className="mb-3">
@@ -118,6 +112,19 @@ const AccountProfile = () => {
 
   )
 }
+export const SectionBreadcrumbs = ({section})=>{
+    const user = JSON.parse(localStorage.getItem("user"))
+    return(
+        <div className="account-breadcrumbs">
+            <img className="rounded-circle me-2" src={user.avatar.url} style={{height: "3em"}} alt="" />
+            <div className="breadcrumbs-title">
+                <span><strong>{`${user.firstName} ${user.lastName}`}</strong> / <strong>{section.title}</strong></span>
+                <p className='mb-0'>{section.subTitle}</p>
+            </div>
+        </div>
+    )
+}
+
 export const Tabs = ({history})=>{
     const tabs = ['Profile', 'Contact', 'Password', 'Worker']
     return(

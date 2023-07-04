@@ -204,32 +204,32 @@ const WorkerDetails = ({ match, history }) => {
                 </ul>
                 </div>
 
-                <div className="card-body">
-                <ul className="list-group list-group-flush">
-                    <li className="list-group-item">
-                    <strong>RECENT REVIEWS</strong>
-                    </li>
-                    {reviews&& reviews.map(review => (<li className="list-group-item">
-                      <span className="col">
-                          <strong className="me-1">{review.name}</strong>
-                          <RatingStars rating={review.rating}/>
-                      </span>
-                      <p className="col">
-                          {review.comment}
-                      </p>
-                    </li>))}
-                    {reviews?.length > 5&&<li className="list-group-item text-end mb-3 border-0">
-                      <Link to="#">More</Link>
-                    </li>}
-                    <button
-                    type="button"
-                    className="btn bg-primary-2 text-white"
-                    onClick={handleShow}
-                    >
-                    <strong>Engage</strong>
-                    </button>
-                </ul>
-                </div>
+                {reviews&&<div className="card-body">
+                  <ul className="list-group list-group-flush">
+                      <li className="list-group-item">
+                      <strong>RECENT REVIEWS</strong>
+                      </li>
+                      {reviews.map(review => (<li className="list-group-item">
+                        <span className="col">
+                            <strong className="me-1">{review.name}</strong>
+                            <RatingStars rating={review.rating}/>
+                        </span>
+                        <p className="col">
+                            {review.comment}
+                        </p>
+                      </li>))}
+                      {reviews?.length > 5&&<li className="list-group-item text-end mb-3 border-0">
+                        <Link to="#">More</Link>
+                      </li>}
+                      <button
+                      type="button"
+                      className="btn bg-primary-2 text-white"
+                      onClick={handleShow}
+                      >
+                      <strong>Engage</strong>
+                      </button>
+                  </ul>
+                </div>}
             </div>
             </div>
             <WorkOrderModal />
