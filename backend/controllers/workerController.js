@@ -33,8 +33,6 @@ exports.createWorker = catchAsyncErrors(async (req, res, next) => {
     
     const { lga, state } = user.contact.town;
     
-    localities = JSON.parse(localities);
-    
     const bulkOps = localities.map(el => {
       const doc = { name: el.name, lga: lga._id, state: state._id }
       return {
@@ -58,7 +56,7 @@ exports.createWorker = catchAsyncErrors(async (req, res, next) => {
         owner: user.id,
         description,
         localities: existingLocalities,
-        category: JSON.parse(category),
+        category,
         featuredGraphics: {public_id: featuredGraphicsUpload.public_id, url: featuredGraphicsUpload.secure_url},
         pricing: {
           minRate: parseFloat((minRate).replace(/,/g, "")), 

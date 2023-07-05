@@ -30,7 +30,7 @@ const AccounCreatetWorker = () => {
   const [worker, setWorker] = useState({
         avatar: user?.avatar?.url,
         featuredGraphics: '',
-        category: '',
+        // category: {name: '', sn: ''},
         minRate: '',
         dailyRate: '',
         description: '',
@@ -64,13 +64,6 @@ const AccounCreatetWorker = () => {
     const submitHandler = (e)=>{
       e.preventDefault();
 
-      // formData.set("featuredGraphics", images.featured)
-      // formData.set("category", JSON.stringify(category[0]))
-      // formData.set("minRate", worker.minRate)
-      // formData.set("dailyRate", worker.dailyRate)
-      // formData.set("localities", JSON.stringify(localities))
-      // formData.set("description", worker.description)
-
       const emptyFields = Object.keys(worker).filter(key => worker[key]==="");
       setShakeFields(emptyFields);
 
@@ -79,20 +72,20 @@ const AccounCreatetWorker = () => {
       }
     }
 
-    const categories = [
-        {key: 'makeup', name:"Make-up Artist"}, 
-        {key: "carpenter", name: "Carpenter"}, 
-        {key: "electrician", name: "Electrician"}, 
-        {key: "mc", name: "MC (Master of Ceremony)"}, 
-        {key: "housekeep", name: "House Keeper"},
-        {key: "nanny", name: "Nanny"}
-    ];
+    // const categories = [
+    //     {key: 'makeup', name:"Make-up Artist"}, 
+    //     {key: "carpenter", name: "Carpenter"}, 
+    //     {key: "electrician", name: "Electrician"}, 
+    //     {key: "mc", name: "MC (Master of Ceremony)"}, 
+    //     {key: "housekeep", name: "House Keeper"},
+    //     {key: "nanny", name: "Nanny"}
+    // ];
 
     useEffect(()=>setHasFG(worker.featuredGraphics), [worker.featuredGraphics]);
     
-    useEffect(()=>dispatch(getTowns("647744b487968b971280e108")), 
+    useEffect(()=>dispatch(getTowns(user.contact.town._id)), 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dispatch]);
+    []);
     
     
     // eslint-disable-next-line no-unused-vars
@@ -150,37 +143,53 @@ const AccounCreatetWorker = () => {
         </div>
 
         <div className="mx-3 mt-4">
-          <div className="mb-3">
+          {/* <div className="mb-3">
             <label for="category" className="form-label">Category / Service Type </label>
             <select 
-              className={`form-select ${shakeFields.includes('category')? 'shake':''}`} 
-              aria-label="Select category"
-              name="category"
-              value={worker.category}
-              onChange={onChange} >
-              <option selected>select</option>
-              {categories.map(category => <option key={category.key} value={category.key}>{category.name}</option>)}
-          </select>
+                className={`form-select ${shakeFields.includes('category')? 'shake':''}`} 
+                aria-label="Select category"
+                name="category"
+                value={worker.category}
+                onChange={onChange} >
+                <option selected>select</option>
+                {categories.map(category => <option key={category.key} value={category.key}>{category.name}</option>)}
+            </select>
+          </div> */}
+
+          <div className="mb-3">
+            <label for="description" className="form-label">Service:</label>
+            <textarea 
+                type="text" 
+                name="description" 
+                className={`input ${shakeFields.includes('description')? 'shake':''}`} 
+                id="description"
+                placeholder='Tell us what you do'
+                rows={1}
+                value={worker.description}
+                onChange={onChange}
+            />
           </div>
 
           <div className="mb-3">
-            <label for="minRate" className="form-label">Minimum charge for job?</label>
+            <label for="minRate" className="form-label">Minimum charge:</label>
             <input 
                 name="minRate"
                 type="text" 
                 className={`input ${shakeFields.includes('minRate')? 'shake':''}`} 
                 id="minRate" 
+                placeholder='Least amount you charge per job'
                 value={worker.minRate}
                 onChange={onChange}
             />
           </div>
           <div className='mb-3'>
-              <label for="dailyRate" className="form-label">Your daily rate?</label>
+              <label for="dailyRate" className="form-label">Daily rate:</label>
               <input 
                   name="dailyRate"
                   type="text" 
                   className={`input ${shakeFields.includes('dailyRate')? 'shake':''}`} 
                   id="dailyRate" 
+                  placeholder="How much do you charge for a full day's job"
                   value={worker.dailyRate}
                   onChange={onChange}
               />
@@ -193,18 +202,6 @@ const AccounCreatetWorker = () => {
             setMychoices={setLocalities}
             suggestionTitle="Localities" /> */}
 
-          <div className="mb-3">
-            <label for="description" className="form-label">Description</label>
-            <textarea 
-                type="text" 
-                name="description" 
-                className={`input ${shakeFields.includes('description')? 'shake':''}`} 
-                id="description"
-                value={worker.description}
-                onChange={onChange}
-            />
-            <label for="description" className="form-label text-secondary">Describe the servies you perform</label>
-          </div>
         </div>
         <div className={`mb-3 text-center`}>
             <button disabled={loading} type="submit" className={`btn bg-primary-1 px-3 ${loading?'loading':''}`}>Create Account</button>

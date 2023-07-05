@@ -192,7 +192,7 @@ const WorkerDetails = ({ match, history }) => {
                     </li>
                     <li className="d-flex list-group-item ">
                       <div className="col">Pricing</div>
-                      <div className="col">{`${formatAmount(worker.pricing.minRate)} Per Job`}</div>
+                      <div className="col">{`${formatAmount(worker.pricing.minRate)} - ${formatAmount(worker.pricing.dailyRate)}`}</div>
                     </li>
                     <li className="d-flex list-group-item ">
                     <div className="col">Rating</div>
@@ -204,7 +204,7 @@ const WorkerDetails = ({ match, history }) => {
                 </ul>
                 </div>
 
-                {reviews&&<div className="card-body">
+                {reviews?.length>0&&<div className="card-body">
                   <ul className="list-group list-group-flush">
                       <li className="list-group-item">
                       <strong>RECENT REVIEWS</strong>
@@ -277,40 +277,8 @@ const WorkOrderModal = () => {
             name="description"
             value={description}
             onChange={e => setDescription(e.target.value)}
-            rows="3"
+            rows="2"
           />
-          <ul className="card-text d-flex flex-wrap list-unstyled text-center">
-            <li
-              className="col mt-1 me-1 px-2 text-nowrap"
-              style={{ maxWidth: "fit-content" }}
-            >
-              Suggestion:
-            </li>
-            <li
-              className="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
-              style={{ maxWidth: "fit-content" }}
-            >
-              Dispatch Job
-            </li>
-            <li
-              className="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
-              style={{ maxWidth: "fit-content" }}
-            >
-              Errands Job
-            </li>
-            <li
-              className="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
-              style={{ maxWidth: "fit-content" }}
-            >
-              Delivery Job
-            </li>
-            <li
-              className="badge border rounded-pill col mt-1 me-1 text-muted text-nowrap"
-              style={{ maxWidth: "fit-content" }}
-            >
-              Pick-up Job
-            </li>
-          </ul>
         </div>
         <div className="mb-3">
           <label htmlFor="location" className="form-label">
@@ -331,8 +299,8 @@ const WorkOrderModal = () => {
         <div className="mb-3 attention">
           <h5>ATTENTION</h5>
           <ul>
-            <li>{formatAmount(pricing.minRate)} is my minimum charge per job</li>
-            <li>I charge {formatAmount(pricing.dailyRate)} for full day jobs </li>
+            <li>{formatAmount(pricing.minRate)} is my minimum charge for a job </li>
+            <li>{formatAmount(pricing.dailyRate)} for full day engagement </li>
             <li>Other payment arrangements are negotiable</li>
           </ul>
 

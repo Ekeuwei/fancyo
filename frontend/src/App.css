@@ -320,6 +320,10 @@ input[type="password"]:focus{
   align-items: center;
   padding: 0;
   margin: 0 10px;
+  overflow: scroll;
+}
+.tabs-list::-webkit-scrollbar{
+  display: none;
 }
 
 .tab-item {

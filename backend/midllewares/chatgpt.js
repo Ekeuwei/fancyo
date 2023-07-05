@@ -46,8 +46,10 @@ exports.classify = catchAsyncErrors(async(req, res, next)=>{
             let category = await Category.findOne({name: title});
             
             if(!category){
-                await Category.create({ name: title })
+                category = await Category.create({ name: title })
             }
+
+            req.body.category = category;
 
         } catch (error) {
             console.log(error)

@@ -54,7 +54,7 @@ const workerSchema = new mongoose.Schema({
       type: String,
       required: true
     },
-    key:{
+    sn:{
       type: String,
       required: true
     }
