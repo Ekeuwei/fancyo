@@ -14,6 +14,7 @@ import { formatAmount } from "../Utils";
 import SearchDropdown from "../layout/SearchDropdown";
 import { getTowns } from "../../actions/prefsAction";
 import RatingStars from "../layout/RatingStars";
+import ErrorFetchingData from "../layout/ErrorFetchingData";
 
 const WorkerContext = createContext();
 
@@ -114,7 +115,7 @@ const WorkerDetails = ({ match, history }) => {
 
         {loading || loading === undefined? <Loader /> : <div className="container-0">
             <div className="rounded-bottom row g-0">
-            {worker&&<div className="col-12 col-md-7">
+            {worker?.length>0?<div className="col-12 col-md-7">
               {/* Start */}
               <div className="featured-graphics">
                 <img 
@@ -169,7 +170,7 @@ const WorkerDetails = ({ match, history }) => {
                     </span>
                 </div>
                 </div>
-            </div>}
+            </div>:<ErrorFetchingData />}
 
             <div className="col-12 col-md-5">
                 <div className="card-body pt-md-0 pe-md-0">
