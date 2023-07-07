@@ -12,6 +12,7 @@ const Review = require("../models/review");
 const FuzzySearch = require("../utils/FuzzySearch");
 const WhatAppTempId = require("../models/whatAppTempId");
 const { sendWhatsAppMessage } = require("../utils/taskNotification");
+const sendSMS = require("../utils/sendSMS");
 
 //Create new task => /api/v1/task/new
 exports.newTask = catchAsyncErrors(async (req, res, next) => {
@@ -49,6 +50,7 @@ exports.newTask = catchAsyncErrors(async (req, res, next) => {
         Confirming availability incurs a N100 service fee.\n
         For more details, log in to your dashboard on our web platform.
         https://www.ebiwon.com`;
+    const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, You have a job request in ${moreTask.location.town}, ${moreTask.location.lga.name}. Check your dashboard on the web platform to confirm availability. You have 30 mins to confirm. Visit https://www.ebiwon.com`
       
     const location = `Task location: ${moreTask.location.town}, ${moreTask.location.lga.name}, ${moreTask.location.lga.state.name} State.`
 
@@ -57,6 +59,7 @@ exports.newTask = catchAsyncErrors(async (req, res, next) => {
     
     const waId = `234${worker.owner.phoneNumber.slice(-10)}`
 
+    await sendSMS(SMSmessage, `+${waId}`);
     await sendWhatsAppMessage(waId, worker._id, {id:moreTask._id, header, message, location});
 
   }
@@ -122,7 +125,8 @@ exports.myTasks = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.requestApplication = catchAsyncErrors(async(req, res, next)=>{
-  const task = await Task.findById(req.body.taskId);
+  const task = await Task.findById(req.body.taskId)
+                .populate("user", "firstName lastName phoneNumber", User);
   
   const workerProfile = req.user.workers.find(workerProfile => workerProfile._id.equals(req.body.profileId));
 
@@ -145,6 +149,13 @@ exports.requestApplication = catchAsyncErrors(async(req, res, next)=>{
     message = message?.length > 7? message : "Sure, I'd be happy to take on the job!";
 
     task.applicants.push({worker: workerProfile._id, message});
+
+    if(task.applicants.length === 1){
+      const waId = `234${task.user.phoneNumber.slice(-10)}`
+      const message = `Hello ${task.user.firstName}, your ${task.title} job request has started receiving applications. Check your dashboard on the web platform to review and select the perfect candidate for the job. Visit https://www.ebiwon.com for more details.`
+      await sendSMS(message, `+${waId}`);
+      // Consider sending to the whatsapp platform
+    }
 
 
     await task.save();
@@ -258,11 +269,13 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
             Confirming availability incurs a N${platformCommission} service fee.\n
             For more details, log in to your dashboard on our web platform.
             https://www.ebiwon.com`;
-
+        const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, Congrats on being approved for the ${task.title} job!. Check your dashboard on the web platform to confirm availability. You have 30 mins to confirm. Visit https://www.ebiwon.com`
+            
         const location = `Task location: ${task.location.town}, ${task.location.lga.name}, ${task.location.lga.state.name} State.`
 
         // Notify the applicant to accept the work
         // TODO: check if worker has opted to receive whatsApp notification
+        await sendSMS(SMSmessage, `+${waId}`)
         await sendWhatsAppMessage(waId, applicantId, {id:task._id, header, message, location})
       }
 
@@ -300,7 +313,7 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
 
   }
 
-  await task.save();
+  // await task.save();
 
   res.status(200).json({
     success: true,
