@@ -4,7 +4,10 @@
   status = 200
 
 [[redirects]]
-  from = "/api/*"
   force = true
-  to = "https://coral-thankful-moonstone.glitch.me/api/:splat"
+  from = "/api/*"
   status = 200
+  to = "https://coral-thankful-moonstone.glitch.me/api/:splat"
+  
+  
+  #to = "https://ebiwoni-api.netlify.app/api/:splat"
