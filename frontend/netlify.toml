@@ -8,6 +8,3 @@
   from = "/api/*"
   status = 200
   to = "https://coral-thankful-moonstone.glitch.me/api/:splat"
-  
-  
-  #to = "https://ebiwoni-api.netlify.app/api/:splat"
