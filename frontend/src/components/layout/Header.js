@@ -15,7 +15,7 @@ const Header = () => {
 
     let user;
     try {
-        JSON.parse(localStorage.getItem('user'));
+        user = JSON.parse(localStorage.getItem('user'));
         
     } catch (error) {
         
