@@ -1,4 +1,9 @@
 [[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
   from = "/api/*"
   force = true
   to = "https://coral-thankful-moonstone.glitch.me/api/:splat"
