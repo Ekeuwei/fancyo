@@ -1,9 +1,0 @@
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-#"https://coral-thankful-moonstone.glitch.me/api/:splat"
-  
-  
-#"https://ebiwoni-api.netlify.app/api/:splat"

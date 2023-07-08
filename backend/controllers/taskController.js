@@ -13,13 +13,20 @@ const FuzzySearch = require("../utils/FuzzySearch");
 const WhatAppTempId = require("../models/whatAppTempId");
 const { sendWhatsAppMessage } = require("../utils/taskNotification");
 const sendSMS = require("../utils/sendSMS");
+const user = require("../models/user");
 
 //Create new task => /api/v1/task/new
 exports.newTask = catchAsyncErrors(async (req, res, next) => {
-  req.body.user = req.user.id
+  const user = req.user;
   req.body.workers = req.body.worker? [{worker: req.body.worker}]:[]
 
-  const task = await Task.create(req.body);
+  const tasksBelongsToUser = user.workers?.find(profile => profile._id.toString() === req.body.worker);
+
+  if(tasksBelongsToUser){
+    return next(new ErrorHandler("You cannot apply to self!", 403))
+  }
+
+  const task = await Task.create({...req.body, user: user.id});
 
 
   if(task && task.workers.length > 0){
@@ -50,7 +57,7 @@ exports.newTask = catchAsyncErrors(async (req, res, next) => {
         Confirming availability incurs a N100 service fee.\n
         For more details, log in to your dashboard on our web platform.
         https://www.ebiwon.com`;
-    const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, You have a job request in ${moreTask.location.town}, ${moreTask.location.lga.name}. Check your dashboard on the web platform to confirm availability. You have 30 mins to confirm. Visit https://www.ebiwon.com`
+    const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, You have a ${task.title} job request in ${moreTask.location.town}, ${moreTask.location.lga.name}. Check your dashboard on the web platform to confirm availability. You have 30 mins to confirm. Visit https://www.ebiwon.com`
       
     const location = `Task location: ${moreTask.location.town}, ${moreTask.location.lga.name}, ${moreTask.location.lga.state.name} State.`
 

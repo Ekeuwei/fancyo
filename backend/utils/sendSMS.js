@@ -8,7 +8,7 @@ const sendSMS = async (message, to)=>{
     const from = process.env.SMS_SENDER_ID
     try {
         status = await client.messages.create({body: message, from, to});
-        console.log(status.sid);
+        console.log('SMS sent: ',status.sid);
     } catch (error) {
         console.error(error.message)
     }
