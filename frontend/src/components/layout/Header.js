@@ -13,7 +13,13 @@ const Header = () => {
     const alert = useAlert()
     const dispatch = useDispatch()
 
-    const user = JSON.parse(localStorage.getItem('user'));
+    let user;
+    try {
+        JSON.parse(localStorage.getItem('user'));
+        
+    } catch (error) {
+        
+    }
 
     const logoutHandler = ()=>{
         dispatch(logout());
