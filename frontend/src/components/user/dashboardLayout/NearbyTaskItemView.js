@@ -1,11 +1,10 @@
 import React, { useState } from 'react'
 import TaskApplicationModal from '../../modal/TaskApplicationModal'
-import { useSelector } from 'react-redux';
 import { formatAmount, formatTime } from '../../Utils';
 
 const NearbyTaskItemView = ({task}) => {
     
-    const { user } = useSelector(state => state.auth)
+    const user = JSON.parse(localStorage.getItem("user"));
     
     const [show, setShow] = useState(false)
     const handleClose = ()=> setShow(false);
@@ -31,7 +30,7 @@ const NearbyTaskItemView = ({task}) => {
                 <button className={'btn accept'} onClick={openModal}>Apply</button>
             </div>
         </div>
-        {user&& <TaskApplicationModal workerProfiles={user?.workers} taskId={task._id} show={show} handleClose={handleClose}/>}
+        {user?.workers&& <TaskApplicationModal workerProfiles={user?.workers} taskId={task._id} show={show} handleClose={handleClose}/>}
     </div>
   )
 }

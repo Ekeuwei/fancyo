@@ -71,6 +71,7 @@ const GroupWorkers = ({taskWorker, taskId, displayButton, time, userMode, tabDir
 
     // const { userMode, tabDirection } = useContext(ManageJobsContext)
     const [showImage, setShowImage] = useState(true)
+    const handleCall = ()=> window.location.href = `tel:${taskWorker.worker.owner.phoneNumber}`
 
     return(
         <div className="timeline-item">
@@ -91,6 +92,8 @@ const GroupWorkers = ({taskWorker, taskId, displayButton, time, userMode, tabDir
                     <div className="jobrequest--action">
                         <i className={view.i} aria-hidden="true" style={{fontSize: "10px"}}></i>
                         <em><h6 className='single-line mb-0'>{view.status}</h6></em>
+                        {taskWorker.worker.owner.phoneNumber&&<button className="btn bg-accent-2" onClick={handleCall}>
+                        <i class="fa fa-phone fa-lg" aria-hidden="true" ></i> Call worker</button>}
                         <UpdateButton 
                             updateDetails={details} 
                             view={{...view, txt:`${displayButton(taskWorker)}` }} 
@@ -156,6 +159,7 @@ const SingleWorker = ({singleWorker, taskId, description, displayButton, time, u
     }
 
     const [showImage, setShowImage] = useState(true)
+    const handleCall = ()=> window.location.href = `tel:${singleWorker.worker.owner.phoneNumber}`
 
     return(
         <div className="jobrequest-item">
@@ -173,9 +177,12 @@ const SingleWorker = ({singleWorker, taskId, description, displayButton, time, u
                     <p>{formatTime(time)}</p>
                 </div>
                 <p className='message'>{description}</p>
+                <h6 className='single-line mb-0'>{'08030572700'}</h6>
                 <div className="jobrequest--action">
                     <i className={view.i} aria-hidden="true" style={{fontSize: "10px"}}></i>
-                    <em><h6 className='single-line mb-0'>{view.status}</h6></em>
+                    <h6 className='single-line mb-0 me-auto'><em>{view.status}</em></h6>
+                    {singleWorker.worker.owner.phoneNumber&&<button className="btn bg-accent-2" onClick={handleCall}>
+                        <i class="fa fa-phone fa-lg" aria-hidden="true" ></i> Call worker</button>}
                     <UpdateButton 
                         updateDetails={details} 
                         view={{...view, txt:`${displayButton(singleWorker)}`}} 
@@ -195,23 +202,23 @@ const label = (status)=>{
         case 'Accepted':
             return {
                 i: 'fa fa-circle text-orange me-1',
-                btn: 'bg-dark-3 btn ms-auto',
+                btn: 'bg-dark-3 btn d-none',
                 txt: 'Cancel',
                 status: 'In Progress',
-                action: ''
+                action: 'Cancelled'
             }
         case 'Pending':
             return {
                 i: 'fa fa-circle text-dark-3 me-1',
-                btn: 'bg-dark-3 btn ms-auto',
+                btn: 'bg-dark-3 btn',
                 txt: 'Cancel',
                 status,
-                action: ''
+                action: 'Cancelled'
             }
         case 'Completed':
             return {
                 i: 'fa fa-circle text-success me-1',
-                btn: 'btn ms-auto bg-secondary-3',
+                btn: 'btn bg-secondary-3',
                 txt: 'Confirm',
                 status,
                 action: 'Completed'
@@ -219,7 +226,7 @@ const label = (status)=>{
         case 'Request':
             return {
                 i: 'fa fa-circle text-success me-1',
-                btn: 'btn ms-auto bg-secondary-3',
+                btn: 'btn bg-secondary-3',
                 txt: 'Assign Task',
                 status,
                 action: 'Pending'
@@ -228,7 +235,7 @@ const label = (status)=>{
         default:
             return {
                 i: 'fa fa-circle text-dark-3 me-1',
-                btn: 'btn ms-auto bg-dark-3 d-none',
+                btn: 'btn bg-dark-3 d-none',
                 txt: 'Cancel',
                 status: `${status} by worker`,
                 action: 'Cancelled'

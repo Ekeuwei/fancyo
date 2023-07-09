@@ -17,6 +17,8 @@ const TaskRequestItemWorkerView = ({task, userMode, tabDirection})=>{
 
     const commission = task.budget * 0.1 || task.worker.pricing.minRate * 0.1;
     const [showImage, setShowImage] = useState(true)
+
+    const handleCall = ()=> window.location.href = `tel:${task.user.phoneNumber}`
     return (
         <div className="jobrequest-item">
             {showImage&& <div className="avatar">
@@ -37,11 +39,15 @@ const TaskRequestItemWorkerView = ({task, userMode, tabDirection})=>{
                 (<em><h6 className='single-line mb-0'>
                     <i className={view.i} aria-hidden="true" style={{fontSize: "10px"}}></i>
                         {pendingConfirmation?"Pending confirmation":view.txt}</h6></em>):
+                <>
                 <h5>
                     <i className="fa fa-map-marker me-1 text-danger" aria-hidden="true"></i>
-                    {task.location?.town}
-                </h5>}
+                    {`${task.location?.town} ${task.user.phoneNumber?'- 08030572700':''}`}
+                </h5>
+                </>}
                 <div className={`jobrequest--action ${taskConcluded? 'd-none':''}`}>
+                    {task.user.phoneNumber&&<button className="btn bg-accent-2" onClick={handleCall}>
+                        <i class="fa fa-phone fa-lg" aria-hidden="true" ></i> Call</button>}
                     <UpdateButton updateDetails={{...details, status:view.action.confirm}} view={{ txt:view.txt.confirm, btn:view.btn }} commission={commission} userMode={userMode} tabDirection={tabDirection} />
                     <UpdateButton updateDetails={{...details, status:view.action.decline}} view={{ txt:view.txt.decline, btn:'btn decline' }} commission={commission} userMode={userMode} tabDirection={tabDirection} />
                 </div>
@@ -77,7 +83,7 @@ const label = (status)=>{
         default:
             return {
                 i: 'fa fa-circle text-dark-3 me-1',
-                btn: 'btn ms-auto bg-dark-3',
+                btn: 'btn bg-dark-3',
                 txt: `Task ${status}`,
                 action: '',
         }

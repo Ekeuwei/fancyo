@@ -96,40 +96,6 @@ exports.newTaskRequest = catchAsyncErrors(async(req, res, next)=>{
   })
 })
 
-// Get logged in user task => /api/v1/user/tasks
-exports.myTasks = catchAsyncErrors(async (req, res, next) => {
-  const searchFields = ['status']
-  const resPerPage = 10;
-  const searchQuery = req.query.keyword==='undefined'?'':req.query;
-  const apiFeatures = new APIFeatures(Task.find({ user: req.user.id })
-    .populate("workers.review", "name comment rating", Review)
-    .populate({
-      path:"applicants.worker",
-      select:"message createdAt",
-      populate:{
-        path: "owner", 
-        select:"firstName lastName avatar"
-      }
-    })
-    .populate({
-      path:"workers.worker",
-      select:"pricing",
-      populate:{
-        path: "owner", 
-        select:"firstName lastName avatar"
-      }
-    }), searchQuery, searchFields)
-    .search()
-    // .filter()
-
-  apiFeatures.pagination(resPerPage);
-  let tasks = await apiFeatures.query;
-
-  res.status(200).json({
-    success: true,
-    tasks,
-  });
-});
 
 exports.requestApplication = catchAsyncErrors(async(req, res, next)=>{
   const task = await Task.findById(req.body.taskId)
@@ -178,6 +144,50 @@ exports.requestApplication = catchAsyncErrors(async(req, res, next)=>{
   }
 })
 
+// Get logged in user task => /api/v1/user/tasks
+exports.myTasks = catchAsyncErrors(async (req, res, next) => {
+  const searchFields = ['status']
+  const resPerPage = 10;
+  const searchQuery = req.query.keyword==='undefined'?'':req.query;
+  const apiFeatures = new APIFeatures(Task.find({ user: req.user.id })
+    .populate("workers.review", "name comment rating", Review)
+    .populate({
+      path:"applicants.worker",
+      select:"message createdAt",
+      populate:{
+        path: "owner", 
+        select:"firstName lastName avatar"
+      }
+    })
+    .populate({
+      path:"workers.worker",
+      select:"pricing",
+      populate:{
+        path: "owner", 
+        select:"firstName lastName phoneNumber avatar"
+      }
+    }), searchQuery, searchFields)
+    .search()
+    // .filter()
+
+  apiFeatures.pagination(resPerPage);
+  let tasks = await apiFeatures.query;
+
+  tasks = tasks.map(task => {
+      if(!['Completed', 'Accepted'].includes(task.status)) 
+          task.workers = task.workers.map(workerObj => {
+            workerObj.worker.owner.phoneNumber = null
+            return workerObj;
+          })
+      return task
+    })
+
+  res.status(200).json({
+    success: true,
+    tasks,
+  });
+});
+
 // Get logged in worker task => /api/v1/user/works
 exports.myWorks = catchAsyncErrors(async (req, res, next) => {
   const searchQuery = req.query.keyword==='undefined'?'':req.query;
@@ -185,7 +195,7 @@ exports.myWorks = catchAsyncErrors(async (req, res, next) => {
   const resPerPage = 10;
   const apiFeatures = new APIFeatures(Task.find({ "workers.worker": { $in: req.user.workers } })
     .populate('workers.worker','pricing')
-    .populate("user","firstName lastName avatar",User), searchQuery, searchFields)
+    .populate("user","firstName lastName avatar phoneNumber",User), searchQuery, searchFields)
     .search()
 
   apiFeatures.pagination(resPerPage);
@@ -194,6 +204,9 @@ exports.myWorks = catchAsyncErrors(async (req, res, next) => {
 
   if(works){
     works = works.map(task =>{
+      if(!['Completed', 'Accepted'].includes(task.status)) 
+        task.user.phoneNumber = null
+
       const workerIndex = task.workers.findIndex(workerObj => {
         return req.user.workers.some(worker => worker._id.equals(workerObj.worker._id))
       })
@@ -287,6 +300,11 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
       }
 
     }else{
+      // user cannot cancell a task that has been accepted
+      if(req.body.status === "Cancelled" && task.workers[workerIndex].escrow.worker === "Accepted"){
+        return next(new ErrorHandler("You cannot cancel this task"))
+      }
+
       task.workers[workerIndex].escrow.user = req.body.status;
     }
   }else if(loggedWorkerIndex !== -1) {
@@ -301,7 +319,10 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
   
     if(debitWorker){
 
-      await debitWallet(platformCommission, 'Work request comm', req.user._id);
+      const debitStatus = await debitWallet(platformCommission, 'Work request comm', req.user._id);
+      if(debitStatus === "insufficient"){
+        return next(new ErrorHandler("Insufficient fund, top up and try again", 402))
+      }
 
     }
   
@@ -320,7 +341,7 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
 
   }
 
-  // await task.save();
+  await task.save();
 
   res.status(200).json({
     success: true,

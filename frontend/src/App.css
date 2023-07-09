@@ -21,7 +21,7 @@
   --secondary04: #dff7e0;
   --secondary05: #E8F9E9;
   --accent01: #75bcf5;
-  --accent02: #63db6a;
+  --accent02: #fd7e14;
   --accent03: #37e4a6;
   --success: #198754;
   --info: #0dcaf0;
@@ -127,6 +127,7 @@
 }
 .bg-accent-2 {
   background-color: var(--accent02);
+  color: rgba(255, 255, 255, 0.90);
 }
 .bg-accent-3 {
   background-color: var(--accent03);
