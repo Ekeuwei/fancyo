@@ -57,8 +57,7 @@ exports.newTask = catchAsyncErrors(async (req, res, next) => {
         Confirming availability incurs a N100 service fee.\n
         For more details, log in to your dashboard on our web platform.
         https://www.ebiwon.com`;
-    const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, You have a ${task.title} job request in ${moreTask.location.town}, ${moreTask.location.lga.name}. Check your dashboard on the web platform to confirm availability. You have 30 mins to confirm. Visit https://www.ebiwon.com`
-      
+    const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, ${task.title} job request in ${moreTask.location.town}, ${moreTask.location.lga.name}. Please confirm your availability on the web platform. You have 30 mins to respond. Visit www.ebiwon.com`
     const location = `Task location: ${moreTask.location.town}, ${moreTask.location.lga.name}, ${moreTask.location.lga.state.name} State.`
 
     // create a whatsapp chat identifier
@@ -66,9 +65,8 @@ exports.newTask = catchAsyncErrors(async (req, res, next) => {
     
     const waId = `234${worker.owner.phoneNumber.slice(-10)}`
 
-    await sendSMS(SMSmessage, `+${waId}`);
-    await sendWhatsAppMessage(waId, worker._id, {id:moreTask._id, header, message, location});
-
+    sendSMS(SMSmessage, `+${waId}`);
+    sendWhatsAppMessage(waId, worker._id, {id:moreTask._id, header, message, location});
   }
 
   res.status(201).json({
@@ -289,14 +287,14 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
             Confirming availability incurs a N${platformCommission} service fee.\n
             For more details, log in to your dashboard on our web platform.
             https://www.ebiwon.com`;
-        const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, Congrats on being approved for the ${task.title} job!. Check your dashboard on the web platform to confirm availability. You have 30 mins to confirm. Visit https://www.ebiwon.com`
+        const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, Congrats on being approved for the ${task.title} job!. Check your dashboard on the web platform to confirm availability. You have 30 mins to confirm. Visit www.ebiwon.com`
             
         const location = `Task location: ${task.location.town}, ${task.location.lga.name}, ${task.location.lga.state.name} State.`
 
         // Notify the applicant to accept the work
         // TODO: check if worker has opted to receive whatsApp notification
-        await sendSMS(SMSmessage, `+${waId}`)
-        await sendWhatsAppMessage(waId, applicantId, {id:task._id, header, message, location})
+        sendSMS(SMSmessage, `+${waId}`)
+        sendWhatsAppMessage(waId, applicantId, {id:task._id, header, message, location})
       }
 
     }else{
