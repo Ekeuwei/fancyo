@@ -56,8 +56,8 @@ exports.newTask = catchAsyncErrors(async (req, res, next) => {
         You have a ${moreTask.title} job request from ${moreTask.user.firstName} ${moreTask.user.lastName}. Please confirm your availability within 30 minutes to receive the task owner's contact info.\n
         Confirming availability incurs a N100 service fee.\n
         For more details, log in to your dashboard on our web platform.
-        https://www.ebiwon.com`;
-    const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, ${task.title} job request in ${moreTask.location.town}, ${moreTask.location.lga.name}. Please confirm your availability on the web platform. You have 30 mins to respond. Visit www.ebiwon.com`
+        https://www.ebiwoni.com`;
+    const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, ${task.title} job request in ${moreTask.location.town}, ${moreTask.location.lga.name}. Please confirm your availability on the web platform. You have 30 mins to respond. Visit www.ebiwoni.com`
     const location = `Task location: ${moreTask.location.town}, ${moreTask.location.lga.name}, ${moreTask.location.lga.state.name} State.`
 
     // create a whatsapp chat identifier
@@ -123,7 +123,7 @@ exports.requestApplication = catchAsyncErrors(async(req, res, next)=>{
 
     if(task.applicants.length === 1){
       const waId = `234${task.user.phoneNumber.slice(-10)}`
-      const message = `Hello ${task.user.firstName}, your ${task.title} job request has started receiving applications. Check your dashboard on the web platform to review and select the perfect candidate for the job. Visit https://www.ebiwon.com for more details.`
+      const message = `Hello ${task.user.firstName}, your ${task.title} job request has started receiving applications. Check your dashboard on the web platform to review and select the perfect candidate for the job. Visit https://www.ebiwoni.com for more details.`
       await sendSMS(message, `+${waId}`);
       // Consider sending to the whatsapp platform
     }
@@ -286,8 +286,8 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
             Congrats on being approved for the ${task.title} job! Please confirm your availability within 30 minutes to receive the task owner's contact info.\n
             Confirming availability incurs a N${platformCommission} service fee.\n
             For more details, log in to your dashboard on our web platform.
-            https://www.ebiwon.com`;
-        const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, Congrats on being approved for the ${task.title} job!. Check your dashboard on the web platform to confirm availability. You have 30 mins to confirm. Visit www.ebiwon.com`
+            https://www.ebiwoni.com`;
+        const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, Congrats on being approved for the ${task.title} job!. Check your dashboard on the web platform to confirm availability. You have 30 mins to confirm. Visit www.ebiwoni.com`
             
         const location = `Task location: ${task.location.town}, ${task.location.lga.name}, ${task.location.lga.state.name} State.`
 
