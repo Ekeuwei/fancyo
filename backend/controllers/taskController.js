@@ -57,7 +57,7 @@ exports.newTask = catchAsyncErrors(async (req, res, next) => {
         Confirming availability incurs a N100 service fee.\n
         For more details, log in to your dashboard on our web platform.
         https://www.ebiwoni.com`;
-    const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, ${task.title} job request in ${moreTask.location.town}, ${moreTask.location.lga.name}. You have 30 mins to confirm your availability for this job. Visit www.ebiwoni.com/`
+    const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, ${task.title} job request in ${moreTask.location.town}, ${moreTask.location.lga.name}. You have 30 mins to confirm your availability for this job. Visit www.ebiwoni.com`
     const location = `Task location: ${moreTask.location.town}, ${moreTask.location.lga.name}, ${moreTask.location.lga.state.name} State.`
 
     // create a whatsapp chat identifier

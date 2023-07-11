@@ -40,8 +40,8 @@ const sendSMS = async (message, to)=>{
         if (error){
             console.error(error.message);
         }else{
-            const { message_id } = response.body
-            console.log('SMS sent: ', message_id);
+            const {message_id} = JSON.parse(response.body)
+            console.log('SMS sent: message_id-> ', message_id);
         }
     });
 
