@@ -1007,7 +1007,7 @@ input[type="password"]:focus{
 /* Spinner */
 .loading {
   position: relative;
-  color: transparent !important;
+  /* color: transparent !important; */
 }
 .loading::after{
   position: absolute;

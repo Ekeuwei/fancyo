@@ -28,8 +28,7 @@ const NearbyJobs = () => {
     }, [dispatch, user.contact]);
 
     return (
-        // loading?<Loader/>:
-        (<div className={`nearby-tasks ${loading&& 'loading'}`}>
+        (<div className={`nearby-tasks ${loading?'loading':''}`}>
             <div className="heading-link">
                 <div className="title">
                     <h5>Job Requests Near You</h5>

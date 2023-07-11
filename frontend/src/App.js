@@ -48,6 +48,7 @@ import AccounCreatetWorker from "./components/user/AccountCreateWorker";
 import NearbyJobs from "./components/user/dashboardLayout/NearbyJobs";
 import AllTasksAndWorks from "./components/user/dashboardLayout/AllTasksAndWorks";
 import PaymentHistory from "./components/user/dashboardLayout/PaymentHistory";
+import ManageJobs from "./components/user/dashboardLayout/ManageJobs";
 
 function App() {
   useEffect(() => {
@@ -77,8 +78,9 @@ function App() {
           <Route path='/worker/:id' component={WorkerDetails} />
 
           {/* Task */}
-          <Route path="/tasks" component={Task} exact />
-          <Route path="/works" component={WorkerTask} exact />
+          <Route path="/tasks" component={ManageJobs} exact />
+          {/* <Route path="/tasks" component={Task} exact /> */}
+          {/* <Route path="/works" component={WorkerTask} exact /> */}
           <Route path="/progress" component={TaskProgress} exact />
 
           {/* User */}

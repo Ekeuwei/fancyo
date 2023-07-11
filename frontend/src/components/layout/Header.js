@@ -83,9 +83,6 @@ const NavLinks = ({avatar, firstName, logoutHandler, switchMode, userMode, role}
             <ul className="dropdown-menu dropdown-menu-end bg-primary-1 m-0 border-0 end-0" aria-labelledby="dropdownMenu">
                 <li><Link className="dropdown-item text-white" to="/dashboard">Dashboard</Link></li>
                 <li><Link className="dropdown-item text-white" to="/account/profile">Account</Link></li>
-                {!userMode && <>
-                    <li><Link className="dropdown-item text-white" to="/works">My Orders</Link></li>
-                </>}
                 {role === 'worker'&&<li className="dropdown-item text-white" onClick={switchMode}>{`${userMode?'Worker':'User'} Mode`}</li>}
                 <li><Link className="dropdown-item text-white" to="/" onClick={logoutHandler}>Logout</Link></li>
             </ul>

@@ -57,7 +57,7 @@ exports.newTask = catchAsyncErrors(async (req, res, next) => {
         Confirming availability incurs a N100 service fee.\n
         For more details, log in to your dashboard on our web platform.
         https://www.ebiwoni.com`;
-    const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, ${task.title} job request in ${moreTask.location.town}, ${moreTask.location.lga.name}. Please confirm your availability on the web platform. You have 30 mins to respond. Visit www.ebiwoni.com`
+    const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, ${task.title} job request in ${moreTask.location.town}, ${moreTask.location.lga.name}. You have 30 mins to confirm your availability for this job. Visit www.ebiwoni.com/`
     const location = `Task location: ${moreTask.location.town}, ${moreTask.location.lga.name}, ${moreTask.location.lga.state.name} State.`
 
     // create a whatsapp chat identifier
@@ -287,7 +287,7 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
             Confirming availability incurs a N${platformCommission} service fee.\n
             For more details, log in to your dashboard on our web platform.
             https://www.ebiwoni.com`;
-        const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, Congrats on being approved for the ${task.title} job!. Check your dashboard on the web platform to confirm availability. You have 30 mins to confirm. Visit www.ebiwoni.com`
+        const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, Congrats on being approved for the ${task.title} job! You have 30 mins to confirm your availability for this job. Visit www.ebiwoni.com`
             
         const location = `Task location: ${task.location.town}, ${task.location.lga.name}, ${task.location.lga.state.name} State.`
 
