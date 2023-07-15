@@ -1,14 +1,11 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect } from 'react'
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
 import MetaData from '../layout/MetaData';
 
 import { forgotPassword, clearErrors } from '../../actions/userActions'
-import { Link } from 'react-router-dom/cjs/react-router-dom.min';
 
-const ForgotPassword = () => {
-
-    const [email, setEmail] = useState('')
+const ForgotPassword = ({email, setEmail, setShowResetPassword}) => {
     
     const alert = useAlert();
     const dispatch = useDispatch()
@@ -51,13 +48,13 @@ const ForgotPassword = () => {
                             <input
                                 type="email"
                                 id="email_field"
-                                className="form-control"
+                                className="input"
                                 value={email}
                                 onChange={(e)=> setEmail(e.target.value)}
                             />
                         </div>
                         <div class="mb-3 text-end">
-                            <Link to="/login" className="btn btn-link text-dark-1">Back to login</Link>
+                            <button onClick={()=>setShowResetPassword(false)} className="btn btn-link text-dark-1">Back to login</button>
                             <button type="submit" disabled={loading} className={`btn bg-primary-1 px-3 ${loading? 'loading':''}`}>Send Email</button>
                         </div>
 

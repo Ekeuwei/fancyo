@@ -7,12 +7,14 @@ import MetaData from '../layout/MetaData';
 
 import { login, clearErrors } from '../../actions/userActions'
 import SendActivationLink from './SendActivationLink';
+import ForgotPassword from './ForgotPassword';
 
 const Login = ({ history, location }) => {
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showRequestLinkForm, setRequestLinkForm] = useState(false)
+    const [showResetPassword, setShowResetPassword] = useState(false)
 
     const alert = useAlert();
     const dispatch = useDispatch()
@@ -58,6 +60,7 @@ const Login = ({ history, location }) => {
             <Fragment>
                 <MetaData title={'Login'} />
                 <section className="center-screen tile">
+                    {!showResetPassword?
                     <div className="auth">
                         {showRequestLinkForm? 
                         <>
@@ -92,7 +95,7 @@ const Login = ({ history, location }) => {
                                     onChange={(e)=> setPassword(e.target.value)}
                                 />
                                 <div className="text-end">
-                                    <a href="/password/forgot" className="navbar-brand fs-6 text-dark-1 text-end">Forgot Password</a>
+                                    <button onClick={()=>setShowResetPassword(true)} className="btn btn-link text-dark-1">Forgot password</button>
                                 </div>
                             </div>
                             <div className="mb-3 text-end">
@@ -100,7 +103,8 @@ const Login = ({ history, location }) => {
                                 <button type="submit" disabled={loading} className={`btn bg-primary-1 px-3 ${loading?'loading':''}`}>Login</button>
                             </div>
                         </form>}
-                    </div>
+                    </div>:
+                    <ForgotPassword email={email} setEmail={setEmail} setShowResetPassword={setShowResetPassword}/>}
                 </section>
             </Fragment>
         </Fragment>

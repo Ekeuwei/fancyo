@@ -16,7 +16,6 @@ import store from "./store";
 import ProtectedRoute from "./components/route/ProtectedRoute";
 import UpdateProfile from "./components/user/UpdateProfile";
 import UpdatePassword from "./components/user/UpdatePassword";
-import ForgotPassword from "./components/user/ForgotPassword";
 import NewPassword from "./components/user/NewPassword";
 
 // Cart imports
@@ -86,7 +85,7 @@ function App() {
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} exact />
           <Route path="/activate" component={Activate} exact />
-          <Route path="/password/forgot" component={ForgotPassword} exact />
+          {/* <Route path="/password/forgot" component={ForgotPassword} exact /> */}
           <Route path="/password/reset/:token" component={NewPassword} exact />
           <Route path="/dashboard" component={Dashboard} exact/>
           {/* <ProtectedRoute path = "/me" component = {MyProfile} exact /> */}

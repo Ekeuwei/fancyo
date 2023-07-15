@@ -136,7 +136,8 @@ exports.passwordResetTemplate = (url, email, firstName) =>`
     
     <p>If you didn't request a password reset, you can ignore this email. Your password will not be changed.</p>
     
-    <p>Thank you</br> The ${process.env.APP_NAME} Team.</p>
+    <p>Thank you,</p>
+    <p>The ${process.env.APP_NAME} Team</p>
   </div>
 </body>
 </html>
