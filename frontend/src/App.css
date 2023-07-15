@@ -103,20 +103,21 @@
   background-color: var(--primary01);
   color: var(--white);
 }
-.bg-primary-1 {
-  background-color: var(--primary01);
-}
 .bg-primary-2 {
   background-color: var(--primary02);
+  color: var(--white);
 }
 .bg-primary-3 {
   background-color: var(--primary03);
+  color: var(--white);
 }
 .bg-secondary-1 {
   background-color: var(--secondary01);
+  color: var(--white);
 }
 .bg-secondary-2 {
   background-color: var(--secondary02);
+  color: var(--white);
 }
 .bg-secondary-3 {
   background-color: var(--secondary03);
@@ -243,7 +244,7 @@ input, textarea{
   border: none;
   outline: none;
   background: transparent;
-  width: 100%;
+  flex: 1;
   min-width: 100px;
   /* margin-left: 10px;
   margin-right: 10px; */
@@ -1004,16 +1005,54 @@ input[type="password"]:focus{
   border-radius: 10px;
 }
 
+.status-message{
+  text-align: center;
+  /* background-color: var(--white); */
+  box-shadow: 0 0 0 0.15rem rgba(81, 81, 82, 0.25);
+  transition: border-color .15s ease-in-out,
+    box-shadow .15s ease-in-out;
+  font-weight: 500;
+  padding: 1em;
+  border-radius: .625em;
+  margin: 1em 0;
+}
+.error{
+  color: var(--red);
+}
+.success{
+  color: var(--green)
+}
+.status-message .action{
+  color: var(--blue);
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+}
+
 /* Spinner */
 .loading {
   position: relative;
   /* color: transparent !important; */
 }
+.loading::before{
+  position: absolute;
+  content: '';
+  display: flex;
+  background-color: #aeaeae;
+  border-radius: 50%;
+  aspect-ratio: 1/1;
+  width: auto;
+  height: 80%;
+  max-height: 3.725rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 .loading::after{
   position: absolute;
   content: '';
   display: flex;
-  border: 3px solid rgba(0, 0, 0, 0.2);
+  border: 3px solid rgba(255, 255, 255, 0.8);
   border-top-color: #3498db;
   border-radius: 50%;
   aspect-ratio: 1/1;

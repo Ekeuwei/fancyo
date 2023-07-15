@@ -44,6 +44,11 @@ const userSchema = new mongoose.Schema({
         minlength: [6, 'Your password must be at least 6 characters long'],
         select: false //the password should not be displayed when displaying the user
     },
+    isActivated: {
+        type: Boolean,
+        select: false,
+        default: false
+    },
     avatar: {
         public_id:{
             type: String,
@@ -75,6 +80,10 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    activationToken:{
+        type: String,
+        select: false
+    },
     resetPasswordToken: String,
     resetPasswordExpires: Date
 });
@@ -100,6 +109,17 @@ userSchema.methods.getJwtToken = function(){
     return jwt.sign({ id: this._id }, process.env.JWT_SECRET, { 
         expiresIn: process.env.JWT_EXPIRES_TIME
     })
+}
+
+// Generate activation token
+userSchema.methods.getActivationToken = function(){
+    // Generate token
+    const activationToken = crypto.randomBytes(20).toString('hex');
+
+    // set to activationToken
+    this.activationToken = activationToken;
+
+    return activationToken;
 }
 
 // Generate password reset token

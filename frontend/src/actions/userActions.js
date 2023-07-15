@@ -64,7 +64,13 @@ import {
     CHANGE_USER_MODE_FAIL,
     WALLET_TRANSACTIONS_REQUEST,
     WALLET_TRANSACTIONS_SUCCESS,
-    WALLET_TRANSACTIONS_FAIL
+    WALLET_TRANSACTIONS_FAIL,
+    ACTIVATION_LINK_REQUEST,
+    ACTIVATION_LINK_SUCCESS,
+    ACTIVATION_LINK_FAIL,
+    ACTIVATE_ACCOUNT_REQUEST,
+    ACTIVATE_ACCOUNT_SUCCESS,
+    ACTIVATE_ACCOUNT_FAIL
 } from '../constants/userConstants'
 
 // Login
@@ -115,6 +121,44 @@ export const register = (userData) => async (dispatch) =>{
     } catch (error) {
         dispatch({
             type: REGISTER_USER_FAIL,
+            payload: error.response.data.message
+        })
+    }
+}
+
+export const activationLink = (email) => async (dispatch)=> {
+    try {
+        dispatch({type: ACTIVATION_LINK_REQUEST})
+
+        const { data } = await axios.get(`/api/v1/activate?email=${email}`)
+        
+        dispatch({
+            type: ACTIVATION_LINK_SUCCESS,
+            payload: data.message
+        })
+
+    } catch (error) {
+        dispatch({
+            type: ACTIVATION_LINK_FAIL,
+            payload: error.response.data.message
+        })
+    }
+}
+
+export const activateAccount = (token) => async (dispatch)=>{
+    try {
+
+        dispatch({type: ACTIVATE_ACCOUNT_REQUEST})
+        const { data } = await axios.get(`/api/v1/activate/${token}`)
+        
+        dispatch({
+            type: ACTIVATE_ACCOUNT_SUCCESS,
+            payload: data
+        })
+
+    } catch (error) {
+        dispatch({
+            type: ACTIVATE_ACCOUNT_FAIL,
             payload: error.response.data.message
         })
     }

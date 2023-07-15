@@ -11,6 +11,8 @@ import {
   productReviewReducer,
 } from "./reducers/productReducers";
 import {
+  activateAccountReducer,
+  activationLinkReducer,
   allUsersReducer,
   authReducer,
   forgotPasswordReducer,
@@ -64,6 +66,8 @@ const reducer = combineReducers({
   allUsers: allUsersReducer,
   userDetails: userDetailsReducer,
   forgotPassword: forgotPasswordReducer,
+  activateAccount: activateAccountReducer,
+  activationLink: activationLinkReducer,
   cart: cartReducer,
   newOrder: newOrderReducer,
   myOrders: myOrderReducer,

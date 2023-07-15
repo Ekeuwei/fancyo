@@ -93,13 +93,13 @@ const Home = ({ match }) => {
                         <div className="bg-secondary-4 p-3 text-dark-2">
                             <h3 className="text-md-center mb-3">How it Works</h3>
                             <div className="col-12 col-lg-6">
-                                {howItWorks.map(how =>(<>            
+                                {howItWorks.map(how =>(<div key={how.step}>            
                                     <h5 className="mb-1">
                                         <i className="fa fa-check-circle me-2" aria-hidden="true"></i>
                                         {how.step}
                                     </h5>
                                     <p>{how.details}</p>
-                                </>))}
+                                </div>))}
                             </div>
 
                             <div className="col-12 col-lg-6 col-md-9 my-auto">

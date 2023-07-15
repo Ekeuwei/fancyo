@@ -20,7 +20,9 @@ const {
     getUserDetails,
     updateUser,
     deleteUser,
-    changeMode
+    changeMode,
+    activateUser,
+    resendActivationToken
 } = require ('../controllers/authController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../midllewares/auth')
@@ -29,6 +31,8 @@ const { isAuthenticatedUser, authorizeRoles } = require('../midllewares/auth')
 // router.route('/artisan/login').post(loginArtisan);
 
 router.route('/register').post(registerUser);
+router.route('/activate').get(resendActivationToken);
+router.route('/activate/:token').get(activateUser);
 router.route('/login').post(loginUser);
 
 router.route('/password/forgot').post(forgotPassword);

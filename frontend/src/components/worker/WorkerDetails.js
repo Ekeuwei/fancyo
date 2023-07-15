@@ -7,7 +7,7 @@ import MetaData from "../layout/MetaData";
 import { Modal } from "react-bootstrap";
 import { useAlert } from "react-alert";
 import { getWorkerDetails, clearErrors, getWorkerReviews } from "../../actions/workerActions";
-import { getTasksReviews, newTask } from "../../actions/taskAction";
+import { newTask } from "../../actions/taskAction";
 import { NEW_TASK_RESET } from "../../constants/taskConstants";
 import dateFormat from "dateformat";
 import { formatAmount } from "../Utils";
@@ -55,6 +55,7 @@ const WorkerDetails = ({ match, history }) => {
 
   useEffect(()=>{
     dispatch(getWorkerReviews(match.params.id))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const { towns } = useSelector(state => state.prefs);
@@ -210,7 +211,7 @@ const WorkerDetails = ({ match, history }) => {
                       <li className="list-group-item">
                       <strong>RECENT REVIEWS</strong>
                       </li>
-                      {reviews.map(review => (<li className="list-group-item">
+                      {reviews.map(review => (<li className="list-group-item" key={review._id}>
                         <span className="col">
                             <strong className="me-1">{review.name}</strong>
                             <RatingStars rating={review.rating}/>

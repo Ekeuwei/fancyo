@@ -55,6 +55,12 @@ import {
   WALLET_TRANSACTIONS_REQUEST,
   WALLET_TRANSACTIONS_SUCCESS,
   WALLET_TRANSACTIONS_FAIL,
+  ACTIVATION_LINK_REQUEST,
+  ACTIVATION_LINK_SUCCESS,
+  ACTIVATION_LINK_FAIL,
+  ACTIVATE_ACCOUNT_REQUEST,
+  ACTIVATE_ACCOUNT_SUCCESS,
+  ACTIVATE_ACCOUNT_FAIL,
 } from "../constants/userConstants";
 
 export const authReducer = (state = { user: {} }, action) => {
@@ -129,6 +135,50 @@ export const authReducer = (state = { user: {} }, action) => {
   }
 };
 
+export const activateAccountReducer = (state = {}, action)=>{
+  switch (action.type) {
+    case ACTIVATE_ACCOUNT_REQUEST:
+      return{
+        loading: true,
+        message: action.payload
+      }
+    case ACTIVATE_ACCOUNT_SUCCESS:
+      return{
+        ...state,
+        loading: false,
+        message: action.payload,
+      }
+    case ACTIVATE_ACCOUNT_FAIL:
+      return{
+        loading: false,
+        error: action.payload
+      }
+    default:
+      return {...state}
+  }
+}
+
+export const activationLinkReducer = (state = {}, action)=>{
+  switch (action.type) {
+    case ACTIVATION_LINK_REQUEST:
+      return{
+        loading: true
+      }
+    case ACTIVATION_LINK_SUCCESS:
+      return{
+        ...state,
+        loading: false,
+        message: action.payload,
+      }
+    case ACTIVATION_LINK_FAIL:
+      return{
+        loading: false,
+        error: action.payload
+      }
+    default:
+      return {...state}
+  }
+}
 export const userReducer = (state = {}, action) => {
   switch (action.type) {
     case UPDATE_PROFILE_REQUEST:

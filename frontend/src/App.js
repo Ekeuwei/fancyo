@@ -34,11 +34,9 @@ import Dashboard from "./components/user/Dashboard";
 import UsersList from "./components/admin/UsersList";
 import UpdateUser from "./components/admin/UpdateUser";
 import ProductReviews from "./components/admin/ProductReviews";
-import Task from "./components/user/Task";
 import TaskProgress from "./components/user/TaskProgress";
 import CreateWorker from "./components/worker/CreateWorker";
 import WorkerDetails from "./components/worker/WorkerDetails";
-import WorkerTask from "./components/user/task/WorkerTasks";
 import Category from "./components/Category";
 import AccountProfile from "./components/user/AccountProfile";
 import AccountAddress from "./components/user/AccountAddress";
@@ -49,6 +47,7 @@ import NearbyJobs from "./components/user/dashboardLayout/NearbyJobs";
 import AllTasksAndWorks from "./components/user/dashboardLayout/AllTasksAndWorks";
 import PaymentHistory from "./components/user/dashboardLayout/PaymentHistory";
 import ManageJobs from "./components/user/dashboardLayout/ManageJobs";
+import Activate from "./components/user/Activate";
 
 function App() {
   useEffect(() => {
@@ -86,6 +85,7 @@ function App() {
           {/* User */}
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} exact />
+          <Route path="/activate" component={Activate} exact />
           <Route path="/password/forgot" component={ForgotPassword} exact />
           <Route path="/password/reset/:token" component={NewPassword} exact />
           <Route path="/dashboard" component={Dashboard} exact/>

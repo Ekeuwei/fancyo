@@ -10,10 +10,13 @@ const cloudinary = require('cloudinary');
 const Wallet = require('../models/wallet');
 const Worker = require('../models/worker');
 const Town = require('../models/address/town');
+const { activationEmailTemplate, activationEmailTemplate2, passwordResetTemplate } = require('../utils/emailTemplates');
  
 // Register a user => /api/v1/register
 
 exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
+
+    let activationToken = undefined;
 
     const { firstName, lastName, phoneNumber, gender, email, password, avatar } = req.body;
     
@@ -45,12 +48,33 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
         })
 
         user.walletId = wallet._id;
+        
+        activationToken = user.getActivationToken();
 
-        user = await user.save();
+        user = await user.save({ validateStateBeforeSave: false });
 
     } catch (error) {
         await cloudinary.v2.uploader.destroy(result.public_id); // Delete uploaded image
         next(new ErrorHandler(error.message, 500));
+    }
+
+    // Create activation url
+    const activationUrl = `${process.env.FRONTEND_URL}/activate?token=${activationToken}`
+
+    // const message = `Please click on the following link to activate your account:\n\n${activationUrl}\n\nPlease ignore this message if you did authorize the requested.`
+    const message = activationEmailTemplate(activationUrl, user.firstName)
+
+    try {
+
+        await sendEmail({
+            email: user.email,
+            subject: `${process.env.APP_NAME} Account Activation`,
+            message
+        });
+
+    } catch (error) {
+
+        next(new ErrorHandler(error.message), 500)
     }
 
     sendToken(user, 200, res);
@@ -70,7 +94,7 @@ exports.loginUser = catchAsyncErrors( async (req, res, next)=>{
     const user = await User.findOne({ email })
                 .populate({path: 'contact.town', select: 'name lga state', populate:{path: 'lga state', select: 'name'}})
                 .populate('workers', 'category', Worker)
-                .select('+password');
+                .select('+password +isActivated');
 
     if(!user){
         return next(new ErrorHandler('Invalid Email or Password', 401))
@@ -82,8 +106,82 @@ exports.loginUser = catchAsyncErrors( async (req, res, next)=>{
     if(!isPasswordMatched){
         return next(new ErrorHandler('Invalid Email or Password', 401))
     }
+    
+    if(!user.isActivated){
 
-    sendToken(user, 200, res);
+        res.status(401).json({
+            isActivated: false,
+            message: 'Please activate your account and try again'
+        })
+
+    }else{
+
+        sendToken(user, 200, res);
+    }
+
+});
+
+// Reset password => /api/v1/activate
+exports.resendActivationToken = catchAsyncErrors( async (req, res, next) => {
+
+    const user = await User.findOne( { email: req.query.email });
+
+    if(!user){
+        return next(new ErrorHandler('User not found with this email', 404));
+    }
+
+    // Set up new password
+    const activationToken = user.getActivationToken();
+    await user.save({ validateStateBeforeSave: false });
+
+    // Create activation url
+    const activationUrl = `${process.env.FRONTEND_URL}/activate?token=${activationToken}`
+
+    // const message = `Please click on the following link to activate your account:\n\n${activationUrl}\n\nPlease ignore this message if you did authorize the requested.`
+    const message = activationEmailTemplate2(activationUrl, user.firstName)
+
+    try {
+
+        await sendEmail({
+            email: user.email,
+            subject: `${process.env.APP_NAME} Account Activation`,
+            message
+        });
+
+        res.status(200).json({
+            success: true,
+            message: `Activation link sent`
+        });
+
+    } catch (error) {
+        user.activationToken = undefined;
+        await user.save({ validateStateBeforeSave: false });
+        next(new ErrorHandler(error.message), 500)
+    }
+
+});
+
+// Activate user account => /api/v1/activate/:token
+exports.activateUser = catchAsyncErrors( async (req, res, next) => {
+
+    const user = await User.findOne({ activationToken: req.params.token });
+
+    if(!user){
+        return next(new ErrorHandler('Invalid activation token', 400));
+    }
+
+    // Set up new password
+    user.isActivated = true;
+    user.activationToken = undefined;
+
+    // await user.save();
+
+    res.status(200).json({
+        success: true,
+        title: "Account activation successful",
+        message: `Congratulations! Your account has been successfully verified and activated. You can now fully access and enjoy all the features and services provided by ${process.env.APP_NAME}.`
+    })
+
 });
 
 // Forgot Password => /api/v1/password/forgot
@@ -100,16 +198,17 @@ exports.forgotPassword = catchAsyncErrors( async (req, res, next) => {
     await user.save( { validateStateBeforeSave: false });
 
     // Create reset password url
-    // const resetUrl = `${process.env.FRONTEND_URL}/password/reset/${resetToken}` // Development
-    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/password/reset/${resetToken}`
+    const resetUrl = `${process.env.FRONTEND_URL}/password/reset/${resetToken}` 
+    // const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/password/reset/${resetToken}` // Development
 
-    const message = `Your password reset token is as follow:\n\n${resetUrl}\n\nPlease ignore this message if you did authorize the requested.`
+    // const message = `Your password reset token is as follow:\n\n${resetUrl}\n\nPlease ignore this message if you did authorize the requested.`
+    const message = passwordResetTemplate(resetUrl, user.email, user.firstName)
 
     try {
 
         await sendEmail({
             email: user.email,
-            subject: 'Ebiwani Password Recovery',
+            subject: `${process.env.APP_NAME} Password Recovery`,
             message
         });
 
