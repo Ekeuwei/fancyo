@@ -125,6 +125,7 @@
 }
 .bg-accent-1 {
   background-color: var(--accent01);
+  color: var(--white);
 }
 .bg-accent-2 {
   background-color: var(--accent02);
@@ -239,7 +240,36 @@
 }
 
 /* Input starts */
-
+.accord{
+  border-radius: .625rem;
+  overflow: hidden;
+  margin: .625rem 0;
+  box-shadow: 0 0 0 0.15rem rgba(42, 119, 182, .35);
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+.accord .head{
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  box-shadow: none;
+  border: none;
+  padding: .6125rem 1rem;
+  background-color: #2a77b6;
+  color:white;
+}
+.accord .btn{
+  border-radius: .3125rem;
+  padding: .3125rem 1rem;
+  background-color: hwb(207 16% 29%);
+}
+.accordion-body{
+  /* border-left: solid #75bcf5;
+  border-right: solid #75bcf5;
+  border-bottom: solid #75bcf5;
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem; */
+}
 input, textarea{
   border: none;
   outline: none;
@@ -635,7 +665,8 @@ input[type="password"]:focus{
 .jobrequest--action{
   display: flex;
   width: 100%;
-  column-gap: 5px;
+  flex-wrap: wrap;
+  gap: 5px;
 }
 .list-- .jobrequest--action{
   align-items: center;

@@ -18,7 +18,7 @@ exports.createWorker = catchAsyncErrors(async (req, res, next) => {
 
   // console.log(user);
 
-  if(user.workers.length <= 10 || user.role === 'admin'){
+  if(user.workers.length < 1 || user.role === 'admin'){
 
 
     const featuredGraphicsUpload = await cloudinary.v2.uploader.upload(req.body.featuredGraphics, {
@@ -46,15 +46,18 @@ exports.createWorker = catchAsyncErrors(async (req, res, next) => {
     
     await Town.bulkWrite(bulkOps)
     
-    // localities = [...localities, ...town.getUpsertedIds()]
-
-    // const existingLocalities = localities.filter(el => el._id !== undefined).map(el => el._id.toString());
     const existingLocalities = localities.map(el => el.name);
+
+    const userLocation = await Town.findById(user.contact.town.id).populate({
+      path: "lga state", select: "name sn"
+    })
+    const location = {state: userLocation.state.sn, lga: userLocation.lga.sn, town: userLocation.name};
 
     try {
       worker = await Worker.create({
         owner: user.id,
         description,
+        location,
         localities: existingLocalities,
         category,
         featuredGraphics: {public_id: featuredGraphicsUpload.public_id, url: featuredGraphicsUpload.secure_url},
@@ -87,17 +90,29 @@ exports.getWorkers = catchAsyncErrors(async (req, res, next) => {
 
   const resPerPage = 5;
   const workersCount = await Worker.countDocuments();
-  const searchFields = ['category.name', 'description', 'displayName', 'localities']
+  const searchFields = ['category.name', 'description', 'displayName']
   const query = Worker.find().populate('owner', 'firstName lastName avatar contact', User)
   // const apiFeatures = new APIFeatures(query, req.query, searchFields)
   //                     .search()
                       // .filter()
 
+  const searchQuery = {}
+  if (req.query.s) {
+    searchQuery['location.state'] = req.query.s;
+  }
 
+  if (req.query.l) {
+    searchQuery['location.lga'] = req.query.l;
+  }
+
+  if (req.query.t) {
+    searchQuery['location.town'] = req.query.t;
+  }
+  if (req.query.category) {
+    searchQuery['category.sn'] = req.query.category;
+  }
  
-
-
-  const documents = await Worker.find()
+  const documents = await Worker.find(searchQuery)
                     .populate({
                       path: 'owner',
                       select: 'firstName lastName avatar',

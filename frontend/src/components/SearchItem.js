@@ -8,9 +8,8 @@ const SearchItem = ({worker, viewArtisan})=> {
       style={{ maxWidth: "16rem", minWidth: "11rem" }}
     >
       <div
-        onClick={viewArtisan}
-        uid={worker._id}
-        className="card mx-auto border-0 bg-secondary-2"
+        onClick={()=>viewArtisan(worker._id)}
+        className="card mx-auto border-0 bg-secondary-2 text-dark"
       >
         <h5 className="card-title py-2 bg-primary-1 text-uppercase text-white single-line">
           {worker.category.name}

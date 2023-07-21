@@ -47,12 +47,14 @@ export const createWorker = (workerData) => async (dispatch) => {
 
 //Get All Workers
 export const getWorkers =
-  (keyword = "", currentPage = 1, category, ratings = 0) =>
+  (keyword = "", currentPage = 1, state="", lga="", town="", category, ratings = 0) =>
   async (dispatch) => {
     try {
       dispatch({ type: ALL_WORKERS_REQUEST });
 
       let link = `/api/v1/workers?keyword=${keyword}&page=${currentPage}
+                    &s=${state}&l=${lga}&t=${town}&ratings[gte]=${ratings}`;
+      let link_1 = `/api/v1/workers?keyword=${keyword}&page=${currentPage}
                     &ratings[gte]=${ratings}`;
 
       if (category) {

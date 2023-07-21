@@ -21,7 +21,7 @@ const Category = ({match}) => {
         if(error){
             return  alert.error(error)
         }
-        dispatch(getWorkers(keyword, currentPage, category, rating))
+        dispatch(getWorkers(keyword, currentPage,"","","", category, rating))
     }, [dispatch, category, currentPage, rating, error, keyword, alert]);
 
     return (

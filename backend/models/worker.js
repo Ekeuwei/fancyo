@@ -46,6 +46,11 @@ const workerSchema = new mongoose.Schema({
         required: true
     }
   },
+  location:{
+    state: String,
+    lga: String,
+    town: String
+  },
   localities: [{
     type: String
   }],
