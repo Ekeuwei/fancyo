@@ -38,28 +38,25 @@ const ForgotPassword = ({email, setEmail, setShowResetPassword}) => {
         <Fragment>
             <MetaData title={'Forgot Pasword'} />
 
-            <div className="center-screen tile">
-                
-                <div className="auth shadow-lg">
-                    <form onSubmit={submitHandler}>
-                        <h3 className="mb-3 text-start">Forgot Password</h3>
-                        <div className="mb-3">
-                            <label htmlFor="email_field">Enter Email</label>
-                            <input
-                                type="email"
-                                id="email_field"
-                                className="input"
-                                value={email}
-                                onChange={(e)=> setEmail(e.target.value)}
-                            />
-                        </div>
-                        <div class="mb-3 text-end">
-                            <button onClick={()=>setShowResetPassword(false)} className="btn btn-link text-dark-1">Back to login</button>
-                            <button type="submit" disabled={loading} className={`btn bg-primary-1 px-3 ${loading? 'loading':''}`}>Send Email</button>
-                        </div>
+            <div className="auth shadow-lg">
+                <form onSubmit={submitHandler}>
+                    <h3 className="mb-3 text-start">Forgot Password</h3>
+                    <div className="mb-3">
+                        <label htmlFor="email_field">Enter Email</label>
+                        <input
+                            type="email"
+                            id="email_field"
+                            className="input"
+                            value={email}
+                            onChange={(e)=> setEmail(e.target.value)}
+                        />
+                    </div>
+                    <div class="mb-3 text-end">
+                        <button type='button' onClick={()=>setShowResetPassword(false)} className="btn btn-link text-dark-1">Back to login</button>
+                        <button type="submit" disabled={loading} className={`btn bg-primary-1 px-3 ${loading? 'loading':''}`}>Send Email</button>
+                    </div>
 
-                    </form>
-                </div>
+                </form>
             </div>
             
         </Fragment>

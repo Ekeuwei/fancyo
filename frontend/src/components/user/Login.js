@@ -95,7 +95,7 @@ const Login = ({ history, location }) => {
                                     onChange={(e)=> setPassword(e.target.value)}
                                 />
                                 <div className="text-end">
-                                    <button onClick={()=>setShowResetPassword(true)} className="btn btn-link text-dark-1">Forgot password</button>
+                                    <button type='button' onClick={()=>setShowResetPassword(true)} className="btn btn-link text-dark-1">Forgot password</button>
                                 </div>
                             </div>
                             <div className="mb-3 text-end">
