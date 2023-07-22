@@ -4,7 +4,7 @@ const catchAsyncErrors = require("./catchAsyncErrors");
 const Category = require('../models/settings/category');
 
 exports.classify = catchAsyncErrors(async(req, res, next)=>{
-    const sample1 = 'closest work category for: i need someone to ';
+    const sample1 = "A worker is needed. Suggest a common worker category name for someone that performs a service. Limit your response to only the category name. It's okay if you repeat my input";
     const sample2 = 'Classify to closest niche category: i need someone to '
     const systemMsg = `you are a helpful assistant, you help to classify user 
                         input to their closest niche category. 
@@ -24,7 +24,7 @@ exports.classify = catchAsyncErrors(async(req, res, next)=>{
             },
             json: {
                 model: 'gpt-3.5-turbo',
-                messages: [{"content":systemMsgPersonified,"role": "system"},
+                messages: [{"content":sample1,"role": "system"},
                             {"role": "user", "content": req.body.description}],
                 temperature: 0,
                 max_tokens: 7
