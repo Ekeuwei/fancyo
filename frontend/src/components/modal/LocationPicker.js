@@ -10,7 +10,7 @@ const LocationPicker = ({handleFilter, loading, handleClose})=>{
     const { states, lgas, towns } = useSelector(state => state.prefs)
 
 
-    const lastLocation = JSON.parse(localStorage.getItem("location"))
+    const lastLocation = JSON.parse(localStorage.getItem("location"))??{state:{name:""},lga:{name:""},town:{name:""}}
 
     const [location, setLocation] = useState({
         state: lastLocation.state,

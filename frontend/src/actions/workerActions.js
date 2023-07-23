@@ -46,8 +46,9 @@ export const createWorker = (workerData) => async (dispatch) => {
 }
 
 //Get All Workers
+const location = JSON.parse(localStorage.getItem("location"))??{state:{sn:""},lga:{sn:""},town:{name:""}};
 export const getWorkers =
-  (keyword = "", currentPage = 1, state="", lga="", town="", category, ratings = 0) =>
+  (keyword = "", currentPage = 1, state=location.state.sn||'', lga=location.lga.sn||'', town=location.town.name||'', category, ratings = 0) =>
   async (dispatch) => {
     try {
       dispatch({ type: ALL_WORKERS_REQUEST });

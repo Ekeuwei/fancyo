@@ -16,7 +16,7 @@ exports.isAuthenticatedUser = catchAsyncErrors( async (req, res, next)=>{
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = await User.findById(decoded.id)
-                .populate({path: 'contact.town', select: 'name lga state', populate:{path: 'lga state', select: 'name'}})
+                .populate({path: 'contact.town', select: 'name lga state', populate:{path: 'lga state', select: 'name sn'}})
                 .populate('workers', 'category', Worker);
 
     if(!req.user){

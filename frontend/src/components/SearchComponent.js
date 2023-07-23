@@ -17,16 +17,15 @@ const SearchComponent = ({ keyword, workers, count, loading }) => {
   const [show, setShow] = useState(false);
   const showWorkRequestModal = () => setShow(true);
   const hideWorkRequestModal = () => setShow(false);
-  const user = JSON.parse(localStorage.getItem("user"));
+
   let location = JSON.parse(localStorage.getItem("location"));
-  location = location? `${location.town.name}, ${location.lga.name}, ${location.state.name}`: 
-                      `${user?.contact?.town.name}, ${user?.contact?.town.lga.name}`
-  location = location? location.trim().replace(/^( *, *)*(.*?)( *, *)*$/g, '$2'):"Nigeria"
+  location = location? `${location.town.name}, ${location.lga.name}, ${location.state.name}`: "Nigeria"
+  location = location.trim().replace(/^( *, *)*(.*?)( *, *)*$/g, '$2')
   
 
   const handleFilter = data => {
     localStorage.setItem("location", JSON.stringify(data))
-    // TODO: Request workers with the changed location
+    // Request workers with the changed location
     dispatch(getWorkers(keyword, 1, data.state?.sn, data.lga?.sn, data.town?.name))        
     handleClose();
   }

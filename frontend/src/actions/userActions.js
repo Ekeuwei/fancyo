@@ -85,6 +85,11 @@ export const login = (email, password) => async (dispatch) =>{
         const { data } = await axios.post('/api/v1/login', {email, password}, config)
 
         localStorage.setItem('user', JSON.stringify(data.user))
+        if(data.user?.contact?.town){
+            const { lga, state, name } = data.user.contact.town;
+            const currentLocation = JSON.parse(localStorage.getItem('location')) ?? {town:{name}, lga, state};
+            localStorage.setItem('location', JSON.stringify(currentLocation))
+        }
 
         dispatch({
             type: LOGIN_SUCCESS,
@@ -289,6 +294,11 @@ export const loadUser = () => async (dispatch) =>{
         const { data } = await axios.get('/api/v1/me')
         
         localStorage.setItem('user', JSON.stringify(data.user))
+        if(data.user?.contact?.town){
+            const { lga, state, name } = data.user.contact.town;
+            const currentLocation = JSON.parse(localStorage.getItem('location')) ?? {town:{name}, lga, state};
+            localStorage.setItem('location', JSON.stringify(currentLocation))
+        }
 
         dispatch({
             type: LOAD_USER_SUCCESS,

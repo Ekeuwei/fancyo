@@ -92,7 +92,7 @@ exports.loginUser = catchAsyncErrors( async (req, res, next)=>{
 
     // Finding user in database
     const user = await User.findOne({ email })
-                .populate({path: 'contact.town', select: 'name lga state', populate:{path: 'lga state', select: 'name'}})
+                .populate({path: 'contact.town', select: 'name lga state', populate:{path: 'lga state', select: 'name sn'}})
                 .populate('workers', 'category', Worker)
                 .select('+password +isActivated');
 
