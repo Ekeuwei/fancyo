@@ -19,7 +19,7 @@ const SearchComponent = ({ keyword, workers, count, loading }) => {
   const hideWorkRequestModal = () => setShow(false);
 
   let location = JSON.parse(localStorage.getItem("location"));
-  location = location? `${location.town.name}, ${location.lga.name}, ${location.state.name}`: "Nigeria"
+  location = location?.state?.sn? `${location.town.name}, ${location.lga.name}, ${location.state.name}`: "Nigeria"
   location = location.trim().replace(/^( *, *)*(.*?)( *, *)*$/g, '$2')
   
 
