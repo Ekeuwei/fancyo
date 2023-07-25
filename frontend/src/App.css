@@ -254,13 +254,18 @@
   text-align: left;
   box-shadow: none;
   border: none;
-  padding: .6125rem 1rem;
-  background-color: #2a77b6;
-  color:white;
+}
+.accord .accordion-button{
+  /* background-color: #2a77b6;
+  color:white; */
+
+}
+.accord .accordion-button:not(.collapsed){
+  box-shadow: none;
 }
 .accord .btn{
   border-radius: .3125rem;
-  padding: .3125rem 1rem;
+  padding: .6125rem 1rem;
   background-color: hwb(207 16% 29%);
 }
 .accordion-body{
@@ -358,23 +363,25 @@ input[type="password"]:focus{
   display: none;
 }
 
-.tab-item {
-  list-style-type: none;
-  color: rgba(0, 0, 0, 0.4);
-  text-align: center;
-  padding: 5px 20px;
-}
-
 .tabs-list a{
   text-decoration: none;
   color: none;
 }
 
-.item-selected{
+
+
+.tab-item {
+  list-style-type: none;
+  color: rgba(0, 0, 0, 0.4);
+  text-align: center;
+  flex: 1;
+  padding: 5px;
+}
+.item-selected {
   border-bottom: solid 2px #f0820d;
   color: #000;
+  min-width: fit-content;
 }
-
 .no-work-profile{
   display: flex;
   padding: 20px;
@@ -591,15 +598,17 @@ input[type="password"]:focus{
   border-radius: calc(.625em / 2);
   overflow: hidden;
 }
+
 .list--heading .job-status{
-  width: 100%;
   text-align: center;
   color: rgba(255, 255, 255, 0.75);
   padding: .625em;
+  flex: 1;
   cursor: pointer;
 }
-.job-status.active{
+.job-status.active {
   color: var(--white);
+  min-width: fit-content;
   border-bottom: var(--primary02) .125em solid;
 }
 .job-status .status-value{
@@ -756,6 +765,9 @@ input[type="password"]:focus{
   border-left: var(--primary02) 3px solid;
 }
 /* Timeline ends */
+
+/* Off canvas Menu Starts */
+
 
 /* Payment Transaction History ---starts */
 .payment-item{

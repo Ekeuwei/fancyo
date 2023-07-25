@@ -55,15 +55,15 @@ const ManageJobs = () => {
                     create request</button>}
                 </div>
                 <div className="list--heading">
-                    <div className={`job-status ${tabManagement.pending && 'active'}`} data-name="pending" onClick={tabClicked}>
+                    <div className={`job-status ${tabManagement.pending?'active':''}`} data-name="pending" onClick={tabClicked}>
                         Pending
                         <span className={`job-status ${size>0&&'bordered-icon'} ${!tabManagement.pending && 'd-none'}`}>{size>0?size:''}</span>
                     </div>
-                    <div className={`job-status ${tabManagement['in progress'] && 'active'}`} data-name="accepted" onClick={tabClicked}>
+                    <div className={`job-status ${tabManagement['in progress']?'active':''}`} data-name="accepted" onClick={tabClicked}>
                         In progress
                         <span className={`job-status ${size>0&&'bordered-icon'} ${!tabManagement['in progress'] && 'd-none'}`}>{size>0?size:''}</span>
                     </div>
-                    <div className={`job-status ${tabManagement.completed && 'active'}`} data-name="completed" onClick={tabClicked}>
+                    <div className={`job-status ${tabManagement.completed?'active':''}`} data-name="completed" onClick={tabClicked}>
                         Completed
                         <span className={`job-status ${size>0&&'bordered-icon'} ${!tabManagement.completed && 'd-none'}`}>{size>0?size:''}</span>
                     </div>

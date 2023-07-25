@@ -132,7 +132,7 @@ export const Tabs = ({history})=>{
             <ul className='tabs-list'>
                 {tabs.map(tab=>{
                     const path = `/account/${tab.toLocaleLowerCase()}`;
-                    return <Link key={tab} to={path}><li className={`tab-item ${path===history.location.pathname&& 'item-selected'}`}>{tab}</li></Link>
+                    return <Link className={`tab-item ${path===history.location.pathname? 'item-selected':''}`} key={tab} to={path}>{tab}</Link>
                 })}
             </ul>
         </div>
