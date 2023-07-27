@@ -303,6 +303,7 @@ select{
 .input {
   display: flex;
   outline: solid rgba(0, 0, 0, 0.15);
+  background-color: var(--white);
   width: 100%;
   padding: 10px;
   align-items: center;

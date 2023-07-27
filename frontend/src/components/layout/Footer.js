@@ -6,8 +6,8 @@ const Footer = () => {
             <footer className="py-1 mt-auto">
                 <div className="container-fluid text-center mx-auto">
                     <hr/>
-                    <h3>Ebiwani</h3>
-                    <p>© ebiwani Limited 2022</p>
+                    <h3>Ebiwoni</h3>
+                    <p>© ebiwoni Limited 2023</p>
                     <span>
                         <i className="p-2 fa fa-facebook" aria-hidden="true"></i>
                         <i className="p-2 fa fa-linkedin" aria-hidden="true"></i>

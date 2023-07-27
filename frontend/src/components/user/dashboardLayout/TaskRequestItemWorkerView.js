@@ -15,7 +15,7 @@ const TaskRequestItemWorkerView = ({task, userMode, tabDirection})=>{
         status: view.action
     }
 
-    const commission = task.budget * 0.1 || task.worker.pricing.minRate * 0.1;
+    const commission = 100;//task.budget * 0.1 || task.worker.pricing.minRate * 0.1;
     const [showImage, setShowImage] = useState(true)
 
     const handleCall = ()=> window.location.href = `tel:${task.user.phoneNumber}`

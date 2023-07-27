@@ -266,9 +266,9 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
       const applicantId = req.body.workerId;
       
       const worker = await Worker.findById(applicantId)
-      const platformCommission = task.budget? 
-          parseFloat(task.budget * 0.1) : 
-          parseFloat(worker.pricing.minRate * 0.1)
+      const platformCommission = 100; 
+          // parseFloat(task.budget * 0.1) : 
+          // parseFloat(worker.pricing.minRate * 0.1)
 
       let applicantExist = task.workers.find(workerObj => workerObj.worker._id.toString() === applicantId)
       
@@ -284,7 +284,7 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
         const header = `${task.title} Job Approval Notice`.toUpperCase();
         const message = `Hi ${applicant.owner.firstName},
             Congrats on being approved for the ${task.title} job! Please confirm your availability within 30 minutes to receive the task owner's contact info.\n
-            Confirming availability incurs a N${platformCommission} service fee.\n
+            Confirming availability incurs a ₦${platformCommission} service fee.\n
             For more details, log in to your dashboard on our web platform.
             https://www.ebiwoni.com`;
         const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, Congrats on being approved for the ${task.title} job! You have 30 mins to confirm your availability for this job. Visit www.ebiwoni.com`
@@ -309,15 +309,15 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
     
     const debitWorker = task.workers[loggedWorkerIndex].escrow.worker === 'Pending' && req.body.status === 'Accepted'
         
-    const platformCommission = task.budget? 
-          parseFloat(task.budget * 0.1) : 
-          parseFloat(task.workers[loggedWorkerIndex].worker.pricing.minRate * 0.1)
+    const platformCommission = 100; 
+          // parseFloat(task.budget * 0.1) : 
+          // parseFloat(task.workers[loggedWorkerIndex].worker.pricing.minRate * 0.1)
 
     task.workers[loggedWorkerIndex].escrow.worker = req.body.status;
   
     if(debitWorker){
 
-      const debitStatus = await debitWallet(platformCommission, 'Work request comm', req.user._id);
+      const debitStatus = await debitWallet(platformCommission, 'Work request commission', req.user._id);
       if(debitStatus === "insufficient"){
         return next(new ErrorHandler("Insufficient fund, top up and try again", 402))
       }

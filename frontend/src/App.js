@@ -63,11 +63,7 @@ function App() {
           <Route path="/" component={Home} exact />
           <Route path="/category/:name" component={Category} exact />
           <Route path="/search/:keyword" component={Home} />
-          <Route path="/product/:id" component={ProductDetails} exact />
 
-          <Route path="/cart" component={Cart} />
-          <ProtectedRoute path="/shipping" component={Shipping} />
-          <ProtectedRoute path="/order/confirm" component={ConfirmOrder} />
           <ProtectedRoute path="/success" component={OrderSuccess} />
         
 
@@ -76,10 +72,10 @@ function App() {
           <Route path='/worker/:id' component={WorkerDetails} />
 
           {/* Task */}
-          <Route path="/tasks" component={ManageJobs} exact />
+          <ProtectedRoute path="/tasks" component={ManageJobs} exact />
           {/* <Route path="/tasks" component={Task} exact /> */}
           {/* <Route path="/works" component={WorkerTask} exact /> */}
-          <Route path="/progress" component={TaskProgress} exact />
+          <ProtectedRoute path="/progress" component={TaskProgress} exact />
 
           {/* User */}
           <Route path="/login" component={Login} />
@@ -87,7 +83,7 @@ function App() {
           <Route path="/activate" component={Activate} exact />
           {/* <Route path="/password/forgot" component={ForgotPassword} exact /> */}
           <Route path="/password/reset/:token" component={NewPassword} exact />
-          <Route path="/dashboard" component={Dashboard} exact/>
+          <ProtectedRoute path="/dashboard" component={Dashboard} exact/>
           {/* <ProtectedRoute path = "/me" component = {MyProfile} exact /> */}
           <ProtectedRoute path="/me/update" component={UpdateProfile} exact />
           <ProtectedRoute
@@ -97,11 +93,11 @@ function App() {
           />
 
           {/* Account */}
-          <Route path="/account/profile" component={AccountProfile} exact />
-          <Route path="/account/contact" component={AccountAddress} exact />
-          <Route path="/account/password" component={AccountPassword} exact />
-          <Route path="/account/worker" component={AccountWorker} exact />
-          <Route path="/account/worker/create" component={AccounCreatetWorker} exact />
+          <ProtectedRoute path="/account/profile" component={AccountProfile} exact />
+          <ProtectedRoute path="/account/contact" component={AccountAddress} exact />
+          <ProtectedRoute path="/account/password" component={AccountPassword} exact />
+          <ProtectedRoute path="/account/worker" component={AccountWorker} exact />
+          <ProtectedRoute path="/account/worker/create" component={AccounCreatetWorker} exact />
 
           <ProtectedRoute path="/orders/me" component={ListOrders} exact />
           <ProtectedRoute path="/order/:id" component={OrderDetails} exact />
