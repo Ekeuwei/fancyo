@@ -20,7 +20,6 @@ const Login = ({ history, location }) => {
     const dispatch = useDispatch()
 
     const { isAuthenticated, error, loading } = useSelector(state => state.auth);
-    // const { loading:requestingActivation, error:activationError, message } = useSelector(state => state.activateAccount);
 
     const [inactiveError, setInactiveError] = useState(false);
     const redirect = location.search ? location.search.split('=')[1] : '/';

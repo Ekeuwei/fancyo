@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import Home from "./components/Home";
-import ProductDetails from "./components/product/ProductDetails";
 
 
 import Login from "./components/user/Login";
@@ -17,11 +16,6 @@ import ProtectedRoute from "./components/route/ProtectedRoute";
 import UpdateProfile from "./components/user/UpdateProfile";
 import UpdatePassword from "./components/user/UpdatePassword";
 import NewPassword from "./components/user/NewPassword";
-
-// Cart imports
-import Cart from "./components/cart/Cart";
-import Shipping from "./components/cart/Shipping";
-import ConfirmOrder from "./components/cart/ConfirmOrder";
 
 // Payments
 import OrderSuccess from "./components/cart/OrderSuccess";

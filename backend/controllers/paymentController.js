@@ -267,7 +267,7 @@ exports.flwPaymentCallback = catchAsyncErrors(async(req, res, next)=>{
             success: transactionDetails.status==='successful',
             topup: {
                 success: transactionDetails.status==='successful',
-                message: `Payment verification ${transactionDetails.status}`
+                message: `Payment ${transactionDetails.status}`
             }
         })
     }else{

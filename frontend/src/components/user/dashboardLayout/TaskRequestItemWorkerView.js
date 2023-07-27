@@ -31,7 +31,7 @@ const TaskRequestItemWorkerView = ({task, userMode, tabDirection})=>{
             </div>}
             <div className="jobrequest--content">
                 <div className="title-containter">
-                    <h5 className='single-line'>{task.title}</h5>
+                    <h5 className='single-line'>{`${task.title} Job`}</h5>
                     <p>{formatTime(task.createdAt)}</p>
                 </div>
                 <p className='message'>{task.summary||task.description}</p>
@@ -42,12 +42,16 @@ const TaskRequestItemWorkerView = ({task, userMode, tabDirection})=>{
                 <>
                 <h5>
                     <i className="fa fa-map-marker me-1 text-danger" aria-hidden="true"></i>
-                    {`${task.location?.town} ${task.user.phoneNumber?'- 08030572700':''}`}
+                    {`${task.location?.town}`}
                 </h5>
+                {task.user.phoneNumber&&<h5>
+                    <i className="fa fa-user me-1 text-grey" aria-hidden="true"></i>
+                    {`${task.user.firstName} (${task.user.phoneNumber})`}
+                </h5>}
                 </>}
                 <div className={`jobrequest--action ${taskConcluded? 'd-none':''}`}>
                     {task.user.phoneNumber&&<button className="btn bg-accent-2" onClick={handleCall}>
-                        <i class="fa fa-phone fa-lg" aria-hidden="true" ></i> Call</button>}
+                        <i className="fa fa-phone fa-lg" aria-hidden="true" ></i> Call</button>}
                     <UpdateButton updateDetails={{...details, status:view.action.confirm}} view={{ txt:view.txt.confirm, btn:view.btn }} commission={commission} userMode={userMode} tabDirection={tabDirection} />
                     <UpdateButton updateDetails={{...details, status:view.action.decline}} view={{ txt:view.txt.decline, btn:'btn decline' }} commission={commission} userMode={userMode} tabDirection={tabDirection} />
                 </div>

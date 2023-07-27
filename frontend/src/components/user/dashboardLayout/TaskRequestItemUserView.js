@@ -177,11 +177,11 @@ const SingleWorker = ({singleWorker, taskId, description, displayButton, time, u
                     <p>{formatTime(time)}</p>
                 </div>
                 <p className='message'>{description}</p>
-                <h6 className='single-line mb-0'>{'08030572700'}</h6>
+                <h6 className='single-line mb-0'>{singleWorker.worker.owner.phoneNumber}</h6>
                 <div className="jobrequest--action">
                     <i className={view.i} aria-hidden="true" style={{fontSize: "10px"}}></i>
                     <h6 className='single-line mb-0 me-auto'><em>{view.status}</em></h6>
-                    {singleWorker.worker.owner.phoneNumber&&<button className="btn bg-accent-2" onClick={handleCall}>
+                    {singleWorker.worker?.owner?.phoneNumber&&<button className="btn bg-accent-2" onClick={handleCall}>
                         <i class="fa fa-phone fa-lg" aria-hidden="true" ></i> Call worker</button>}
                     <UpdateButton 
                         updateDetails={details} 

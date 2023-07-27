@@ -55,8 +55,6 @@ export const getWorkers =
 
       let link = `/api/v1/workers?keyword=${keyword}&page=${currentPage}
                     &s=${state}&l=${lga}&t=${town}&ratings[gte]=${ratings}`;
-      let link_1 = `/api/v1/workers?keyword=${keyword}&page=${currentPage}
-                    &ratings[gte]=${ratings}`;
 
       if (category) {
         link = `/api/v1/workers?keyword=${keyword}&page=${currentPage}
