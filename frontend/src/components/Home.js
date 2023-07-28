@@ -75,7 +75,7 @@ const Home = ({ match }) => {
                         </div>
                     </section>
 
-                    {categories?.length >0 && <section>
+                    {categories?.length >0 && false && <section>
                         <div className="bg-white p-3">
                             <h3 className="color-dark-2 mb-3">Popular Services</h3>
                             <div className="container-fluid ps-0 overflow-auto row gx-3 pb-2 flex-nowrap">
