@@ -22,13 +22,15 @@ const {
     deleteUser,
     changeMode,
     activateUser,
-    resendActivationToken
+    resendActivationToken,
+    keepAlive
 } = require ('../controllers/authController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../midllewares/auth')
 
 // router.route('/artisan/register').post(registerArtisan);
 // router.route('/artisan/login').post(loginArtisan);
+router.route('/live').get(keepAlive);
 
 router.route('/register').post(registerUser);
 router.route('/activate').get(resendActivationToken);

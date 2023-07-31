@@ -13,7 +13,6 @@ const Town = require('../models/address/town');
 const { activationEmailTemplate, activationEmailTemplate2, passwordResetTemplate } = require('../utils/emailTemplates');
  
 // Register a user => /api/v1/register
-
 exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
 
     let activationToken = undefined;
@@ -125,6 +124,14 @@ exports.loginUser = catchAsyncErrors( async (req, res, next)=>{
     }
 
 });
+
+// Keep page alive => /api/v1/alive
+exports.keepAlive = catchAsyncErrors(async (req, res, next)=>{
+    res.status(200).json({
+        success: true,
+        message: "We're live :-)"
+    })
+})
 
 // Reset password => /api/v1/activate
 exports.resendActivationToken = catchAsyncErrors( async (req, res, next) => {
