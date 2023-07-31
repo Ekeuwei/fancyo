@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import MetaData from '../layout/MetaData';
 
 import { register, clearErrors } from '../../actions/userActions'
+import { REGISTER_USER_RESET } from '../../constants/userConstants';
 
 const Register = ({ history }) => {
 
@@ -25,12 +26,19 @@ const Register = ({ history }) => {
     const alert = useAlert();
     const dispatch = useDispatch()
 
-    const { isAuthenticated, error, loading } = useSelector(state => state.auth);
+    const { isAuthenticated, message, error, loading } = useSelector(state => state.auth);
+
+    const [successMessage, setSuccessMesage] = useState("");
 
     useEffect(() => {
 
         if (isAuthenticated) {
             history.push('/')
+        }
+
+        if(message){
+            setSuccessMesage(message);
+            dispatch({type: REGISTER_USER_RESET})
         }
 
         if (error) {
@@ -39,7 +47,7 @@ const Register = ({ history }) => {
             dispatch(clearErrors());
         }
 
-    }, [dispatch, alert, isAuthenticated, error, history])
+    }, [dispatch, alert, isAuthenticated, message, error, history])
 
     const submitHandler = (e) => {
         e.preventDefault();
@@ -54,7 +62,7 @@ const Register = ({ history }) => {
     }
 
     const onChange = e => {
-        let value = e.target.value;
+        let value = e.target.value.trim();
         if(e.target.name === 'avatar'){
             const reader = new FileReader();
 
@@ -78,6 +86,16 @@ const Register = ({ history }) => {
 
             <section className='center-screen tile'>
                 <div className="auth">
+                    {successMessage?<div>
+                        <div className="text-center">
+                            <i className="fa fa-thumbs-up fa-2x text-success" aria-hidden="true"></i>
+                        </div>
+                        <h4 className='text-center success'>Registration successfull</h4>
+                        <p>{successMessage}</p>
+                        <div className="mt-3 text-center">
+                            <Link to="/login" className="btn bg-primary-1 px-3 mx-3">Back to login</Link>
+                        </div>                    
+                    </div>:
                     <form onSubmit={ submitHandler} encType='multipart/form-data'>
                         <h3 class="form-title"><strong>REGISTER</strong></h3>
                         
@@ -175,7 +193,7 @@ const Register = ({ history }) => {
                             <Link to="/login" class="btn btn-link text-dark-1" >Login</Link>
                             <button disabled={loading} type="submit" class={`${loading? 'loading':''} btn bg-primary-1 px-3`}>Submit</button>
                         </div>
-                    </form>
+                    </form>}
                 </div>
             </section>
 

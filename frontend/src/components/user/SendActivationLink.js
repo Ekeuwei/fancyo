@@ -39,7 +39,7 @@ const SendActivationLink = ({email, setEmail, setRequestLinkForm}) => {
                     id="email_field"
                     placeholder='Enter Email'
                     value={email}
-                    onChange={(e)=> setEmail(e.target.value)}
+                    onChange={(e)=> setEmail(e.target.value.trim())}
                 />
                 <span className={`${loading?'loading':''}`}>
                     {message?<i class="fa fa-check-circle-o success" aria-hidden="true"></i>:

@@ -199,7 +199,7 @@ exports.flwPayment = catchAsyncErrors( async(req, res, next)=>{
                 },
                 customizations: {
                     title: "Account Topup",
-                    logo: "http://www.ebiwani.com/images/logo.png"
+                    logo: `${process.env.FRONTEND_URL}/images/logo.png"`
                 }
             },
         }).json();

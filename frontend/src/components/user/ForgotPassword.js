@@ -48,7 +48,7 @@ const ForgotPassword = ({email, setEmail, setShowResetPassword}) => {
                             id="email_field"
                             className="input"
                             value={email}
-                            onChange={(e)=> setEmail(e.target.value)}
+                            onChange={(e)=> setEmail(e.target.value.trim())}
                         />
                     </div>
                     <div class="mb-3 text-end">

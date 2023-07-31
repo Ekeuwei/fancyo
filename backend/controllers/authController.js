@@ -77,7 +77,12 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
         next(new ErrorHandler(error.message), 500)
     }
 
-    sendToken(user, 200, res);
+    // TODO: reqeust newly registered user to activate their account.
+    res.status(200).json({
+        success: true,
+        message: `We have sent a confirmation email to your email address. Please follow the instructions in the confirmation email in order to activate your account.`
+    })
+    // sendToken(user, 200, res);
 
 })
 
@@ -174,7 +179,7 @@ exports.activateUser = catchAsyncErrors( async (req, res, next) => {
     user.isActivated = true;
     user.activationToken = undefined;
 
-    // await user.save();
+    await user.save();
 
     res.status(200).json({
         success: true,

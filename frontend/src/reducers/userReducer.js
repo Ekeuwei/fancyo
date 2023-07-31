@@ -61,6 +61,7 @@ import {
   ACTIVATE_ACCOUNT_REQUEST,
   ACTIVATE_ACCOUNT_SUCCESS,
   ACTIVATE_ACCOUNT_FAIL,
+  REGISTER_USER_RESET,
 } from "../constants/userConstants";
 
 export const authReducer = (state = { user: {} }, action) => {
@@ -81,6 +82,17 @@ export const authReducer = (state = { user: {} }, action) => {
       };
 
     case REGISTER_USER_SUCCESS:
+      return{
+        ...state,
+        loading: false,
+        message: action.payload
+      }
+
+    case REGISTER_USER_RESET:
+      return{
+        ...state,
+        message: null
+      }
     case LOGIN_SUCCESS:
     case LOAD_USER_SUCCESS:
     case CHANGE_USER_MODE_SUCCESS:

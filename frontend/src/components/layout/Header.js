@@ -130,7 +130,7 @@ function OffcanvasExample({user, logoutHandler, switchMode, userMode, role}) {
                             </Nav.Link>
                         </>}
                         
-                        <Nav.Link href="/" onClick={logoutHandler}>Logout</Nav.Link>
+                        <Nav.Link onClick={logoutHandler}>Logout</Nav.Link>
                     </>:<>
                         {/* Visitors links */}
                         <Nav.Link href="#">Home</Nav.Link>
