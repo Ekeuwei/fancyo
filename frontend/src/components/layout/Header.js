@@ -116,19 +116,21 @@ function OffcanvasExample({user, logoutHandler, switchMode, userMode, role}) {
                     {user?.role?<>
                         {/* Users links */}
                         <Nav.Link href="/dashboard">Dashboard</Nav.Link>
-                        <Nav.Link href="/tasks">Tasks</Nav.Link>
                         <Nav.Link href="/account/profile">Account</Nav.Link>
-                        <Nav.Link href="/account/worker">Worker Profile</Nav.Link>
                         
-
-                        {/* Workers links */}
-                        {user.role==="worker"&& <>
+                        {user.userMode?<>
+                            <Nav.Link href="#">Post a Job</Nav.Link>
+                            <Nav.Link href="/tasks">Opened Jobs</Nav.Link>
+                            <Nav.Link href="/account/worker">Create Worker Profile</Nav.Link>
+                        </>:<>
+                            {/* Workers links */}
                             <Nav.Link href="#">Task requests</Nav.Link>
                             <Nav.Link href="/morejobs">Nearby Jobs</Nav.Link>
-                            <Nav.Link href="#"onClick={switchMode}>
-                                {`Switch to ${userMode?'Worker':'User'} Mode`}
-                            </Nav.Link>
                         </>}
+
+                        {user.role==="worker"&& <Nav.Link href="#"onClick={switchMode}>
+                            {`Switch to ${userMode?'Worker':'User'} Mode`}
+                        </Nav.Link>}
                         
                         <Nav.Link onClick={logoutHandler}>Logout</Nav.Link>
                     </>:<>

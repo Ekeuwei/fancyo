@@ -1,6 +1,8 @@
 const Product = require("../models/product");
+const Task = require("../models/task");
 const State = require("../models/address/state");
 const Lga = require("../models/address/lga");
+
 const dotenv = require("dotenv");
 const connectDatabase = require("../config/database");
 
@@ -43,6 +45,19 @@ const seedSettings = async () => {
   }
 };
 
+const updateAllTasksRates = async ()=> {
+  try {
+    
+    const updateResult = await Task.updateMany({}, { $set: { rate: {value: 2000, agreed: false, postedBy: 'owner'} } });
+
+    console.log(`Updated ${updateResult.matchedCount} tasks`);
+  } catch (error) {
+    console.error(error);
+  } finally{
+    process.exit();
+  }
+}
+
 const seedProduct = async () => {
   try {
     await Product.deleteMany();
@@ -58,5 +73,6 @@ const seedProduct = async () => {
   }
 };
 
-seedSettings();
+updateAllTasksRates();
+// seedSettings();
 // seedProduct();

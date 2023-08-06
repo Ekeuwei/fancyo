@@ -15,9 +15,9 @@
   --primary01: #f5b526;
   --primary02: #fac04e;
   --primary03: #fce9be;
-  --secondary01: #5b98cd;
+  --secondary01: #0f5390;
   --secondary02: #ebf3ff;
-  --secondary03: #52c158;
+  --secondary03: #50C878;
   --secondary04: #dff7e0;
   --secondary05: #E8F9E9;
   --accent01: #75bcf5;
@@ -540,7 +540,32 @@ input[type="password"]:focus{
   width: 50px;
   height: 50px;
 }
+.selection_payment{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625em;
+  margin: 1.2em;
+}
 
+.money{
+  display: flex;
+  margin: 0 auto 1em;
+  max-width: 100px;
+}
+.selection_payment .btn{
+  flex: 1;
+  white-space: nowrap;
+  transition: color .15s ease-in-out,
+  background-color .15s ease-in-out,
+  border-color .15s ease-in-out,
+  box-shadow .15s ease-in-out;
+}
+.btn.selected{
+  box-shadow: 0 0 0 0.25rem rgba(80, 200, 120, 0.42);
+}
+.btn.notselected{
+  box-shadow: 0 0 0 0.25rem rgba(167, 168, 171, 0.09);
+}
 .account-actions .action{
   display: flex;
   flex-direction: column;
@@ -683,7 +708,7 @@ input[type="password"]:focus{
 }
 .jobrequest--action .btn{
   border-radius: .625em;
-  margin-left: .3em;
+  margin-left: 0;
   flex: 0 0 auto
 }
 .jobrequest--action .hide, .hide{

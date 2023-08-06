@@ -121,7 +121,7 @@ const AccountAddress = () => {
                     itemSelected = { itemSelected }
                     onChange={onChange} 
                     suggestions={towns} 
-                    placeholder='Town' />
+                    placeholder='Name of Town' />
             </div>
             
             <div className="mb-3">
@@ -130,6 +130,7 @@ const AccountAddress = () => {
                     className='input'
                     id="address"
                     value={contact.address.name}
+                    placeholder='Closest landmark'
                     onChange={e => onChange(e.target.value, e.target.name)}
                 />
             </div>

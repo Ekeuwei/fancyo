@@ -39,7 +39,7 @@ const workerSchema = new mongoose.Schema({
   pricing: {
     minRate: {
         type: Number,
-        min: [1000, 'The minimum rate should be at least ₦1,000']
+        min: [2000, 'The minimum rate on the platform is ₦2,000'],
     },
     dailyRate:{
         type: Number,

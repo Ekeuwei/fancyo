@@ -1,10 +1,14 @@
 import { useState } from "react";
 import UpdateButton from "../../layout/UpdateButton";
-import { formatTime } from "../../Utils";
+import { formatAmount, formatTime } from "../../Utils";
+import { useAlert } from "react-alert";
+import { updateTaskProgressLocal } from "../../../actions/taskAction";
+import { Modal } from "react-bootstrap";
+import { useSelector } from "react-redux";
 
 const TaskRequestItemUserView = ({task, action, userMode, tabDirection})=>{
-    const view = label(task.status);
-    const displayButton = worker => worker.escrow.user === "Completed"? "Review":view.txt
+    // const view = label(task.status);
+    const displayButton = worker => worker.escrow.user === "Completed"? "Review":label(worker.escrow.worker).txt
     const handleUpdate = (details) => action(details);
     
     return (
@@ -18,6 +22,7 @@ const TaskRequestItemUserView = ({task, action, userMode, tabDirection})=>{
                             <p>{formatTime(task.createdAt)}</p>
                         </div>
                         <p className='message'>{task.description}</p>
+                        <h6>{`Rate: ${formatAmount(task.rate.value)}`}</h6>
                     </div>
                 </div>
                 <div className="timeline-list">
@@ -28,8 +33,10 @@ const TaskRequestItemUserView = ({task, action, userMode, tabDirection})=>{
                         taskId={task._id} 
                         displayButton={displayButton} 
                         handleUpdate={handleUpdate} 
+                        task={task}
                         time={task.createdAt} 
                         userMode={userMode} 
+                        rate={task.rate}
                         tabDirection={tabDirection} 
                         review={taskWorker.review} />))}
                     
@@ -40,6 +47,7 @@ const TaskRequestItemUserView = ({task, action, userMode, tabDirection})=>{
                         taskId={task._id} 
                         displayButton={displayButton} 
                         handleUpdate={handleUpdate} 
+                        task={task}
                         time={task.createdAt} 
                         userMode={userMode} 
                         tabDirection={tabDirection} 
@@ -49,11 +57,9 @@ const TaskRequestItemUserView = ({task, action, userMode, tabDirection})=>{
             (task.workers.length===1 && 
                 <SingleWorker 
                     singleWorker={task.workers[0]} 
-                    taskId={task._id} 
+                    task={task} 
                     displayButton={displayButton} 
-                    description={task.description} 
                     handleUpdate={handleUpdate} 
-                    time={task.createdAt} 
                     userMode={userMode} 
                     tabDirection={tabDirection}
                     review={task.workers[0].review} />)}
@@ -61,11 +67,11 @@ const TaskRequestItemUserView = ({task, action, userMode, tabDirection})=>{
 )}
 
 
-const GroupWorkers = ({taskWorker, taskId, displayButton, time, userMode, tabDirection, review})=>{
+const GroupWorkers = ({taskWorker, taskId, displayButton, task, time, userMode, tabDirection, review})=>{
     const view = label(taskWorker.escrow.worker)
     const details = {
         taskId,
-        workerId: taskWorker._id,
+        workerId: taskWorker.worker._id,
         status: view.action
     }
 
@@ -86,17 +92,21 @@ const GroupWorkers = ({taskWorker, taskId, displayButton, time, userMode, tabDir
                 </div>}
                 <div className="jobrequest--content">
                     <div className="title-containter">
-                        <h5 className='single-line'>{`${taskWorker.worker.owner.firstName} ${taskWorker.worker.owner.lastName}`}</h5>
+                        <h5 className='single-line text-dark-2'>
+                            <i className="fa fa-user me-1" aria-hidden="true"></i>
+                            {`${taskWorker.worker.owner.firstName} ${taskWorker.worker.owner.lastName}`}</h5>
                         <p></p>
                     </div>
+                    {taskWorker.worker.owner.phoneNumber&&<div className="mt-2 text-dark-2">
+                            <h6 onClick={handleCall}><i className="fa fa-phone fa-lg me-1 text-grey" aria-hidden="true" ></i>{taskWorker.worker.owner.phoneNumber}</h6> 
+                        </div>}
                     <div className="jobrequest--action">
                         <i className={view.i} aria-hidden="true" style={{fontSize: "10px"}}></i>
-                        <em><h6 className='single-line mb-0'>{view.status}</h6></em>
-                        {taskWorker.worker.owner.phoneNumber&&<button className="btn bg-accent-2" onClick={handleCall}>
-                        <i class="fa fa-phone fa-lg" aria-hidden="true" ></i> Call worker</button>}
+                        <h6 className='single-line mb-0 me-auto'><em>{view.status}</em></h6>
                         <UpdateButton 
                             updateDetails={details} 
                             view={{...view, txt:`${displayButton(taskWorker)}` }} 
+                            task={task}
                             userMode={userMode} 
                             tabDirection={tabDirection} 
                             workerId={taskWorker.worker._id}
@@ -108,7 +118,7 @@ const GroupWorkers = ({taskWorker, taskId, displayButton, time, userMode, tabDir
     )
 }
 
-const Applicant = ({taskApplicant, taskId, displayButton, time, userMode, tabDirection, review})=>{
+const Applicant = ({taskApplicant, task, taskId, displayButton, time, userMode, tabDirection, review})=>{
     const view = label('Request') //Task.status
     const details = {
         taskId,
@@ -140,6 +150,7 @@ const Applicant = ({taskApplicant, taskId, displayButton, time, userMode, tabDir
                         <UpdateButton 
                             updateDetails={details} 
                             view={{...view, txt:`${view.txt}` }} 
+                            task={task}
                             userMode={userMode} 
                             tabDirection={tabDirection} 
                             workerId={taskApplicant.worker._id}
@@ -150,13 +161,14 @@ const Applicant = ({taskApplicant, taskId, displayButton, time, userMode, tabDir
         </div>
     )
 }
-const SingleWorker = ({singleWorker, taskId, description, displayButton, time, userMode, tabDirection, review})=>{
+const SingleWorker = ({singleWorker, userMode, task, tabDirection, displayButton, review})=>{
     const view = label(singleWorker.escrow.worker)
     const details = {
-        taskId,
-        workerId: singleWorker._id,
+        taskId: task._id,
+        workerId: singleWorker.worker._id,
         status: view.action
     }
+    const [showModal, setShowModal] = useState(false);
 
     const [showImage, setShowImage] = useState(true)
     const handleCall = ()=> window.location.href = `tel:${singleWorker.worker.owner.phoneNumber}`
@@ -173,27 +185,105 @@ const SingleWorker = ({singleWorker, taskId, description, displayButton, time, u
             </div>}
             <div className="jobrequest--content">
                 <div className="title-containter">
-                    <h5 className='single-line'>{`${singleWorker.worker.owner.firstName} ${singleWorker.worker.owner.lastName}`}</h5>
-                    <p>{formatTime(time)}</p>
+                    <h5 className='single-line'>{`${task.title} Job`}</h5>
+                    <p>{formatTime(task.createdAt)}</p>
                 </div>
-                <p className='message'>{description}</p>
-                <h6 className='single-line mb-0'>{singleWorker.worker.owner.phoneNumber}</h6>
+                <p className='message'>{task.description}</p>
+                <h6>
+                    <i className="fa fa-user me-1 text-grey" aria-hidden="true"></i>
+                    {`${singleWorker.worker.owner.firstName} ${singleWorker.worker.owner.lastName} `}
+                </h6>
+                {singleWorker.worker.owner.phoneNumber&&<div>
+                    <h6 onClick={handleCall}><i className="fa fa-phone fa-lg me-1 text-grey" aria-hidden="true" ></i>{singleWorker.worker.owner.phoneNumber}</h6> 
+                </div>}
+                <h6>{`Rate: ${formatAmount(task.rate.value)}`}</h6>
                 <div className="jobrequest--action">
                     <i className={view.i} aria-hidden="true" style={{fontSize: "10px"}}></i>
                     <h6 className='single-line mb-0 me-auto'><em>{view.status}</em></h6>
-                    {singleWorker.worker?.owner?.phoneNumber&&<button className="btn bg-accent-2" onClick={handleCall}>
-                        <i class="fa fa-phone fa-lg" aria-hidden="true" ></i> Call worker</button>}
                     <UpdateButton 
                         updateDetails={details} 
-                        view={{...view, txt:`${displayButton(singleWorker)}`}} 
+                        view={{...view, txt: `${displayButton(singleWorker)}`}} 
                         userMode={userMode} 
+                        task={task}
                         tabDirection={tabDirection} 
                         workerId={singleWorker.worker._id} 
                         taskWorker={singleWorker} />
+                    {/* <button onClick={()=>setShowModal(true)}>Show Modal</button> */}
                 </div>
+                {showModal&&<ConfirmPaymentModal workerId={singleWorker.worker._id} task={task} show={showModal} onHide={() => setShowModal(false)}/>}
             </div>
         </div>
     )
+}
+
+export const ConfirmPaymentModal = (props)=> {
+    const alert = useAlert()
+    
+    const [loading, setLoading] = useState(false)
+
+    const { walletBalance } = useSelector(state => state.wallet)
+    const [cashPayment, setCashPayment] = useState(true);
+    const invalidPaymentOption = !cashPayment&& walletBalance < props.task.rate.value;
+
+    const submitHandler = async()=>{
+        const taskDetails = {
+            taskId: props.task._id,
+            workerId: props.workerId,
+            paymentOption: cashPayment?'cash':'wallet',
+            status: 'Completed'
+        }
+        setLoading(true);
+
+        const { success, error } = await updateTaskProgressLocal(taskDetails);
+        
+        if(success){
+            alert.success('Status Updated');
+        }
+        if(error){
+            alert.error(error);
+        }
+
+        setLoading(false);
+
+        props.onHide();
+
+        // dispatch(userMode? myTasks(tabDirection):myWorks(tabDirection))
+
+    }
+
+
+    return (
+        <Modal
+        {...props}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+        >
+        <Modal.Header closeButton>
+            <Modal.Title id="contained-modal-title-vcenter">
+            Pay Worker
+            </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            <img className="money" src="/images/money.png" alt="" />
+            <h4 className="text-center">{`${formatAmount(props.task.rate.value)}`}</h4>
+        </Modal.Body>
+            <div className="selection_payment">
+                <button className={`btn ${cashPayment?'selected':'notselected'}`} onClick={()=> setCashPayment(true)}>
+                    {cashPayment&&<i class="fa fa-check-circle me-2 text-secondary-3" aria-hidden="true"></i> }Pay with cash</button>
+                <button className={`btn ${!cashPayment?'selected':'notselected'}`} onClick={()=> setCashPayment(false)}>
+                    {!cashPayment&&<i class="fa fa-check-circle me-2 text-secondary-3" aria-hidden="true"></i>} Pay from Balance</button>
+            </div>
+            {invalidPaymentOption &&<p className="mx-3 text-danger">Your wallet balance is insufficient topup or pay with pash</p>}
+            {false&&<>
+                <h6>GTB: 0236334534</h6>
+                <h6>Opay: 8030572700</h6>
+                <h6>Moniepoint MFB: 80006442392</h6>
+                <h6>You can use any of our autogenerated virtual account numbers to top up your wallet and any money transferred to these account numbers would be credited to your wallet automatically.</h6>
+            </>}
+            <button disabled={invalidPaymentOption} className={`btn bg-secondary-3 mx-3 mb-2 ${loading?'loading':''}`} onClick={submitHandler}>Confirm Payment</button>
+        </Modal>
+    );
 }
 
 const label = (status)=>{

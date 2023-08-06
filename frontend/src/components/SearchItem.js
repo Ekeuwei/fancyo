@@ -1,4 +1,4 @@
-export const formatNumber = value => Number(value).toLocaleString("en-US");
+export const formatNumber = value => new Intl.NumberFormat('en-US').format(value.toString().replace(/\D/g, ''))//Number(value).toLocaleString("en-US");
 export const formatNumberFraction = value => Number(value).toLocaleString("en-US", {minimumFractionDigits: 2});
 
 const SearchItem = ({worker, viewArtisan})=> {

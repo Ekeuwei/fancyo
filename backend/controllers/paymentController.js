@@ -164,6 +164,28 @@ exports.debitWallet = async (amount, title, userId)=>{
     return transaction.reference;
 }
 
+// debit wallet
+exports.debitPlateformCommission = async (amount, userId)=>{
+    const title = `Platform Commission ref:${userId}`
+    const wallet = await Wallet.findOne({userId});
+
+    const transaction = await Transaction.create({
+        title,
+        userId,
+        amount,
+        type: 'debit',
+        walletId: wallet.walletId
+    });
+
+    transaction.balanceBefore = wallet.balance
+    transaction.balanceAfter = wallet.balance - amount
+
+    wallet.balance -= amount;
+    transaction.status = 'successful';
+
+    await Promise.all([wallet.save(), transaction.save()]);
+}
+
 // Process flutterwave payments      =>  /api/v1/flwpayment/process
 exports.flwPayment = catchAsyncErrors( async(req, res, next)=>{
     // const got = await import ("got");

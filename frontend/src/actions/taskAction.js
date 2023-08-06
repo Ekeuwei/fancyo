@@ -63,6 +63,7 @@ export const myTasks = (keyword) => async (dispatch) => {
 
 // Get currently logged user tasks
 export const myWorks = (keyword) => async (dispatch) => {
+  keyword = keyword==='pending'? `${keyword}_request`:keyword
   try {
     dispatch({ type: MY_TASKS_REQUEST });
 
@@ -237,6 +238,19 @@ export const updateTaskProgressLocal = async (message) => {
     );
 
     return { success: data.success }
+  } catch (error) {
+    return { error: error.response.data.message }
+  }
+};
+
+// Update Task Rates
+export const updateTaskRate = async (id, amount) => {
+  try {
+
+    const { data } = await axios.put(`/api/v1/taskrate/?id=${id}&amount=${amount}`);
+
+    return { success: data.success }
+    
   } catch (error) {
     return { error: error.response.data.message }
   }

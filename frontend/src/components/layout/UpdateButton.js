@@ -6,14 +6,16 @@ import { useDispatch } from 'react-redux';
 import { getWallet } from '../../actions/userActions';
 import RateWorker from '../user/RateWorker';
 import { workerReview } from '../../actions/workerActions';
+import { ConfirmPaymentModal } from '../user/dashboardLayout/TaskRequestItemUserView';
 
-const UpdateButton = ({view, updateDetails, commission, userMode, tabDirection, workerId, taskWorker })=>{
+const UpdateButton = ({view, updateDetails, task, commission, userMode, tabDirection, workerId, taskWorker })=>{
     const [loading, setLoading] = useState(false);
     const alert = useAlert();
     const dispatch = useDispatch();
 
     const [show, setShow] = useState(false);
     const [rateWorker, setRateWorker] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
     const handleCancel = ()=> setShow(false);
     const handleClose = ()=> setRateWorker(false);
@@ -26,7 +28,13 @@ const UpdateButton = ({view, updateDetails, commission, userMode, tabDirection, 
 
         }else if(userMode && updateDetails.status==='Completed'){
             
-            setRateWorker(true)
+            if(taskWorker.escrow.worker === "Completed" && taskWorker.escrow.user === "Completed"){
+                setRateWorker(true)
+                
+            }else{
+                
+                setShowModal(true)
+            }
 
         }else{
 
@@ -92,15 +100,18 @@ const UpdateButton = ({view, updateDetails, commission, userMode, tabDirection, 
                 taskId={updateDetails.taskId}
                 taskWorker={taskWorker}
             />}
+
+            <ConfirmPaymentModal workerId={workerId} task={task} show={showModal} onHide={() => setShowModal(false)}/>
+
         </>
     )
 }
 
 const DebitConfirmationModal = ({show, loading, handleConfirm, handleCancel, commission})=>{
     return (
-        <Modal show={show} onHide={handleCancel} backdrop="static" keyboard={false}>
+        <Modal show={show} onHide={handleCancel} centered backdrop="static" keyboard={false}>
             <Modal.Header>
-                <Modal.Title>Attention!!!</Modal.Title>
+                <Modal.Title>Confirm Availability</Modal.Title>
                 <button
                 type="button"
                 className="btn-close"
@@ -110,17 +121,12 @@ const DebitConfirmationModal = ({show, loading, handleConfirm, handleCancel, com
             </Modal.Header>
             <Modal.Body>
                 <div className="mb-3 text-center">
-                    <p>{`₦${commission} will be debited from your account.`}</p>
+                    <p>{`Confirming availability incurs a ₦${commission} service fee.`}</p>
                 </div>
             </Modal.Body>
-            <Modal.Footer>
-                <button type="button" className="btn btn-secondary" onClick={handleCancel}>
-                Cancel
-                </button>
-                <button type="button" className={`btn bg-primary-1 ${loading? 'loading':''}`} disabled={loading} onClick={handleConfirm}>
+                <button type="button" className={`btn bg-secondary-3 mx-3 mb-2 ${loading? 'loading':''}`} disabled={loading} onClick={handleConfirm}>
                 Confirm
                 </button>
-            </Modal.Footer>
         </Modal>
     )
 }

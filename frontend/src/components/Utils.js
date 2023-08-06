@@ -1,3 +1,5 @@
+import dateformat from 'dateformat' 
+
 export const formatTime = (date)=>{
     const currentDate = new Date();
     const timeDiff = currentDate.getTime() - new Date(date).getTime();
@@ -7,10 +9,9 @@ export const formatTime = (date)=>{
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
-    
 
     if (days > 0) {
-        return `${days === 1 ? 'Yesterday' : days+' days ago'}`;
+        return `${days === 1 ? 'Yesterday' : dateformat(date, 'mmm d, yyyy')}`;
     } else if (hours > 0) {
         return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
     } else if (minutes > 0) {

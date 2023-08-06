@@ -25,7 +25,7 @@ const PaymentHistory = () => {
 
     return (
         // loading?<Loader/>:
-        (<div className={`nearby-tasks ${loading&& 'loading'}`}>
+        (<div className={`nearby-tasks ${loading? 'loading':''}`}>
             <div className="heading-link">
                 <div className="title">
                     <h5>Wallet Transactions</h5>
@@ -60,7 +60,7 @@ const PaymentHistory = () => {
                         </ul>
                     </div>
                 ))):
-                (<div className={`empty-task-list ${loading&& 'loading'}`}>
+                (<div className={`empty-task-list `}>
                     <h5>{`No Transactions`}</h5>
                 </div>)
             }

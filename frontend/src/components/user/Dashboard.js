@@ -6,6 +6,7 @@ import { useAlert } from 'react-alert';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import ManageJobs from './dashboardLayout/ManageJobs';
 import NearbyJobsLayout from './dashboardLayout/NearbyJobsLayout';
+import { formatNumber } from '../SearchItem';
 
 const Dashboard = () => {
 
@@ -124,11 +125,7 @@ const Dashboard = () => {
 export const TopupModal = ({handleClose, handleAction, loading})=>{
     const [amount, setAmount] = useState('');
 
-    const onChange = (number) =>{
-        const value = number.replace(/\D/g, '');
-        const formattedNumber = new Intl.NumberFormat('en-US').format(value);
-        setAmount(formattedNumber);
-    }
+    const onChange = (number) => setAmount(formatNumber(number))
 
     return(
         <div className="modal--overlay">

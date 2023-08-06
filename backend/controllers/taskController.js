@@ -7,7 +7,7 @@ const catchAsyncErrors = require("../midllewares/catchAsyncErrors");
 const APIFeatures = require("../utils/apiFeatures");
 const ErrorHandler = require("../utils/errorHandler");
 const Worker = require("../models/worker");
-const { debitWallet } = require("./paymentController");
+const { debitWallet, creditWallet, debitPlateformCommission } = require("./paymentController");
 const Review = require("../models/review");
 const FuzzySearch = require("../utils/FuzzySearch");
 const WhatAppTempId = require("../models/whatAppTempId");
@@ -84,6 +84,8 @@ exports.newTaskRequest = catchAsyncErrors(async(req, res, next)=>{
   const filter = { state, lga, name }
   const options = {upsert: true, new: true}
 
+  req.body.rate = {value: req.body.budget}
+
   await Town.findOneAndUpdate(filter, filter, options);
   
   await Task.create(req.body);
@@ -148,6 +150,7 @@ exports.myTasks = catchAsyncErrors(async (req, res, next) => {
   const resPerPage = 10;
   const searchQuery = req.query.keyword==='undefined'?'':req.query;
   const apiFeatures = new APIFeatures(Task.find({ user: req.user.id })
+    .sort({createdAt: -1})
     .populate("workers.review", "name comment rating", Review)
     .populate({
       path:"applicants.worker",
@@ -172,11 +175,17 @@ exports.myTasks = catchAsyncErrors(async (req, res, next) => {
   let tasks = await apiFeatures.query;
 
   tasks = tasks.map(task => {
-      if(!['Completed', 'Accepted'].includes(task.status)) 
+      // if(!['Completed', 'Accepted'].includes(task.status)) 
           task.workers = task.workers.map(workerObj => {
-            workerObj.worker.owner.phoneNumber = null
+            
+            // Worker must confirm availability before user can access workers contact details
+            if(!['Completed', 'Accepted'].includes(workerObj.escrow.worker)){
+              workerObj.worker.owner.phoneNumber = null
+            }
+
             return workerObj;
           })
+
       return task
     })
 
@@ -192,6 +201,7 @@ exports.myWorks = catchAsyncErrors(async (req, res, next) => {
   const searchFields = ['status']
   const resPerPage = 10;
   const apiFeatures = new APIFeatures(Task.find({ "workers.worker": { $in: req.user.workers } })
+    .sort({createdAt: -1})
     .populate('workers.worker','pricing')
     .populate("user","firstName lastName avatar phoneNumber",User), searchQuery, searchFields)
     .search()
@@ -202,8 +212,6 @@ exports.myWorks = catchAsyncErrors(async (req, res, next) => {
 
   if(works){
     works = works.map(task =>{
-      if(!['Completed', 'Accepted'].includes(task.status)) 
-        task.user.phoneNumber = null
 
       const workerIndex = task.workers.findIndex(workerObj => {
         return req.user.workers.some(worker => worker._id.equals(workerObj.worker._id))
@@ -212,6 +220,11 @@ exports.myWorks = catchAsyncErrors(async (req, res, next) => {
       const taskObj = task.toObject();
       const newTask = {...taskObj.workers[workerIndex], ...taskObj}
       delete newTask.workers
+      
+      if(!['Completed', 'Accepted'].includes(newTask.escrow.worker)){
+        newTask.user.phoneNumber = null
+      }
+
       return newTask;
     })
   }
@@ -221,6 +234,20 @@ exports.myWorks = catchAsyncErrors(async (req, res, next) => {
     works,
   });
 });
+
+exports.allowedUpdate = (incoming)=>{
+  switch (incoming) {
+    case "Request":
+      return ['Pending', 'Cancelled']
+    case "Pending":
+      return ['Accepted', 'Completed', 'Cancelled', 'Declined']
+    case "Accepted":
+      return ['Completed', 'Abandoned']
+
+    default:
+      return []
+  }
+}
 
 exports.updateTask = catchAsyncErrors(async (req, res, next) => {
   
@@ -243,68 +270,73 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
     })
     .populate("user", "firstName lastName phoneNumber", User);
 
-  let workerIndex = task.workers.findIndex(workersObj => workersObj._id.equals(req.body.workerId))
+  // Get the index of the worker in the task workers array
+  let workerIndex = task.workers.findIndex(workersObj => workersObj.worker._id.equals(req.body.workerId))
   
+  // Check if the update request is from task owner
   const isUser = task.user.equals(req.user.id);
-  
-  // const loggedWorkerIndex = task.workers.findIndex(workerObj => workerObj.worker.equals(req.user.id));
+
   const loggedWorkerIndex = task.workers.findIndex(workerObj => {
     return req.user.workers.some(profile => profile._id.equals(workerObj.worker._id))
   });
-  
-  let allCompleted = task.workers.map(taskObj => 
-      taskObj.escrow.user === 'Completed' && taskObj.escrow.worker === 'Completed')
-    .every(status => status === true);
-  
-  // allCompleted = allCompleted.every(status => status === true);
 
+  const completedWork = task.workers[workerIndex].escrow.worker==="Completed" && 
+                        task.workers[workerIndex].escrow.user==="Completed"
   
   
   if (isUser) {
-    if(task.status === "Request"){
-      //Make sure the worker index is also the applicant index
-      const applicantId = req.body.workerId;
+    //Make sure the worker index is also the applicant index
+    const applicantId = req.body.workerId;
+    
+    const applicantExist = task.workers.find(workerObj => workerObj.worker._id.toString() === applicantId)
+    
+    const worker = await Worker.findById(applicantId)
+    const platformCommission = 100; 
       
-      const worker = await Worker.findById(applicantId)
-      const platformCommission = 100; 
-          // parseFloat(task.budget * 0.1) : 
-          // parseFloat(worker.pricing.minRate * 0.1)
+    if(!applicantExist && task.status === "Request"){
+      task.workers = [...task.workers, {worker: applicantId}]
 
-      let applicantExist = task.workers.find(workerObj => workerObj.worker._id.toString() === applicantId)
+      // Delete the applicant's ID from the list of applicants
+      task.applicants = task.applicants.filter(applicant => applicant.worker.toString() !== applicantId)
       
-      if(!applicantExist){
-        task.workers = [...task.workers, {worker: applicantId}]
+      const applicant = await Worker.findById(applicantId).populate({path:'owner', select:'firstName phoneNumber'});
+      const waId = `234${applicant.owner.phoneNumber.slice(-10)}`
+      
+      const header = `${task.title} Job Approval Notice`.toUpperCase();
+      const message = `Hi ${applicant.owner.firstName},
+          Congrats on being approved for the ${task.title} job! Please confirm your availability within 30 minutes to receive the task owner's contact info.\n
+          Confirming availability incurs a ₦${platformCommission} service fee.\n
+          For more details, log in to your dashboard on our web platform.
+          https://www.ebiwoni.com`;
+      const SMSmessage = `Hello ${applicant.owner.firstName}, Congrats on being approved for the ${task.title} job! You have 30 mins to confirm your availability for this job. Visit www.ebiwoni.com`
+          
+      const location = `Task location: ${task.location.town}, ${task.location.lga.name}, ${task.location.lga.state.name} State.`
 
-        // Delete the applicant's ID from the list of applicants
-        task.applicants = task.applicants.filter(applicant => applicant.worker.toString() !== applicantId)
-        
-        const applicant = await Worker.findById(applicantId).populate({path:'owner', select:'firstName phoneNumber'});
-        const waId = `234${applicant.owner.phoneNumber.slice(-10)}`
-        
-        const header = `${task.title} Job Approval Notice`.toUpperCase();
-        const message = `Hi ${applicant.owner.firstName},
-            Congrats on being approved for the ${task.title} job! Please confirm your availability within 30 minutes to receive the task owner's contact info.\n
-            Confirming availability incurs a ₦${platformCommission} service fee.\n
-            For more details, log in to your dashboard on our web platform.
-            https://www.ebiwoni.com`;
-        const SMSmessage = `Hello ${moreTask.workers[0].worker.owner.firstName}, Congrats on being approved for the ${task.title} job! You have 30 mins to confirm your availability for this job. Visit www.ebiwoni.com`
-            
-        const location = `Task location: ${task.location.town}, ${task.location.lga.name}, ${task.location.lga.state.name} State.`
+      // Notify the applicant to accept the work
+      // TODO: check if worker has opted to receive whatsApp notification
+      sendSMS(SMSmessage, `+${waId}`)
+      sendWhatsAppMessage(waId, applicantId, {id:task._id, header, message, location})
+    }
+      
+    if(applicantExist){
 
-        // Notify the applicant to accept the work
-        // TODO: check if worker has opted to receive whatsApp notification
-        sendSMS(SMSmessage, `+${waId}`)
-        sendWhatsAppMessage(waId, applicantId, {id:task._id, header, message, location})
-      }
-
-    }else{
       // user cannot cancell a task that has been accepted
       if(req.body.status === "Cancelled" && task.workers[workerIndex].escrow.worker === "Accepted"){
         return next(new ErrorHandler("You cannot cancel this task"))
       }
+  
+      
+      // if(task.workers[workerIndex].escrow.user === 'Pending'){
+      //   enum: ['Request', 'Pending', 'Cancelled', 'Declined', 'Completed', 'Accepted','Abandoned'],
+        
+      // }
+      if(this.allowedUpdate(task.workers[workerIndex].escrow.user).includes(req.body.status)){
+        
+        task.workers[workerIndex].escrow.user = req.body.status;
+      }
 
-      task.workers[workerIndex].escrow.user = req.body.status;
     }
+
   }else if(loggedWorkerIndex !== -1) {
     
     const debitWorker = task.workers[loggedWorkerIndex].escrow.worker === 'Pending' && req.body.status === 'Accepted'
@@ -313,11 +345,14 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
           // parseFloat(task.budget * 0.1) : 
           // parseFloat(task.workers[loggedWorkerIndex].worker.pricing.minRate * 0.1)
 
-    task.workers[loggedWorkerIndex].escrow.worker = req.body.status;
+    if(this.allowedUpdate(task.workers[workerIndex].escrow.worker).includes(req.body.status)){
+      task.workers[loggedWorkerIndex].escrow.worker = req.body.status;
+    }
   
     if(debitWorker){
 
       const debitStatus = await debitWallet(platformCommission, 'Work request commission', req.user._id);
+      
       if(debitStatus === "insufficient"){
         return next(new ErrorHandler("Insufficient fund, top up and try again", 402))
       }
@@ -328,14 +363,62 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Unauthorized Action", 400));
   }
 
+
+  // Finalize a job
+  if(isUser && req.body.status === 'Completed' && 
+  task.workers[workerIndex].escrow.user==="Completed"&&
+  task.workers[workerIndex].escrow.worker==="Completed" && !completedWork){
+    // Debit the worker 10% of the rate
+    
+    const commission = task.rate.value * 0.1 //10%
+    
+    if(req.body.paymentOption === "wallet"){
+
+      // Debit user
+      const debitUserAccount = await debitWallet(task.rate.value, `Worker settlement ref:${task._id}`, req.user.id)
+      
+      if(debitUserAccount === "insufficient"){
+        return next(new ErrorHandler("Insufficient fund, top up and try again", 402))
+      }
+
+      // Credit worker
+      await creditWallet(task.rate.value, `Work settlement ref:${task._id}`, task.workers[workerIndex].worker.owner._id)
+    }
+
+    debitPlateformCommission(commission, task.workers[workerIndex].worker.owner._id)
+
+    // TODO: Notify worker if payment was wallet transfer
+  }
+
   if(task.workers.length >= task.numberOfWorkers){
+
+    // Check if both user and workr has comfirmed job completion
+    const allCompleted = task.workers.map(taskObj => 
+      taskObj.escrow.user === 'Completed' && taskObj.escrow.worker === 'Completed')
+    .every(status => status === true);
     
     if(task.status === "Request"){
       // Delete all applicants
       // task.applicants = []
     }
+    
+    task.status = allCompleted? 'Completed': task.status
 
-    task.status = allCompleted && task.status!=='Request'? 'Completed': req.body.status
+    // task acceptance should not update task status
+    /*if(req.body.status !== "Accepted"){
+
+      if(req.body.status==="Completed" && task.status !== "Completed"){
+
+        task.status = allCompleted && task.status!=='Request'? 'Completed': task.status
+
+      
+      }else{
+
+        task.status = req.body.status
+        
+      }
+    
+    }*/
 
   }
 
@@ -345,6 +428,43 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
     success: true,
   });
 });
+
+// updates task rates => '/api/v1/task/rate'
+exports.updateTaskRate = catchAsyncErrors(async (req, res, next)=>{
+  const task = await Task.findById(req.query.id);
+
+  const taskOwner = task.user._id.equals(req.user.id);
+  const taskWorker = task.workers.some(taskWorker => req.user.workers.find(userWorker => taskWorker.worker.equals(userWorker._id)))
+
+  const cleanedValue = req.query.amount.replace(/,/g, '');
+  
+  if(taskOwner && task.rate?.postedBy=== 'worker' || 
+    taskWorker && task.rate?.postedBy === 'owner'){
+
+      task.rate = {
+        value: parseFloat(cleanedValue),
+        postedBy: taskOwner? 'owner':'worker',
+        agreed: parseFloat(task.rate.value) === parseFloat(cleanedValue)
+      }
+    
+      console.log(parseFloat(task.rate.value) === parseFloat(cleanedValue), parseFloat(task.rate.value), parseFloat(cleanedValue));
+      // Task is accepted when both parties have agreed on the rate
+      if(task.rate.agreed){
+        task.status = "Accepted"
+      }
+
+      await task.save();
+
+    // TODO: notify taskOwner/taskWoker of the change in rate
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Rate updated succefully"
+  })
+
+})
+
 
 // return nearby tasks => '/api/v1/tasks/nearby'
 exports.nearbyTasks = catchAsyncErrors(async(req, res, next)=>{

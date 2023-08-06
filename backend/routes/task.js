@@ -9,6 +9,7 @@ const {
   newTaskRequest,
   nearbyTasks,
   requestApplication,
+  updateTaskRate,
 } = require("../controllers/taskController");
 const { isAuthenticatedUser } = require("../midllewares/auth");
 const { classify, summarize } = require("../midllewares/chatgpt");
@@ -22,5 +23,6 @@ router.route("/tasks/nearby")
             .post(isAuthenticatedUser, nearbyTasks);
 router.route("/works").get(isAuthenticatedUser, myWorks);
 router.route("/task/:id").put(isAuthenticatedUser, updateTask);
+router.route("/taskrate").put(isAuthenticatedUser, updateTaskRate);
 
 module.exports = router;
