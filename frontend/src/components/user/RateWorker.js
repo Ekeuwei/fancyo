@@ -34,7 +34,7 @@ const RateWorker = ({handleCancel, handleUpdate, workerId, loading, taskId, task
                     </div>
                     <div className="user-view">
                         <div className="avatar">
-                            <img src="/images/avatar.png" alt="Avatar" />
+                            <img src={taskWorker.worker.owner.avatar.url} alt="Avatar" />
                         </div>
                         <h4>{`${taskWorker.worker.owner.firstName} ${taskWorker.worker.owner.lastName}`} </h4>
                         {/* <div className="rating-outer">

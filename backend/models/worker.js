@@ -20,6 +20,10 @@ const workerSchema = new mongoose.Schema({
       // required: true
     },
   },
+  uniqueId:{
+    type: String,
+    required: true
+  },
   description: {
     type: String,
   },
@@ -87,5 +91,15 @@ const workerSchema = new mongoose.Schema({
   }
 });
 
+workerSchema.pre('save', async function(){
+    if(this.isNew){
+        this.uniqueId = await this.constructor.generateNextUniqueId();
+    }
+})
+
+workerSchema.statics.generateNextUniqueId = async function () {
+  const lastWorker = await this.findOne().sort({ uniqueId: -1 });
+  return lastWorker && !isNaN(lastWorker.uniqueId)? (parseInt(lastWorker.uniqueId) + 1).toString() : "100";
+};
 
 module.exports = mongoose.model("Worker", workerSchema);

@@ -55,7 +55,7 @@ const UpdateButton = ({view, updateDetails, task, commission, userMode, tabDirec
         const { success, error } = await updateTaskProgressLocal(updateDetails);
         
         if(success){
-            alert.success('Status Updated');
+            alert.success(success.message);
         }
         if(error){
             alert.error(error);

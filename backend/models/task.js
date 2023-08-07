@@ -50,6 +50,10 @@ const taskSchema = mongoose.Schema({
             type: String,
             default: 'owner',
             enum: ['owner', 'worker']
+        },
+        finalRate:{
+            type: Boolean,
+            default: false
         }
     },
     user: {
@@ -75,7 +79,7 @@ const taskSchema = mongoose.Schema({
                     default: 'Pending'
                 },
                 worker: {
-                    enum: ['Pending', 'Declined', 'Completed', 'Accepted','Abandoned'],
+                    enum: ['Pending', 'Declined', 'Cancelled', 'Accepted', 'Completed', 'Abandoned'],
                     type: String,
                     default: 'Pending'
                 }
@@ -120,7 +124,7 @@ taskSchema.pre('save', async function(){
 
 taskSchema.statics.generateNextTaskId = async function () {
   const lastTask = await this.findOne().sort({ taskId: -1 });
-  return lastTask? (parseInt(lastTask.taskId) + 1).toString() : "1000";
+  return lastTask && !isNaN(lastTask.taskId)? (parseInt(lastTask.taskId) + 1).toString() : "1000";
 };
 
 module.exports = mongoose.model('Task', taskSchema);

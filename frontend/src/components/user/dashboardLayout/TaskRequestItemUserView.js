@@ -5,6 +5,7 @@ import { useAlert } from "react-alert";
 import { myTasks, myWorks, updateTaskProgressLocal, updateTaskRate } from "../../../actions/taskAction";
 import { Modal } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
+import { formatNumber } from "../../SearchItem";
 
 const TaskRequestItemUserView = ({task, action, userMode, tabDirection})=>{
     // const view = label(task.status);
@@ -222,14 +223,17 @@ const RateUpdate = ({task, userMode, tabDirection})=>{
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false)
 
-    const submitHandler = async()=>{
+    const [rate, setRate] = useState("");
+    const [showModal, setShowModal] = useState(false);
+    
+    const submitHandler = async(newRate, final)=>{
         
         setLoading(true);
 
-        const { success, error } = await updateTaskRate(task._id, task.rate.value);
+        const { success, error } = await updateTaskRate(task._id, newRate, final);
         
         if(success){
-            alert.success('Status Updated');
+            alert.success(success.message);
         }
         if(error){
             alert.error(error);
@@ -240,13 +244,37 @@ const RateUpdate = ({task, userMode, tabDirection})=>{
         dispatch(userMode? myTasks(tabDirection):myWorks(tabDirection))
 
     }
-
     
     return (
         <div className="jobrequest--action">
             <h6 className="text-danger"><em>{`Attn: worker has updated the rate for this job (${formatAmount(task.rate.value)})`}</em></h6>
-            <button className={`btn bg-secondary-3 ${loading?'loading':''}`} onClick={submitHandler}>Accept price change </button>
-            <button className={`btn bg-primary-1`}>Cancel job </button>
+            <button className={`btn bg-secondary-3 ${loading?'loading':''}`} onClick={()=>submitHandler(task.rate.value)}>Accept Rate </button>
+            <button className={`btn bg-primary-1`} onClick={()=>setShowModal(true)}>Submit Final offer</button>
+            <Modal show={showModal} onHide={() => setShowModal(false)}  size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
+            <Modal.Header closeButton>
+                <Modal.Title id="contained-modal-title-vcenter">
+                {`Submit Final Rate`}
+                </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <p>This is your last chance to submit a bargain for this job. The job will be cancelled if the worker do not accept your new rate.</p>
+                <div>
+                    <h6>{`Current Rate: ${formatAmount(task.rate.value)}`}</h6>
+                    <div className="input">₦
+                        <input 
+                            type="text" 
+                            name="rate"
+                            autoComplete="off"
+                            id="rate" 
+                            placeholder="Enter new rate"
+                            value={rate}
+                            onChange={(e)=> setRate(formatNumber(e.target.value))}
+                        />
+                    </div>
+                </div>
+            </Modal.Body>
+                <button className={`btn bg-secondary-3 mx-3 mb-2 ${loading?'loading':''}`} onClick={()=>submitHandler(rate, 'final')}>{`Submit Rate`}</button>
+            </Modal>
         </div>
     )
 }
@@ -272,7 +300,7 @@ export const ConfirmPaymentModal = (props)=> {
         const { success, error } = await updateTaskProgressLocal(taskDetails);
         
         if(success){
-            alert.success('Status Updated');
+            alert.success(success.message);
         }
         if(error){
             alert.error(error);

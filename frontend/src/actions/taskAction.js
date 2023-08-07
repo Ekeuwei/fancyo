@@ -237,19 +237,20 @@ export const updateTaskProgressLocal = async (message) => {
       config
     );
 
-    return { success: data.success }
+    return { success: data }
   } catch (error) {
     return { error: error.response.data.message }
   }
 };
 
 // Update Task Rates
-export const updateTaskRate = async (id, amount) => {
+export const updateTaskRate = async (id, amount, final) => {
+  final = final || ''
   try {
 
-    const { data } = await axios.put(`/api/v1/taskrate/?id=${id}&amount=${amount}`);
+    const { data } = await axios.put(`/api/v1/taskrate/?id=${id}&amount=${amount}&final=${final}`);
 
-    return { success: data.success }
+    return { success: data }
     
   } catch (error) {
     return { error: error.response.data.message }

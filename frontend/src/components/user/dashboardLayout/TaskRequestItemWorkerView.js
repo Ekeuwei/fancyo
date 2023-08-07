@@ -3,8 +3,9 @@ import { formatAmount, formatTime } from "../../Utils";
 import UpdateButton from "../../layout/UpdateButton";
 import { Modal } from "react-bootstrap";
 import { formatNumber } from "../../SearchItem";
-import { updateTaskRate } from "../../../actions/taskAction";
+import { myTasks, myWorks, updateTaskProgressLocal, updateTaskRate } from "../../../actions/taskAction";
 import { useAlert } from "react-alert";
+import { useDispatch } from "react-redux";
 
 
 
@@ -60,7 +61,7 @@ const TaskRequestItemWorkerView = ({task, userMode, tabDirection})=>{
                 </h6>:
                 <>
                     {task.user.phoneNumber&& !task.rate?.agreed?
-                    <UpdateRate task={task} taskConcluded={taskConcluded} userMode={userMode}/>:
+                    <UpdateRate task={task} taskConcluded={taskConcluded} userMode={userMode} tabDirection={tabDirection} />:
                     <div className={`jobrequest--action ${taskConcluded? 'd-none':''}`}>
                         <UpdateButton task={task} updateDetails={{...details, status:view.action.confirm}} view={{ txt:view.txt.confirm, btn:view.btn }} commission={commission} userMode={userMode} tabDirection={tabDirection} />
                         <UpdateButton task={task} updateDetails={{...details, status:view.action.decline}} view={{ txt:view.txt.decline, btn:'btn decline' }} commission={commission} userMode={userMode} tabDirection={tabDirection} />
@@ -70,45 +71,52 @@ const TaskRequestItemWorkerView = ({task, userMode, tabDirection})=>{
         </div>
 )}
 
-const UpdateRate = ({task, taskConcluded, userMode})=> {
+const UpdateRate = ({task, taskConcluded, userMode, tabDirection})=> {
     const [showModal, setShowModal] = useState(false);
+    const [showConfirmCancel, setShowConfirmCancel] = useState(false);
     const [commenceJob, setCommenceJob] = useState(false);
     
     const handleAction = (commence)=>{
         setCommenceJob(commence)
         setShowModal(true)
     }
+    
     return (
         <div className={`jobrequest--action ${taskConcluded? 'd-none':''}`}>
             {task.rate.postedBy==="worker"? 
             <h6><em>Awaiting user to accept the new job rate</em></h6> : 
             <>
                 <button className="btn bg-secondary-3" onClick={()=>handleAction(true)}>Commence Job</button>
-                <button className="btn bg-primary-1" onClick={()=>handleAction(false)}>Change Rate</button>
+                {task.rate.finalRate?<button className="btn bg-dark-2" onClick={()=>setShowConfirmCancel(true)}>Cancel Job</button>:
+                <button className="btn bg-primary-1" onClick={()=>handleAction(false)}>Change Rate</button>}
             </>}
-            <CenteredModal show={showModal} onHide={() => setShowModal(false)} taskId={task._id} rate={task.rate.value} userMode={userMode} commence={commenceJob}/>
+            <CenteredModal show={showModal} onHide={() => setShowModal(false)} task={task} taskId={task._id} rate={task.rate} userMode={userMode} tabDirection={tabDirection} commence={commenceJob}/>
+            <ConfirmCancellation show={showConfirmCancel} task={task} onHide={() => setShowConfirmCancel(false)} userMode={userMode} tabDirection={tabDirection}/>
         </div>
     )
 }
-
-function CenteredModal(props) {
+const ConfirmCancellation = (props)=>{
     const alert = useAlert()
+    const dispatch = useDispatch()
     
-    const commenceMsg = `By Commencing, you acknowledge that you will be paid at the rate of ${formatAmount(props.rate)} for this job.`
-    const updateRateMsg = "Please contact the user to gather more details about the job and negotiate the rate before requesting an update."
-    const [rate, setRate] = useState('');
+    const cancelMsg = "Are you sure you want to cancel this job?"
     const [loading, setLoading] = useState(false)
+
+    const declineDetails = {
+        taskId: props.task._id,
+        workerId: props.task.worker._id,
+        status: "Cancelled"
+    }
 
     const submitHandler = async()=>{
         
-        const amount = props.commence? props.rate : rate;
         
         setLoading(true);
 
-        const { success, error } = await updateTaskRate(props.taskId, amount);
+        const { success, error } = await updateTaskProgressLocal(declineDetails)
         
         if(success){
-            alert.success('Status Updated');
+            alert.success(success.message);
         }
         if(error){
             alert.error(error);
@@ -118,7 +126,54 @@ function CenteredModal(props) {
 
         props.onHide();
 
-        // dispatch(userMode? myTasks(tabDirection):myWorks(tabDirection))
+        dispatch(props.userMode? myTasks(props.tabDirection):myWorks(props.tabDirection))
+
+    }
+
+    return (
+        <Modal {...props} size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
+        <Modal.Header closeButton>
+            <Modal.Title id="contained-modal-title-vcenter"> Cancel Job </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+        <p>{cancelMsg}</p>
+        </Modal.Body>
+            <button className={`btn decline mx-3 mb-2 ${loading?'loading':''}`} onClick={submitHandler}>Cancel Job</button>
+        </Modal>
+    );
+}
+
+function CenteredModal(props) {
+    const alert = useAlert()
+    const dispatch = useDispatch()
+    
+    const commenceMsg = `By Commencing, you acknowledge that you will be paid at the rate of ${formatAmount(props.rate.value)} for this job.`
+    const updateRateMsg = "Please contact the user to gather more details about the job and negotiate the rate before requesting an update."
+
+    const [rate, setRate] = useState('');
+    const [loading, setLoading] = useState(false)
+
+
+    const submitHandler = async()=>{
+        
+        const amount = props.commence? props.rate.value : rate;
+        
+        setLoading(true);
+
+        const { success, error } = await updateTaskRate(props.taskId, amount);
+        
+        if(success){
+            alert.success(success.message);
+        }
+        if(error){
+            alert.error(error);
+        }
+
+        setLoading(false);
+
+        props.onHide();
+
+        dispatch(props.ConfirmCancellationuserMode? myTasks(props.ConfirmCancellationtabDirection):myWorks(props.ConfirmCancellationtabDirection))
 
     }
 
@@ -131,14 +186,14 @@ function CenteredModal(props) {
         >
         <Modal.Header closeButton>
             <Modal.Title id="contained-modal-title-vcenter">
-            {`${props.commence?'Confirm Commencement':'Update Rate'}`}
+                {props.commence? 'Confirm Commencement':'Update Rate'}
             </Modal.Title>
         </Modal.Header>
         <Modal.Body>
             <p>{props.commence? commenceMsg:updateRateMsg}</p>
-            {!props.commence&&
+            {!props.commence && !props.rate.finalRate&&
             <div>
-                <h6>{`Current Rate: ${formatAmount(props.rate)}`}</h6>
+                <h6>{`Current Rate: ${formatAmount(props.rate.value)}`}</h6>
                 <div className="input">₦
                     <input 
                         type="text" 
@@ -150,10 +205,12 @@ function CenteredModal(props) {
                         onChange={(e)=> setRate(formatNumber(e.target.value))}
                     />
                 </div>
-
             </div>}
         </Modal.Body>
-            <button className={`btn bg-secondary-3 mx-3 mb-2 ${loading?'loading':''}`} onClick={submitHandler}>{`${props.commence?'Proceed':'Update Rate'}`}</button>
+            <button 
+                className={`btn bg-secondary-3 mx-3 mb-2 ${loading?'loading':''}`} 
+                onClick={submitHandler}> {`${props.commence?'Proceed':'Update Rate'}`}
+            </button>
         </Modal>
     );
 }

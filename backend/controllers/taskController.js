@@ -243,7 +243,7 @@ exports.allowedUpdate = (incoming)=>{
     case "Pending":
       return ['Accepted', 'Completed', 'Cancelled', 'Declined']
     case "Accepted":
-      return ['Completed', 'Abandoned']
+      return ['Completed', 'Abandoned', 'Cancelled']
 
     default:
       return []
@@ -326,14 +326,13 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler("You cannot cancel this task"))
       }
   
-      
-      // if(task.workers[workerIndex].escrow.user === 'Pending'){
-      //   enum: ['Request', 'Pending', 'Cancelled', 'Declined', 'Completed', 'Accepted','Abandoned'],
-        
-      // }
       if(this.allowedUpdate(task.workers[workerIndex].escrow.user).includes(req.body.status)){
         
         task.workers[workerIndex].escrow.user = req.body.status;
+
+        if(['Cancelled', 'Declined', 'Abandoned'].includes(req.body.status)){
+          task.status = req.body.status
+        }
       }
 
     }
@@ -343,16 +342,18 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
     const debitWorker = task.workers[loggedWorkerIndex].escrow.worker === 'Pending' && req.body.status === 'Accepted'
         
     const platformCommission = 100; 
-          // parseFloat(task.budget * 0.1) : 
-          // parseFloat(task.workers[loggedWorkerIndex].worker.pricing.minRate * 0.1)
 
     if(this.allowedUpdate(task.workers[workerIndex].escrow.worker).includes(req.body.status)){
       task.workers[loggedWorkerIndex].escrow.worker = req.body.status;
+      
+      if(['Cancelled', 'Declined', 'Abandoned'].includes(req.body.status)){
+        task.status = req.body.status
+      }
     }
   
     if(debitWorker){
 
-      const debitStatus = await debitWallet(platformCommission, 'Work request commission', req.user._id);
+      const debitStatus = await debitWallet(platformCommission, `Task service fee taskId:${task._id}`, req.user._id);
       
       if(debitStatus === "insufficient"){
         return next(new ErrorHandler("Insufficient fund, top up and try again", 402))
@@ -405,28 +406,13 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
     
     task.status = allCompleted? 'Completed': task.status
 
-    // task acceptance should not update task status
-    /*if(req.body.status !== "Accepted"){
-
-      if(req.body.status==="Completed" && task.status !== "Completed"){
-
-        task.status = allCompleted && task.status!=='Request'? 'Completed': task.status
-
-      
-      }else{
-
-        task.status = req.body.status
-        
-      }
-    
-    }*/
-
   }
 
   await task.save();
 
   res.status(200).json({
     success: true,
+    message: `Task ${req.body.status}`
   });
 });
 
@@ -441,10 +427,11 @@ exports.updateTaskRate = catchAsyncErrors(async (req, res, next)=>{
   
   if(taskOwner && task.rate?.postedBy=== 'worker' || 
     taskWorker && task.rate?.postedBy === 'owner'){
-
+      
       task.rate = {
         value: parseFloat(cleanedValue),
         postedBy: taskOwner? 'owner':'worker',
+        finalRate: req.query.final==='final',
         agreed: parseFloat(task.rate.value) === parseFloat(cleanedValue)
       }
     
