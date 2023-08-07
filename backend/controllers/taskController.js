@@ -84,7 +84,8 @@ exports.newTaskRequest = catchAsyncErrors(async(req, res, next)=>{
   const filter = { state, lga, name }
   const options = {upsert: true, new: true}
 
-  req.body.rate = {value: req.body.budget}
+  // Set the task rate so worker can't change rate
+  req.body.rate = {value: req.body.budget, agreed: true}
 
   await Town.findOneAndUpdate(filter, filter, options);
   
@@ -447,7 +448,6 @@ exports.updateTaskRate = catchAsyncErrors(async (req, res, next)=>{
         agreed: parseFloat(task.rate.value) === parseFloat(cleanedValue)
       }
     
-      console.log(parseFloat(task.rate.value) === parseFloat(cleanedValue), parseFloat(task.rate.value), parseFloat(cleanedValue));
       // Task is accepted when both parties have agreed on the rate
       if(task.rate.agreed){
         task.status = "Accepted"

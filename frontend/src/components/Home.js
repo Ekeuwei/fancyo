@@ -90,7 +90,7 @@ const Home = ({ match }) => {
                     </section>}
 
                     <section>
-                        <div className="bg-secondary-4 p-3 text-dark-2">
+                        <div className="bg-secondary-4 p-3 text-dark-1">
                             <h3 className="text-md-center mb-3">How it Works</h3>
                             <div className="col-12 col-lg-6">
                                 {howItWorks.map(how =>(<div key={how.step}>            

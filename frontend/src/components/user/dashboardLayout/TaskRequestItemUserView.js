@@ -2,9 +2,9 @@ import { useState } from "react";
 import UpdateButton from "../../layout/UpdateButton";
 import { formatAmount, formatTime } from "../../Utils";
 import { useAlert } from "react-alert";
-import { updateTaskProgressLocal } from "../../../actions/taskAction";
+import { myTasks, myWorks, updateTaskProgressLocal, updateTaskRate } from "../../../actions/taskAction";
 import { Modal } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const TaskRequestItemUserView = ({task, action, userMode, tabDirection})=>{
     // const view = label(task.status);
@@ -197,6 +197,7 @@ const SingleWorker = ({singleWorker, userMode, task, tabDirection, displayButton
                     <h6 onClick={handleCall}><i className="fa fa-phone fa-lg me-1 text-grey" aria-hidden="true" ></i>{singleWorker.worker.owner.phoneNumber}</h6> 
                 </div>}
                 <h6>{`Rate: ${formatAmount(task.rate.value)}`}</h6>
+                {task.rate.postedBy==="worker"? <RateUpdate task={task} userMode={userMode} tabDirection={tabDirection}/> :
                 <div className="jobrequest--action">
                     <i className={view.i} aria-hidden="true" style={{fontSize: "10px"}}></i>
                     <h6 className='single-line mb-0 me-auto'><em>{view.status}</em></h6>
@@ -209,9 +210,43 @@ const SingleWorker = ({singleWorker, userMode, task, tabDirection, displayButton
                         workerId={singleWorker.worker._id} 
                         taskWorker={singleWorker} />
                     {/* <button onClick={()=>setShowModal(true)}>Show Modal</button> */}
-                </div>
+                </div>}
                 {showModal&&<ConfirmPaymentModal workerId={singleWorker.worker._id} task={task} show={showModal} onHide={() => setShowModal(false)}/>}
             </div>
+        </div>
+    )
+}
+
+const RateUpdate = ({task, userMode, tabDirection})=>{
+    const alert = useAlert()
+    const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false)
+
+    const submitHandler = async()=>{
+        
+        setLoading(true);
+
+        const { success, error } = await updateTaskRate(task._id, task.rate.value);
+        
+        if(success){
+            alert.success('Status Updated');
+        }
+        if(error){
+            alert.error(error);
+        }
+
+        setLoading(false);
+
+        dispatch(userMode? myTasks(tabDirection):myWorks(tabDirection))
+
+    }
+
+    
+    return (
+        <div className="jobrequest--action">
+            <h6 className="text-danger"><em>{`Attn: worker has updated the rate for this job (${formatAmount(task.rate.value)})`}</em></h6>
+            <button className={`btn bg-secondary-3 ${loading?'loading':''}`} onClick={submitHandler}>Accept price change </button>
+            <button className={`btn bg-primary-1`}>Cancel job </button>
         </div>
     )
 }

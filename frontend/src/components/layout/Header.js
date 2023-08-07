@@ -121,7 +121,7 @@ function OffcanvasExample({user, logoutHandler, switchMode, userMode, role}) {
                         {user.userMode?<>
                             <Nav.Link href="#">Post a Job</Nav.Link>
                             <Nav.Link href="/tasks">Opened Jobs</Nav.Link>
-                            <Nav.Link href="/account/worker">Create Worker Profile</Nav.Link>
+                            {user.role==="user"&&<Nav.Link href="/account/worker">Create Worker Profile</Nav.Link>}
                         </>:<>
                             {/* Workers links */}
                             <Nav.Link href="#">Task requests</Nav.Link>
