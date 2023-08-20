@@ -304,6 +304,10 @@ export const loadUser = () => async (dispatch) =>{
         })
 
     } catch (error) {
+        // purge user data from localStorage
+        localStorage.removeItem('userMode')
+        localStorage.removeItem('user')
+
         dispatch({
             type: LOAD_USER_FAIL,
             payload: error.response.data.message

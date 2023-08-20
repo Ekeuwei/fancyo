@@ -14,6 +14,7 @@ const WhatAppTempId = require("../models/whatAppTempId");
 const { sendWhatsAppMessage } = require("../utils/taskNotification");
 const sendSMS = require("../utils/sendSMS");
 const user = require("../models/user");
+const sendEmail = require("../utils/sendEmail");
 
 //Create new task => /api/v1/task/new
 exports.newTask = catchAsyncErrors(async (req, res, next) => {
@@ -67,6 +68,14 @@ exports.newTask = catchAsyncErrors(async (req, res, next) => {
 
     sendSMS(SMSmessage, `+${waId}`);
     sendWhatsAppMessage(waId, worker._id, {id:moreTask._id, header, message, location});
+
+    // Send a notification to the admin
+    sendSMS(`${task.title} job request in ${moreTask.location.town}, ${moreTask.location.lga.name}, ${moreTask.location.state.name}`, "2348030572700")
+    sendEmail({
+      email: "al.ekeuwei@gmail.com",
+      subject: "New Job Request",
+      message: `We have ${task.title} job request in ${moreTask.location.town}, ${moreTask.location.lga.name}, ${moreTask.location.state.name}`
+    })
   }
 
   res.status(201).json({
@@ -89,7 +98,15 @@ exports.newTaskRequest = catchAsyncErrors(async(req, res, next)=>{
 
   await Town.findOneAndUpdate(filter, filter, options);
   
-  await Task.create(req.body);
+  const task = await Task.create(req.body);
+
+  // Send a notification to the admin
+  sendSMS(`Someone is looking for a ${task.title} in ${task.location.town}`, "2348030572700")
+  sendEmail({
+    email: "al.ekeuwei@gmail.com",
+    subject: "Worker Request",
+    message: `Someone is looking for a ${task.title} in ${task.location.town}. Kindly assist in getting a worker as soon as possible for the job. \n\nSUMMARY:\n${task.summary}`
+  })
 
   res.status(200).json({
     success: true,
@@ -281,8 +298,8 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
     return req.user.workers.some(profile => profile._id.equals(workerObj.worker._id))
   });
 
-  const completedWork = task.workers[workerIndex].escrow.worker==="Completed" && 
-                        task.workers[workerIndex].escrow.user==="Completed"
+  const completedWork = task.workers[workerIndex]?.escrow.worker==="Completed" && 
+                        task.workers[workerIndex]?.escrow.user==="Completed"
   
   
   if (isUser) {

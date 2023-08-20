@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import ManageJobs from './dashboardLayout/ManageJobs';
 import NearbyJobsLayout from './dashboardLayout/NearbyJobsLayout';
 import { formatNumber } from '../SearchItem';
+import { formatAmount } from '../Utils';
 
 const Dashboard = () => {
 
@@ -62,7 +63,7 @@ const Dashboard = () => {
         <>
             <div className='funds'>
                 <h5>Work credit balance</h5>
-                <h2 className={`${loading&&'loading'}`}>{walletBalance>=0?`₦${formatNumber(walletBalance)}`:'--'}</h2>
+                <h2 className={`${loading&&'loading'}`}>{isNaN(walletBalance)?'--':`₦${formatNumber(walletBalance)}`}</h2>
                 <div className="account-actions">
                     <div className="action" onClick={handleOpen}>
                         <button className='btn'>
@@ -123,7 +124,7 @@ const Dashboard = () => {
 }
 
 export const TopupModal = ({handleClose, handleAction, loading})=>{
-    const [amount, setAmount] = useState('');
+    const [amount, setAmount] = useState('0');
 
     const onChange = (number) => setAmount(formatNumber(number))
 
@@ -139,27 +140,27 @@ export const TopupModal = ({handleClose, handleAction, loading})=>{
                         <div className="mb-3">
                             <input 
                                 type="text" 
-                                className="form-control" 
+                                className="input" 
                                 id="amount" 
                                 value={amount}
+                                required
                                 autoComplete='off'
                                 onChange={e => onChange(e.target.value)}
                                 placeholder="Enter amount"
                             />
                             <div for="email" className="suggession">
-                                <span onClick={e => onChange(e.target.innerHTML)}>200</span>
-                                <span onClick={e => onChange(e.target.innerHTML)}>500</span>
-                                <span onClick={e => onChange(e.target.innerHTML)}>1,000</span>
-                                <span onClick={e => onChange(e.target.innerHTML)}>5,000</span>
+                                {[200,500,1000,5000].map(val =>
+                                    <span onClick={e => onChange(val)}>
+                                        {formatAmount(val)}
+                                    </span>)}
                             </div>
 
                         </div>
                     </form>
                 </div>
                 <div className="modal--footer">
-                    <button className="btn" onClick={()=>handleAction(amount)}>
-                        {/* <i className="fa fa-spinner spinner" aria-hidden="true"></i> */}
-                        <span className={loading&&'spinner'}>{!loading&&'Next'}</span>
+                    <button disabled={loading||parseInt(amount.replace(',','')) < 100} className={`btn bg-secondary-3 ${loading?'loading':''}`} onClick={()=>handleAction(amount)}>
+                        Next
                     </button>
                 </div>
             </div>

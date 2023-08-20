@@ -41,6 +41,7 @@ import AllTasksAndWorks from "./components/user/dashboardLayout/AllTasksAndWorks
 import PaymentHistory from "./components/user/dashboardLayout/PaymentHistory";
 import ManageJobs from "./components/user/dashboardLayout/ManageJobs";
 import Activate from "./components/user/Activate";
+import ContactUs from "./components/ContactUs";
 
 function App() {
   useEffect(() => {
@@ -57,6 +58,9 @@ function App() {
           <Route path="/" component={Home} exact />
           <Route path="/category/:name" component={Category} exact />
           <Route path="/search/:keyword" component={Home} />
+         
+          <Route path="/contact" component={ContactUs} />
+          <Route path="/about" component={ContactUs} />
 
           <ProtectedRoute path="/success" component={OrderSuccess} />
         

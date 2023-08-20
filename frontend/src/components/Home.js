@@ -19,14 +19,6 @@ const Home = ({ match }) => {
     const [currentPage, setCurrentPage] = useState(1)
     const history = useHistory();
 
-    // const categories = [
-    //     {name: 'General Labour', url: 'labour', image:'./images/labour.png'},
-    //     {name: 'Plumbing', url: 'plumbing', image:'./images/plumbing.png'},
-    //     {name: 'Electrician', url: 'electrician', image:'./images/electrician.png'},
-    //     {name: 'Make-up', url: 'makeup', image:'./images/makeup.png'},
-    //     {name: 'House Keeper', url: 'housekeeper', image:'./images/errand.png'},
-    // ]
-
     const alert = useAlert();
     
     const dispatch = useDispatch();
@@ -65,10 +57,12 @@ const Home = ({ match }) => {
             {keyword? <SearchComponent loading={loading} keyword = {keyword} workers = {workers} count = {count}/> : (
                 <Fragment>
                     <section >
-                        <div className="p-5 bg-img h-l-50">
-                            <h3 className="mb-4 text-white">Find the right worker for any task, easily and quickly</h3>
-                            <p className="mb-4 text-white">Free up your time and energy by letting professionals handle your personal tasks.</p>
-                            <div className="mx-md-5">
+                        <div className="bg-img">
+                            {/* <h3 className="mb-4 text-white">Find the right worker for any task, easily and quickly</h3> */}
+                            <h1 className="mb-3 text-white">Unlocking Opportunities, Connecting Talents</h1>
+                            <h4 className="mb-5 text-white">Ebiwoni - Your Bridge to Skilled Services and Reliable Gigs</h4>
+                            {/* <p className="mb-4 text-white">Free up your time and energy by letting professionals handle your personal tasks.</p> */}
+                            <div className="search-wrapper">
                                 <Route render={ ({history}) => <Search history = {history} />} />
                             </div>       
                             
@@ -90,20 +84,23 @@ const Home = ({ match }) => {
                     </section>}
 
                     <section>
-                        <div className="bg-secondary-4 p-3 text-dark-1">
+                        <div className="bg-secondary-4 p-3 p-md-4 p-lg-5 text-dark-1">
                             <h3 className="text-md-center mb-3">How it Works</h3>
-                            <div className="col-12 col-lg-6">
-                                {howItWorks.map(how =>(<div key={how.step}>            
-                                    <h5 className="mb-1">
-                                        <i className="fa fa-check-circle me-2" aria-hidden="true"></i>
-                                        {how.step}
-                                    </h5>
-                                    <p>{how.details}</p>
-                                </div>))}
-                            </div>
+                            <div className="d-flex flex-wrap">
+                                <div className="col-12 col-lg-6">
+                                    {howItWorks.map(how =>(<div key={how.step}>            
+                                        <h5 className="mb-1">
+                                            <i className="fa fa-check-circle me-2" aria-hidden="true"></i>
+                                            {how.step}
+                                        </h5>
+                                        <p>{how.details}</p>
+                                    </div>))}
+                                </div>
 
-                            <div className="col-12 col-lg-6 col-md-9 my-auto">
-                                <img className="img-fluid px-3" src="./images/vid.png" alt=""/>
+                                <div className="col-12 col-lg-6 col-md-9 my-auto">
+                                    <img className="img-fluid px-3" src="./images/vid.png" alt=""/>
+                                </div>
+
                             </div>
                         </div>
                     </section>
@@ -150,7 +147,7 @@ const Home = ({ match }) => {
                 </Fragment>
             )}
             
-            {(resPerPage <= count || currentPage !==1) && (
+            {(resPerPage <= count || currentPage !==1) && false && (
                 <div className="d-flex justify-content-center mt-5">
                     <Pagination 
                         activePage = {currentPage}

@@ -80,7 +80,7 @@ exports.createWorker = catchAsyncErrors(async (req, res, next) => {
     if(user.workers.length === 1){
       // credit the newly created worker account with 500 bonus 
       creditWallet(500, "Complementary sign-up bonus", user.id);
-      const message = `Congratulations! Your ${worker.category.name} worker profile has been created. You now have N500 complementary work credit to use for tasks and services on our platform. Enjoy!`
+      const message = `Congratulations! ${worker.category.name} worker profile has been created. You now have N500 complementary work credit to use for tasks and services on our platform.`
       const to = `234${user.phoneNumber.slice(-10)}`
       sendSMS(message, to);
     }

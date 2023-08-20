@@ -72,10 +72,10 @@ const SearchComponent = ({ keyword, workers, count, loading }) => {
 const CreateJobRequestAccordion = ({showWorkRequestModal})=>{
   return (
     <Accordion className="accord">
-      <Accordion.Header className="head" eventKey="0">
+      <Accordion.Header className="head" eventkey="0">
         &#128075; Can't Find the Right Worker?
       </Accordion.Header>
-      <Accordion.Body eventKey="0">
+      <Accordion.Body eventkey="0">
           <p>You can still get the job done by creating a job request and let skilled workers come to you with their bids.</p>
           <button className="btn bg-accent-1" onClick={showWorkRequestModal}>create job request</button>
       </Accordion.Body>

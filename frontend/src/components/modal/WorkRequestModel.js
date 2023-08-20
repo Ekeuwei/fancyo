@@ -15,6 +15,8 @@ const WorkRequestModal = ({show, handleClose}) => {
   
   const { states, lgas, towns } = useSelector(state => state.prefs);
 
+  const [errorInputs, setErrorInputs] = useState([])
+
   const [details, setDetails] = useState({
     description: '',
     budget: '',
@@ -22,21 +24,39 @@ const WorkRequestModal = ({show, handleClose}) => {
   })
 
   const [contact, setContact] = useState({
-    state: '',
-    lga: '',
-    town: ''
+    state: {name:''},
+    lga: {name:''},
+    town: {name:''}
   })
   const onChange = e => setDetails(prevDetails => ({...prevDetails, [e.target.name]:e.target.value}))
   
   const itemSelected = (value, field) => setContact(prev => ({...prev, [field]: value}))
   
   const submitHandler = ()=>{
+    const errorInputsL = []
+    
     details.location = {
-      state: contact.state._id,
-      lga: contact.lga._id,
-      town: contact.town.name,
+      state: contact.state._id||'',
+      lga: contact.lga._id||'',
+      town: contact.town.name||'',
     }
-    dispatch(createTaskRequst(details));
+    if(details.description.length < 5) 
+      errorInputsL.push("description")
+    if(parseInt(details.budget.replace(",","")) < 2000 || isNaN(parseInt(details.budget.replace(",","")))) 
+      errorInputsL.push("budget")
+    if(details.numberOfWorkers < 1 ) 
+      errorInputsL.push("numberOfWorkers")
+    
+    const unfilledLocations = Object.keys(details.location).filter(key => details.location[key].length <= 3) 
+    errorInputsL.push(...unfilledLocations)
+
+    setErrorInputs(errorInputsL)
+
+    setTimeout(()=>setErrorInputs([]), 1000)
+
+    if(errorInputsL.length === 0){
+      // dispatch(createTaskRequst(details));
+    }
   }
   useEffect(()=>{
     if(error){
@@ -85,11 +105,11 @@ const WorkRequestModal = ({show, handleClose}) => {
         ></button>
       </Modal.Header>
       <Modal.Body>
-        <div className="mb-3">
-          <label for="workOder" className="form-label">
+        <div className={`mb-3 ${errorInputs.includes('description')?'shake':''}`}>
+          <label htmlFor="workOder" className="form-label">
             Enter the service you want to perform:
           </label>
-          <div className="input">
+          <div className={`input`}>
             <textarea
             id="workOder"
             name="description"
@@ -101,10 +121,10 @@ const WorkRequestModal = ({show, handleClose}) => {
           </div>
         </div>
         <div className="mb-3">
-          <label for="location" className="form-label">
+          <label htmlFor="location" className="form-label">
             Enter location:
           </label>
-          <div className={`input mb-3 ${!contact.state.name ?'shake':''}`}>
+          <div className={`input mb-3 ${errorInputs.includes('state')?'shake':''}`}>
                 <SearchDropdown 
                     validateField={true} 
                     value={contact.state} 
@@ -114,7 +134,7 @@ const WorkRequestModal = ({show, handleClose}) => {
                     suggestions={states} 
                     placeholder='State' />
             </div>
-            <div className={`input mb-3 ${!contact.lga.name ?'shake':''}`}>
+            <div className={`input mb-3 ${errorInputs.includes('lga')?'shake':''}`}>
                 <SearchDropdown 
                     validateField={true} 
                     value={contact.lga} 
@@ -124,7 +144,7 @@ const WorkRequestModal = ({show, handleClose}) => {
                     suggestions={lgas} 
                     placeholder='Lga' />
             </div>
-            <div className={`input mb-3`}>
+            <div className={`input mb-3 ${errorInputs.includes('town')?'shake':''}`}>
                 <SearchDropdown 
                     value={contact.town} 
                     name={'town'}
@@ -134,8 +154,8 @@ const WorkRequestModal = ({show, handleClose}) => {
                     placeholder='Town' />
             </div>
         </div>
-        <div className="mb-3">
-          <label for="numberOfWorkers" className="form-label">
+        <div className={`mb-3 ${errorInputs.includes('numberOfWorkers')?'shake':''}`}>
+          <label htmlFor="numberOfWorkers" className="form-label">
             Number of workers needed:
           </label>
           <div className="input">
@@ -148,9 +168,9 @@ const WorkRequestModal = ({show, handleClose}) => {
             />
           </div>
         </div>
-        <div className="mb-3">
-          <label for="budget" className="form-label">
-            Enter budget per worker (optional):
+        <div className={`mb-3 ${errorInputs.includes('budget')?'shake':''}`}>
+          <label htmlFor="budget" className="form-label">
+            Enter budget per worker:
           </label>
           <div className="input">
             <span className="text-secondary">₦</span>
