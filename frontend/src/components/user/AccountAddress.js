@@ -31,7 +31,6 @@ const AccountAddress = () => {
     const submitHandler = (e)=>{
         e.preventDefault();
         
-        console.log(contact);
         const payload = {
             address: contact.address?.name||contact.address,
             town: contact.town.name,

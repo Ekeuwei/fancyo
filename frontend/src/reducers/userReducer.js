@@ -62,11 +62,16 @@ import {
   ACTIVATE_ACCOUNT_SUCCESS,
   ACTIVATE_ACCOUNT_FAIL,
   REGISTER_USER_RESET,
+  REGISTER_AGENT_RESET,
+  REGISTER_AGENT_SUCCESS,
+  REGISTER_AGENT_REQUEST,
+  REGISTER_AGENT_FAIL,
 } from "../constants/userConstants";
 
 export const authReducer = (state = { user: {} }, action) => {
   switch (action.type) {
     case REGISTER_USER_REQUEST:
+    case REGISTER_AGENT_REQUEST:
     case LOGIN_REQUEST:
     case LOAD_USER_REQUEST:
       return {
@@ -82,6 +87,7 @@ export const authReducer = (state = { user: {} }, action) => {
       };
 
     case REGISTER_USER_SUCCESS:
+    case REGISTER_AGENT_SUCCESS:
       return{
         ...state,
         loading: false,
@@ -89,6 +95,7 @@ export const authReducer = (state = { user: {} }, action) => {
       }
 
     case REGISTER_USER_RESET:
+    case REGISTER_AGENT_RESET:
       return{
         ...state,
         message: null
@@ -128,6 +135,7 @@ export const authReducer = (state = { user: {} }, action) => {
 
     case LOGIN_FAIL:
     case REGISTER_USER_FAIL:
+    case REGISTER_AGENT_FAIL:
       return {
         ...state,
         isAuthenticated: false,

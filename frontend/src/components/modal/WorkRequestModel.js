@@ -55,7 +55,7 @@ const WorkRequestModal = ({show, handleClose}) => {
     setTimeout(()=>setErrorInputs([]), 1000)
 
     if(errorInputsL.length === 0){
-      // dispatch(createTaskRequst(details));
+      dispatch(createTaskRequst(details));
     }
   }
   useEffect(()=>{

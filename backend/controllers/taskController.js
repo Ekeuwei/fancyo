@@ -7,7 +7,7 @@ const catchAsyncErrors = require("../midllewares/catchAsyncErrors");
 const APIFeatures = require("../utils/apiFeatures");
 const ErrorHandler = require("../utils/errorHandler");
 const Worker = require("../models/worker");
-const { debitWallet, creditWallet, debitPlateformCommission } = require("./paymentController");
+const { debitWallet, creditWallet, debitPlateformCommission, creditReferralEarnings } = require("./paymentController");
 const Review = require("../models/review");
 const FuzzySearch = require("../utils/FuzzySearch");
 const WhatAppTempId = require("../models/whatAppTempId");
@@ -275,7 +275,7 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
       select: "pricing",
       populate: {
         path: "owner",
-        select: "firstName lastName phoneNumber",
+        select: "firstName lastName phoneNumber referralId",
       },
     })
     .populate({
@@ -401,10 +401,13 @@ exports.updateTask = catchAsyncErrors(async (req, res, next) => {
       }
 
       // Credit worker
-      await creditWallet(task.rate.value, `Work settlement ref:${task._id}`, task.workers[workerIndex].worker.owner._id)
+      await creditWallet(task.rate.value, `Work settlement taskRef:${task.taskId}`, task.workers[workerIndex].worker.owner._id)
     }
 
-    debitPlateformCommission(commission, task.workers[workerIndex].worker.owner._id)
+    debitPlateformCommission(commission, task.workers[workerIndex].worker.owner._id, task.taskId)
+
+    // Credit the agent/referer
+    creditReferralEarnings((commission/10), task.workers[workerIndex].worker.owner.referralId, task.taskId)
 
     // TODO: Notify worker if payment was wallet transfer
   }

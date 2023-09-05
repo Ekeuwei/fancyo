@@ -13,6 +13,7 @@
     "countries-list": "^2.6.1",
     "dateformat": "^5.0.3",
     "fuse.js": "^6.6.2",
+    "js-cookie": "^3.0.5",
     "mdbreact": "^5.1.0",
     "rc-slider": "^9.7.2",
     "react": "^17.0.2",
@@ -31,8 +32,10 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts --openssl-legacy-provider build",
+    "start_": "react-scripts start",
+    "build_": "react-scripts --openssl-legacy-provider build",
+    "start": "export SET NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
+    "build": "export SET NODE_OPTIONS=--openssl-legacy-provider && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

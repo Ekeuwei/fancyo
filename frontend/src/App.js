@@ -8,6 +8,7 @@ import Home from "./components/Home";
 
 import Login from "./components/user/Login";
 import Register from "./components/user/Register";
+import RegisterAgent from "./components/agent/Register";
 
 import { loadUser } from "./actions/userActions";
 import { useSelector } from "react-redux";
@@ -74,6 +75,9 @@ function App() {
           {/* <Route path="/tasks" component={Task} exact /> */}
           {/* <Route path="/works" component={WorkerTask} exact /> */}
           <ProtectedRoute path="/progress" component={TaskProgress} exact />
+
+          {/* Agents */}
+          <Route path="/agent/register" component={RegisterAgent} exact />
 
           {/* User */}
           <Route path="/login" component={Login} />

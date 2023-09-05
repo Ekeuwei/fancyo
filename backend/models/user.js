@@ -13,14 +13,29 @@ const userSchema = new mongoose.Schema({
     },
     lastName: {
         type: String,
-        required: true,
+        // required: true,
         maxlength: [20, 'Your name cannot exceed 20 characters']
     },
     email: {
         type: String,
-        required: true,
+        // required: true,
         unique: true,
-        validate: [validator.isEmail, 'Please enter valide email address']
+        default: null,
+        // validate: [validator.isEmail||validator.isEmpty, 'Please enter valid email address'],
+        validate: {
+            validator: function (value) {
+                if (this.allowBankEmail && !value) {
+                    return true;
+                } else {
+                    return validator.isEmail(value);
+                }
+            },
+            message: 'Please enter valid email address'
+        }
+    },
+    allowBankEmail:{
+        type: Boolean,
+        default: false
     },
     phoneNumber: {
         type: String,
@@ -29,7 +44,7 @@ const userSchema = new mongoose.Schema({
     },
     gender: {
         type: String,
-        required: true
+        // required: true
     },
     contact: {
         address: String,
@@ -40,8 +55,8 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
-        minlength: [6, 'Your password must be at least 6 characters long'],
+        // required: true,
+        // minlength: [6, 'Your password must be at least 6 characters long'],
         select: false //the password should not be displayed when displaying the user
     },
     isActivated: {
@@ -52,11 +67,11 @@ const userSchema = new mongoose.Schema({
     avatar: {
         public_id:{
             type: String,
-            required: true
+            // required: true
         },
         url:{
             type: String,
-            required: true
+            // required: true
         }
     },
     role: {
@@ -75,6 +90,9 @@ const userSchema = new mongoose.Schema({
     ],
     walletId:{
         type: mongoose.Schema.Types.ObjectId
+    },
+    referralId:{
+        type: String
     },
     createdAt:{
         type: Date,

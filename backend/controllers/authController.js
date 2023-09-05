@@ -11,13 +11,14 @@ const Wallet = require('../models/wallet');
 const Worker = require('../models/worker');
 const Town = require('../models/address/town');
 const { activationEmailTemplate, activationEmailTemplate2, passwordResetTemplate } = require('../utils/emailTemplates');
+const { creditWallet } = require('./paymentController');
  
 // Register a user => /api/v1/register
 exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
 
     let activationToken = undefined;
 
-    const { firstName, lastName, phoneNumber, gender, email, password, avatar } = req.body;
+    const { firstName, lastName, phoneNumber, gender, email, password, avatar, referralId } = req.body;
     
     const result = await cloudinary.v2.uploader.upload(avatar, {
         folder: 'avatars',
@@ -35,6 +36,7 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
             gender,
             email,
             password,
+            referralId,
             // avatar
             avatar: {
                 public_id: result.public_id,
@@ -54,7 +56,7 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
 
     } catch (error) {
         await cloudinary.v2.uploader.destroy(result.public_id); // Delete uploaded image
-        next(new ErrorHandler(error.message, 500));
+        return next(new ErrorHandler(error.message, 500));
     }
 
     // Create activation url
@@ -82,6 +84,66 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
         message: `We have sent a confirmation email to your email address. Please follow the instructions in the confirmation email in order to activate your account.`
     })
     // sendToken(user, 200, res);
+
+})
+
+// Register a user/worker => /api/v1/user/worker
+exports.registerUserAndWorker = catchAsyncErrors( async (req, res, next) =>{
+
+    const { firstName, lastName, phoneNumber, category, contact, referralId, description } = req.body;
+    
+    let user;
+    let worker;
+
+    try {
+        user = await User.create({
+            firstName,
+            lastName,
+            phoneNumber,
+            referralId,
+            contact
+        });
+
+        const wallet = await Wallet.create({ userId: user._id })
+        user.walletId = wallet._id;
+        
+    } catch (error) {
+        return next(new ErrorHandler(error.message, 500));
+    }
+
+    try {
+        
+        worker = await Worker.create({
+            owner: user._id,
+            description,
+            location,
+            localities: existingLocalities,
+            category
+        })
+
+        user.workers.push(worker._id)
+        user.role = 'worker'
+        user.userMode = !user.userMode
+
+    } catch (error) {
+        return next(new ErrorHandler(error.message, 500))
+    }
+        
+    if(user.workers.length === 1){
+        // credit the newly created worker account with 500 bonus 
+        creditWallet(500, "Complementary sign-up bonus", user._id);
+        const message = `Congratulations! ${worker.category.name} worker profile has been created. You now have N500 complementary work credit to use for tasks and services on our platform.`
+        const to = `234${user.phoneNumber.slice(-10)}`
+        sendSMS(message, to);
+    }
+
+
+    user = await user.save({ validateStateBeforeSave: false });
+
+    res.status(200).json({
+        success: true,
+        message: `User and worker profile created successfully`
+    })
 
 })
 
@@ -230,8 +292,8 @@ exports.forgotPassword = catchAsyncErrors( async (req, res, next) => {
         });
 
     } catch (error) {
-        user.getResePasswordToken = undefined;
-        user.resetPasswordExpres = undefined;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
 
         await user.save( { validateStateBeforeSave: false } );
 

@@ -22,7 +22,7 @@ const workerSchema = new mongoose.Schema({
   },
   uniqueId:{
     type: String,
-    required: true
+    unique: true
   },
   description: {
     type: String,
@@ -43,10 +43,14 @@ const workerSchema = new mongoose.Schema({
   pricing: {
     minRate: {
         type: Number,
+        default: 2000,
         min: [2000, 'The minimum rate on the platform is ₦2,000'],
+        required: true
     },
     dailyRate:{
         type: Number,
+        default: 5000,
+        min: [2000, 'The minimum rate on the platform is ₦2,000'],
         required: true
     }
   },

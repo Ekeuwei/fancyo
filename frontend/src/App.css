@@ -330,6 +330,9 @@ select{
   border-radius: 8px;
   cursor: pointer;
 }
+.input.error {
+  outline: solid rgba(222, 12, 12, .7);
+}
 input:focus, textarea:focus, select:focus{
   outline: none;
   background: transparent;
@@ -1060,6 +1063,7 @@ input[type="password"]:focus{
 .input .suggestions{
   position: relative;
   flex: 1;
+  color: #000;
   /* width: 100%; */
 }
 .input ul{

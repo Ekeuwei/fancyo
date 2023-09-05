@@ -29,6 +29,7 @@ const SearchDropdown = ({ value, onChange, suggestions, placeholder, name, valid
             onBlur={handleBlur} >
             
             <input
+                style={{width:'100%'}}
                 type="text"
                 value={value.name}
                 onChange={ e => onChange({name: e.target.value}, name)}

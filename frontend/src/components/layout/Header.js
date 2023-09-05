@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { useAlert } from 'react-alert'
@@ -12,6 +12,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import { changeMode, logout } from '../../actions/userActions'
 
 import '../../App.css'
+import WorkRequestModal from '../modal/WorkRequestModel';
 
 
 const Header = () => {
@@ -33,12 +34,24 @@ const Header = () => {
     }
     const switchMode = ()=> dispatch(changeMode());
     const userMode = JSON.parse(localStorage.getItem('userMode'));
-
+    const [show, setShow] = useState(false)
+    const [showMenu, setShowMenu] = useState(true)
+    const handleClose = ()=> setShow(false);
+    const toggleMenu = ()=> setShowMenu(prev => !prev)
     return (
         <Fragment>
             <nav className="navbar navbar-expand-lg navbar-light bg-primary-1 sticky-top">
                 <div className={`container-fluid`}>
-                    <OffcanvasExample user={user} logoutHandler={logoutHandler} switchMode={switchMode} userMode={userMode} />
+                    <OffcanvasExample 
+                        user={user} 
+                        logoutHandler={logoutHandler} 
+                        switchMode={switchMode} 
+                        userMode={userMode}
+                        showMenu={showMenu}
+                        toggleMenu={toggleMenu}
+                        showModal={show}
+                        setShow={setShow}
+                        handleClose={handleClose} />
                     <Link to={'/'} className="text-white navbar-brand flex-md-grow-0 flex-grow-1 ps-2" >Ebiwoni</Link>
                     <div className="order-1 ms-auto">
                         {user?.role? <NavLinks {...user} logoutHandler={logoutHandler} switchMode={switchMode} userMode={userMode}/>:
@@ -94,7 +107,14 @@ const NavLinks = ({avatar, firstName, logoutHandler, switchMode, userMode, role}
 }
 
 
-function OffcanvasExample({user, logoutHandler, switchMode, userMode, role}) {
+function OffcanvasExample({user, logoutHandler, switchMode, userMode, role, handleClose, setShow, showMenu, toggleMenu, showModal}) {
+    const offCanvasRef = useRef();
+    const closeOffCanvas = () => offCanvasRef.current.backdrop.click();
+    
+    const closeOffCanvasOver = (meth)=>{
+        closeOffCanvas()
+        meth()
+    }
   return (
     <>
       {[false].map((expand) => (
@@ -105,6 +125,7 @@ function OffcanvasExample({user, logoutHandler, switchMode, userMode, role}) {
               id={`offcanvasNavbar-expand-${expand}`}
               aria-labelledby={`offcanvasNavbarLabel-expand-${expand}`}
               placement="start"
+              ref={offCanvasRef}
             >
               <Offcanvas.Header closeButton>
                 <Offcanvas.Title id={`offcanvasNavbarLabel-expand-${expand}`}>
@@ -115,36 +136,36 @@ function OffcanvasExample({user, logoutHandler, switchMode, userMode, role}) {
                 <Nav className="justify-content-end flex-grow-1 pe-3">
                     {user?.role?<>
                         {/* Users links */}
-                        <Nav.Link href="/dashboard">Dashboard</Nav.Link>
-                        <Nav.Link href="/account/profile">Account</Nav.Link>
+                        <Nav.Link onClick={closeOffCanvas} href="/dashboard">Dashboard</Nav.Link>
+                        <Nav.Link onClick={closeOffCanvas} href="/account/profile">Account</Nav.Link>
                         
                         {user.userMode?<>
-                            <Nav.Link href="#">Post a Job</Nav.Link>
-                            <Nav.Link href="/tasks">Opened Jobs</Nav.Link>
-                            {user.role==="user"&&<Nav.Link href="/account/worker">Create Worker Profile</Nav.Link>}
+                            <Nav.Link onClick={()=>closeOffCanvasOver(setShow(true))}>Post a Job</Nav.Link>
+                            <Nav.Link onClick={closeOffCanvas} href="/tasks">Opened Jobs</Nav.Link>
+                            {user.role==="user"&&<Nav.Link onClick={closeOffCanvas} href="/account/worker">Create Worker Profile</Nav.Link>}
                         </>:<>
                             {/* Workers links */}
-                            <Nav.Link href="#">Task requests</Nav.Link>
-                            <Nav.Link href="/morejobs">Nearby Jobs</Nav.Link>
+                            <Nav.Link onClick={closeOffCanvas} href="#">Task requests</Nav.Link>
+                            <Nav.Link onClick={closeOffCanvas} href="/morejobs">Nearby Jobs</Nav.Link>
                         </>}
 
-                        {user.role==="worker"&& <Nav.Link href="#"onClick={switchMode}>
+                        {user.role==="worker"&& <Nav.Link href="#"onClick={()=>closeOffCanvasOver(switchMode)}>
                             {`Switch to ${userMode?'Worker':'User'} Mode`}
                         </Nav.Link>}
                         
-                        <Nav.Link onClick={logoutHandler}>Logout</Nav.Link>
+                        <Nav.Link onClick={()=>closeOffCanvasOver(logoutHandler)}>Logout</Nav.Link>
                     </>:<>
                         {/* Visitors links */}
-                        <Nav.Link href="#">Home</Nav.Link>
-                        <Nav.Link href="#">How It Works</Nav.Link>
-                        <Nav.Link href="#">FAQs</Nav.Link>
-                        <Nav.Link href="#">Find Workers</Nav.Link>
-                        <Nav.Link href="#">About Us</Nav.Link>
-                        <Nav.Link href="#">Contact Us</Nav.Link>
-                        <Nav.Link href="#">Terms of Service</Nav.Link>
-                        <Nav.Link href="#">Privacy Policy</Nav.Link>
-                        <Nav.Link href="#">Referral Program</Nav.Link>
-                        <Nav.Link href="#">Worker Sign-Up</Nav.Link>
+                        <Nav.Link onClick={closeOffCanvas} href="#">Home</Nav.Link>
+                        <Nav.Link onClick={closeOffCanvas} href="#">How It Works</Nav.Link>
+                        <Nav.Link onClick={closeOffCanvas} href="#">FAQs</Nav.Link>
+                        <Nav.Link onClick={closeOffCanvas} href="#">Find Workers</Nav.Link>
+                        <Nav.Link onClick={closeOffCanvas} href="#">About Us</Nav.Link>
+                        <Nav.Link onClick={closeOffCanvas} href="#">Contact Us</Nav.Link>
+                        <Nav.Link onClick={closeOffCanvas} href="#">Terms of Service</Nav.Link>
+                        <Nav.Link onClick={closeOffCanvas} href="#">Privacy Policy</Nav.Link>
+                        <Nav.Link onClick={closeOffCanvas} href="#">Referral Program</Nav.Link>
+                        <Nav.Link onClick={closeOffCanvas} href="#">Worker Sign-Up</Nav.Link>
                     </>}
 
                     
@@ -154,6 +175,8 @@ function OffcanvasExample({user, logoutHandler, switchMode, userMode, role}) {
           </Container>
         </Navbar>
       ))}
+      <WorkRequestModal show={showModal} handleClose={handleClose}/>
+
     </>
   );
 }

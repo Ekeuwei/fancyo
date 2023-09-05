@@ -70,7 +70,10 @@ import {
     ACTIVATION_LINK_FAIL,
     ACTIVATE_ACCOUNT_REQUEST,
     ACTIVATE_ACCOUNT_SUCCESS,
-    ACTIVATE_ACCOUNT_FAIL
+    ACTIVATE_ACCOUNT_FAIL,
+    REGISTER_AGENT_REQUEST,
+    REGISTER_AGENT_SUCCESS,
+    REGISTER_AGENT_FAIL
 } from '../constants/userConstants'
 
 // Login
@@ -124,6 +127,31 @@ export const register = (userData) => async (dispatch) =>{
     } catch (error) {
         dispatch({
             type: REGISTER_USER_FAIL,
+            payload: error.response.data.message
+        })
+    }
+}
+
+// Register Agent
+export const registerAgent = (userData) => async (dispatch) =>{
+    try {
+
+        dispatch({ type: REGISTER_AGENT_REQUEST})
+
+        const config = {
+            headers: {'content-Type': 'application/json'}
+        }
+
+        const { data } = await axios.post('/api/v1/agent/register', userData, config)
+        
+        dispatch({
+            type: REGISTER_AGENT_SUCCESS,
+            payload: data.message
+        })
+
+    } catch (error) {
+        dispatch({
+            type: REGISTER_AGENT_FAIL,
             payload: error.response.data.message
         })
     }

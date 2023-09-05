@@ -4,12 +4,11 @@ const Transaction = require("../models/transaction");
 const Wallet = require("../models/wallet");
 const catchAsyncErrors = require("../midllewares/catchAsyncErrors");
 const ErrorHandler = require("../utils/errorHandler");
+const Agent = require('../models/agent')
 
 const got = require('got');
 
 const stripe = require('stripe')(process.env.STRIPE_SECRETE_KEY)
-const flw = new Flutterwave(process.env.FLW_PUBLIC_KEY, process.env.FLW_SECRET_KEY);
-
 
 
 // Process stripe payments      =>  /api/v1/payment/process
@@ -165,8 +164,8 @@ exports.debitWallet = async (amount, title, userId)=>{
 }
 
 // debit wallet
-exports.debitPlateformCommission = async (amount, userId)=>{
-    const title = `Platform Commission ref:${userId}`
+exports.debitPlateformCommission = async (amount, userId, taskId)=>{
+    const title = `Platform Commission taskRef:${taskId}`
     const wallet = await Wallet.findOne({userId});
 
     const transaction = await Transaction.create({
@@ -181,6 +180,32 @@ exports.debitPlateformCommission = async (amount, userId)=>{
     transaction.balanceAfter = wallet.balance - amount
 
     wallet.balance -= amount;
+    transaction.status = 'successful';
+
+    await Promise.all([wallet.save(), transaction.save()]);
+}
+
+// credit referral earnings
+exports.creditReferralEarnings = async (amount, referralId, taskId)=>{
+    const agent = await Agent.findOne({agentId: referralId})
+    
+    if(!agent) return 
+
+    const title = `Referral earning taskRef: ${taskId}`
+    const wallet = await Wallet.findOne({walletId: agent.walletId});
+
+    const transaction = await Transaction.create({
+        title,
+        userId,
+        amount,
+        type: 'credit',
+        walletId: agent.walletId
+    });
+
+    transaction.balanceBefore = wallet.balance
+    transaction.balanceAfter = wallet.balance + amount
+
+    wallet.balance += amount;
     transaction.status = 'successful';
 
     await Promise.all([wallet.save(), transaction.save()]);
@@ -265,6 +290,7 @@ exports.walletTransactions = catchAsyncErrors(async (req, res, next)=>{
 
 // Handle flutterwave payments Callback     Get =>  /api/v1/flwpayment/callback
 exports.flwPaymentCallback = catchAsyncErrors(async(req, res, next)=>{
+    const flw = new Flutterwave(process.env.FLW_PUBLIC_KEY, process.env.FLW_SECRET_KEY);
     if (req.query?.status) {
         const transactionDetails = await Transaction.findOne({reference: req.query.tx_ref});
         const wallet = await Wallet.findOne({userId: transactionDetails.userId});
@@ -300,6 +326,7 @@ exports.flwPaymentCallback = catchAsyncErrors(async(req, res, next)=>{
 
 // flutterwave payments webhook      Get =>  /api/v1/flwpayment/webhook
 exports.flwPaymentWebhook = catchAsyncErrors(async(req, res, next)=>{
+    const flw = new Flutterwave(process.env.FLW_PUBLIC_KEY, process.env.FLW_SECRET_KEY);
     const secretHash = process.env.FLW_SECRET_HASH;
     const signature = req.headers["verif-hash"];
     if (!signature || (signature !== secretHash)) {
