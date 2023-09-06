@@ -18,24 +18,20 @@ const userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        // required: true,
+        required: true,
         unique: true,
         default: null,
-        // validate: [validator.isEmail||validator.isEmpty, 'Please enter valid email address'],
-        validate: {
-            validator: function (value) {
-                if (this.allowBankEmail && !value) {
-                    return true;
-                } else {
-                    return validator.isEmail(value);
-                }
-            },
-            message: 'Please enter valid email address'
-        }
-    },
-    allowBankEmail:{
-        type: Boolean,
-        default: false
+        validate: [validator.isEmail, 'Please enter valid email address'],
+        // validate: {
+        //     validator: function (value) {
+        //         if (this.allowBankEmail && !value) {
+        //             return true;
+        //         } else { 
+        //             return validator.isEmail(value);
+        //         }
+        //     },
+        //     message: 'Please enter valid email address'
+        // }
     },
     phoneNumber: {
         type: String,

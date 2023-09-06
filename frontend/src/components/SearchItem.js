@@ -2,6 +2,7 @@ export const formatNumber = value => new Intl.NumberFormat('en-US').format(value
 export const formatNumberFraction = value => Number(value).toLocaleString("en-US", {minimumFractionDigits: 2});
 
 const SearchItem = ({worker, viewArtisan})=> {
+  const default_avatar = "/images/avatar.png"
   return(
     <div
       className="col-6 col-sm-4 col-md-3 col-lg-5 mb-3 text-center"
@@ -17,7 +18,7 @@ const SearchItem = ({worker, viewArtisan})=> {
         <div className="w-50  mx-auto">
           <div className="avatar">
             <img
-              src={worker.owner.avatar.url}
+              src={worker.owner.avatar?.url||default_avatar}
               alt={`${worker.owner.firstName}`}
             />
           </div>
@@ -50,7 +51,7 @@ const SearchItem = ({worker, viewArtisan})=> {
               ></i>
             </span>
           </p>
-          <p className="mb-1">{`Location: ${worker.owner.contact?.town?.name}`}</p>
+          <p className="mb-2">{`Location: ${worker.owner.contact?.town?.name}`}</p>
         </div>
       </div>
     </div>

@@ -98,6 +98,8 @@ const seedWorkers = async (lga)=> {
       const { firstName, lastName, phoneNumber, town, landmark, description } = detail;
       
       console.log("User created",town);
+      const value = Math.floor(Math.random()*100)+1
+      const email = `${firstName}.${lastName}${value}@ebiwoni.com`.toLowerCase().replace(/\s/g, '')
       
       let newTown = await Town.findOne({name: town});
 
@@ -125,7 +127,7 @@ const seedWorkers = async (lga)=> {
           phoneNumber,
           referralId: "1001",
           contact,
-          allowBankEmail: true
+          email:email
       });
       console.log("User created");
       const wallet = await Wallet.create({ userId: user._id })
@@ -147,7 +149,7 @@ const seedWorkers = async (lga)=> {
       creditWallet(500, "Complementary sign-up bonus", user._id);
       const message = `Hello ${user.firstName},\nyour ${worker.category.name} worker account is ready. Log in now at www.ebiwoni.com/register to update your rates and charges.`
       const to = `234${user.phoneNumber.slice(-10)}`
-      await sendSMS(message, to);
+      sendSMS(message, to);
 
       await user.save({ validateStateBeforeSave: false });
     
@@ -158,7 +160,7 @@ const seedWorkers = async (lga)=> {
   } catch (error) {
     console.error(error);
   } finally{
-    process.exit();
+    // process.exit();
   }
 }
 

@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Courgette&family=Pacifico&display=swap');
 :root {
   --blue: #0d6efd;
   --indigo: #6610f2;
@@ -450,6 +451,15 @@ input[type="password"]:focus{
   width: 100%;
   object-fit: cover;
 }
+.featured-graphics .fg-text-overley{
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  font-size: 50px;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: Courgette, Pacifico, cursive;
+}
 .featured-graphics .clear-btn{
   position: absolute;
   width: fit-content;
@@ -471,6 +481,7 @@ input[type="password"]:focus{
   border: 0.5em solid #fff;
   border-radius: 50%;
   object-fit: cover;
+  background: antiquewhite;
   z-index: 2;
 }
 .featured-graphics-button{

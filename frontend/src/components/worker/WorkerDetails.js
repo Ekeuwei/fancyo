@@ -120,13 +120,15 @@ const WorkerDetails = ({ match, history }) => {
               {/* Start */}
               <div className="featured-graphics">
                 <img 
-                    src={worker.featuredGraphics?.url || `${window.location.origin}/images/featured.png`}
+                    src={worker.featuredGraphics?.url || `${window.location.origin}/images/featured.jpeg`}
                     alt="featured Graphics"
                   />
+                  {!worker.featuredGraphics&&<h1 className="fg-text-overley">{worker.category.name}</h1>}
+
               </div>
               <div className="featured-graphics-avatar">
                 <img 
-                    src={worker.owner.avatar.url}
+                    src={worker.owner.avatar?.url||`${window.location.origin}/images/avatar.png`}
                     name="avatar"
                     alt={`${worker.displayName}_Photo`}
                   />
