@@ -97,13 +97,10 @@ const seedWorkers = async (lga)=> {
     for (const detail of workers){
       const { firstName, lastName, phoneNumber, town, landmark, description } = detail;
       
-      console.log("User created",town);
       const value = Math.floor(Math.random()*100)+1
       const email = `${firstName}.${lastName}${value}@ebiwoni.com`.toLowerCase().replace(/\s/g, '')
       
       let newTown = await Town.findOne({name: town});
-
-      console.log("User created");
 
       const category = await getProperTitle(description)
             
@@ -115,8 +112,6 @@ const seedWorkers = async (lga)=> {
             lga: newLga._id
           })
       }
-      console.log(newTown);
-      process.exit()
 
       const contact = {
         address: landmark,
