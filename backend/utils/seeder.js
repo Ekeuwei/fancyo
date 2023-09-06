@@ -108,13 +108,15 @@ const seedWorkers = async (lga)=> {
       const category = await getProperTitle(description)
             
       if(!newTown){
-          const newLga = await Lga.findById(lga)
+          const newLga = await Lga.findOne({name:lga})
           newTown = await Town.create({ 
             name: town.trim(),
             state: newLga.state,
             lga: newLga._id
           })
       }
+      console.log(newTown);
+      process.exit()
 
       const contact = {
         address: landmark,
@@ -191,7 +193,7 @@ const updateAllWorkerUniqueIds = async ()=> {
 }
 
 
-seedWorkers("647744b387968b971280e06f")
+seedWorkers("Yenagoa")
 // updateAllWorkerUniqueIds();
 // updateAllTasksIds();
 // updateAllTasksRates();
