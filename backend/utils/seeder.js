@@ -121,7 +121,7 @@ const seedWorkers = async (lga)=> {
       const user = await User.create({
           firstName,
           lastName,
-          phoneNumber,
+          phoneNumber:`0${phoneNumber.slice(-10)}`,
           referralId: "1001",
           contact,
           email:email
@@ -144,7 +144,7 @@ const seedWorkers = async (lga)=> {
           
       // credit the newly created worker account with 500 bonus 
       creditWallet(500, "Complementary sign-up bonus", user._id);
-      const message = `Hello ${user.firstName},\nyour ${worker.category.name} worker account is ready. Log in now at www.ebiwoni.com/register to update your rates and charges.`
+      const message = `Hello ${user.firstName},\nyour ${worker.category.name} worker account has been created. Goto www.ebiwoni.com/register to update your user account, rates and charges.`
       const to = `234${user.phoneNumber.slice(-10)}`
       sendSMS(message, to);
 
@@ -183,7 +183,7 @@ const updateAllWorkerUniqueIds = async ()=> {
   } catch (error) {
     console.error(error);
   } finally{
-    process.exit();
+    // process.exit();
   }
 }
 

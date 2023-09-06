@@ -20,7 +20,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        default: null,
         validate: [validator.isEmail, 'Please enter valid email address'],
         // validate: {
         //     validator: function (value) {
@@ -36,6 +35,7 @@ const userSchema = new mongoose.Schema({
     phoneNumber: {
         type: String,
         required: true,
+        unique: true,
         minlength: [10, 'Phone number not complete']
     },
     gender: {

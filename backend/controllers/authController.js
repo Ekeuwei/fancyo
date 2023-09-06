@@ -29,26 +29,44 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
     let user;
 
     try {
-        user = await User.create({
-            firstName,
-            lastName,
-            phoneNumber,
-            gender,
-            email,
-            password,
-            referralId,
-            // avatar
-            avatar: {
+        user = await User.findOne({
+            phoneNumber: `0${phoneNumber.slice(-10)}`, 
+            email: { $regex: /ebiwoni\.com/i 
+        } })
+
+        if(user){
+            user.firstName = firstName,
+            user.lastName = lastName,
+            user.email = email,
+            user.gender = gender,
+            user.password = password,
+            user.avatar = {
                 public_id: result.public_id,
                 url: result.secure_url
             }
-        });
 
-        const wallet = await Wallet.create({
-            userId: user._id
-        })
+        }else{
+            user = await User.create({
+                firstName,
+                lastName,
+                phoneNumber: `0${phoneNumber.slice(-10)}`,
+                gender,
+                email,
+                password,
+                referralId,
+                // avatar
+                avatar: {
+                    public_id: result.public_id,
+                    url: result.secure_url
+                }
+            });
+            
+        }
 
-        user.walletId = wallet._id;
+        if(!user.walletId){
+            const wallet = await Wallet.create({ userId: user._id })
+            user.walletId = wallet._id;
+        }
         
         activationToken = user.getActivationToken();
 
@@ -96,10 +114,11 @@ exports.registerUserAndWorker = catchAsyncErrors( async (req, res, next) =>{
     let worker;
 
     try {
+        
         user = await User.create({
             firstName,
             lastName,
-            phoneNumber,
+            phoneNumber:`0${phoneNumber.slice(-10)}`,
             referralId,
             contact
         });
