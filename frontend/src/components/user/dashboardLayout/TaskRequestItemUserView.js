@@ -7,6 +7,8 @@ import { Modal } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { formatNumber } from "../../SearchItem";
 
+const defaultAvatar = `${window.location.origin}/images/avatar.png`
+
 const TaskRequestItemUserView = ({task, action, userMode, tabDirection})=>{
     // const view = label(task.status);
     const displayButton = worker => worker.escrow.user === "Completed"? "Review":label(worker.escrow.worker).txt
@@ -85,7 +87,7 @@ const GroupWorkers = ({taskWorker, taskId, displayButton, task, time, userMode, 
             <div className="jobrequest-item timeline-bullet">
                 {showImage&& <div className="avatar" style={{maxWidth: '50px', paddingBottom: '50px'}}>
                     <img 
-                        src={taskWorker.worker.owner.avatar.url} 
+                        src={taskWorker.worker.owner.avatar?.url||defaultAvatar} 
                         alt={taskWorker.worker.owner.firstName} 
                         onLoad={()=>setShowImage(true)} 
                         onError={()=>setShowImage(false)}
@@ -135,7 +137,7 @@ const Applicant = ({taskApplicant, task, taskId, displayButton, time, userMode, 
             <div className="jobrequest-item timeline-bullet">
                 {showImage&& <div className="avatar" style={{maxWidth: '50px', paddingBottom: '50px'}}>
                     <img 
-                        src={taskApplicant.worker.owner.avatar.url} 
+                        src={taskApplicant.worker.owner.avatar?.url||defaultAvatar} 
                         alt={taskApplicant.worker.owner.firstName} 
                         onLoad={()=>setShowImage(true)} 
                         onError={()=>setShowImage(false)}
@@ -178,7 +180,7 @@ const SingleWorker = ({singleWorker, userMode, task, tabDirection, displayButton
         <div className="jobrequest-item">
             {showImage&& <div className="avatar">
                 <img 
-                    src={singleWorker.worker.owner.avatar.url} 
+                    src={singleWorker.worker.owner.avatar?.url||defaultAvatar} 
                     alt={singleWorker.worker.owner.firstName} 
                     onLoad={()=>setShowImage(true)} 
                     onError={()=>setShowImage(false)}

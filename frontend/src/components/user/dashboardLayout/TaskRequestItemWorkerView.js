@@ -7,6 +7,7 @@ import { myTasks, myWorks, updateTaskProgressLocal, updateTaskRate } from "../..
 import { useAlert } from "react-alert";
 import { useDispatch } from "react-redux";
 
+const defaultAvatar = `${window.location.origin}/images/avatar.png`
 
 
 const TaskRequestItemWorkerView = ({task, userMode, tabDirection})=>{
@@ -28,7 +29,7 @@ const TaskRequestItemWorkerView = ({task, userMode, tabDirection})=>{
         <div className="jobrequest-item">
             {showImage&& <div className="avatar">
                 <img 
-                    src={task.user.avatar.url} 
+                    src={task.user.avatar?.url||defaultAvatar} 
                     alt={task.user.firstName} 
                     onLoad={()=>setShowImage(true)} 
                     onError={()=>setShowImage(false)}

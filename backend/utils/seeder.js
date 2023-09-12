@@ -121,7 +121,7 @@ const seedWorkers = async (lga)=> {
       const user = await User.create({
           firstName,
           lastName,
-          phoneNumber:`0${phoneNumber.slice(-10)}`,
+          phoneNumber:`0${phoneNumber.toString().slice(-10)}`,
           referralId: "1001",
           contact,
           email:email
@@ -144,8 +144,8 @@ const seedWorkers = async (lga)=> {
           
       // credit the newly created worker account with 500 bonus 
       creditWallet(500, "Complementary sign-up bonus", user._id);
-      const message = `Hello ${user.firstName},\nyour ${worker.category.name} worker account has been created. Goto www.ebiwoni.com/register to update your user account, rates and charges.`
-      const to = `234${user.phoneNumber.slice(-10)}`
+      const message = `Hello ${user.firstName},\nyour ${worker.category.name} worker account has been created. Goto www.ebiwoni.com/register to update your profile, rates and charges.`
+      const to = `234${user.phoneNumber.toString().slice(-10)}`
       sendSMS(message, to);
 
       await user.save({ validateStateBeforeSave: false });
@@ -159,6 +159,27 @@ const seedWorkers = async (lga)=> {
   } finally{
     // process.exit();
   }
+}
+
+const messageAllWorkers = async()=>{
+  const moment = require("moment")
+  const aDayAgo = moment().subtract(1, 'day');
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+  const workers = await Worker.find({
+    createdAt:{
+      $gte: twentyFourHoursAgo,
+      $lt: new Date() 
+    }
+  }).populate('owner', 'firstName lastName phoneNumber', User)
+
+  for(const worker of workers){
+    const message = `Congratulations ${worker.owner.firstName}! your ${worker.category.name} work profile has been credited with N500 complementary work credit to use for tasks and services on our platform.`
+    const to = `234${worker.owner.phoneNumber.slice(-10)}`
+    sendSMS(message, to);
+  }
+
+  console.log(`${workers.length} total workers messaged`);
 }
 
 const updateAllWorkerUniqueIds = async ()=> {
@@ -187,8 +208,36 @@ const updateAllWorkerUniqueIds = async ()=> {
   }
 }
 
+const updateWorkerDetails = async()=>{
 
-seedWorkers("Yenagoa")
+  try {
+    
+    const result = await Worker.updateMany(
+      {
+        description: "Catereropo",
+        // email: { $regex: /ebiwoni\.com/i } // Use a regular expression for substring matching
+      },
+      {
+        // Your update operations go here
+        // For example, to update a field named 'status':
+        $set: { category: {name: "Caterer", sn:"05"} }
+      }
+    )
+  
+    console.log(`Updated ${result.matchedCount} documents.`);
+  
+  } catch (error) {
+    
+    console.error(err);
+  } finally{
+    
+    process.exit()
+  }
+  
+}
+// messageAllWorkers()
+// updateWorkerDetails()
+// seedWorkers("Yenagoa")
 // updateAllWorkerUniqueIds();
 // updateAllTasksIds();
 // updateAllTasksRates();
