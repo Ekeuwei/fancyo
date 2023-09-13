@@ -4,7 +4,7 @@ const catchAsyncErrors = require("./catchAsyncErrors");
 const Category = require('../models/settings/category');
 
 exports.classify = catchAsyncErrors(async(req, res, next)=>{
-    const sample1 = "A worker is needed. Suggest a common worker category name for someone that performs a service. Limit your response to only the category name. It's okay if you repeat my input";
+    const sample1 = "A worker is needed. Suggest a common worker category name for someone that performs a service. Limit your response to only the category name. It's okay if you repeat my input. Return back the input if it is a category. Think about the most suitable person to perform a task - ";
     const sample2 = 'Classify to closest niche category: i need someone to '
     const systemMsg = `you are a helpful assistant, you help to classify user 
                         input to their closest niche category. 
@@ -63,7 +63,7 @@ exports.classify = catchAsyncErrors(async(req, res, next)=>{
 })
 
 exports.getProperTitle = async(description)=>{
-    const sample1 = "A worker is needed. Suggest a common worker category name for someone that performs a service. Limit your response to only the category name. It's okay if you repeat my input";
+    const sample1 = "A worker is needed. Suggest a common worker category name for someone that performs a service. Limit your response to only the category name. It's okay if you repeat my input. Return back the input if it is a category. Think about the most suitable person to perform a task - ";
   
     let title;
     let category;
