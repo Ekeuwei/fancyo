@@ -455,8 +455,10 @@ input[type="password"]:focus{
   position: absolute;
   /* top: 20%; */
   left: 50%;
+  width: 100%;
+  text-align: center;
   transform: translate(-50%, 50%);
-  font-size: 40px;
+  font-size: 45px;
   color: rgba(255, 255, 255, 0.6);
   font-family: Courgette, Pacifico, cursive;
 }
