@@ -173,17 +173,18 @@
 }
 
 .bg-img {
-  background: url("./images/homev.png"), no-repeat;
-  /* background: linear-gradient(#f8d8b3, transparent, white),
-      #ffa949 url('./images/homev.png') no-repeat center; */
+  /* background: url("./images/homev.png"), no-repeat; */
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.5)),
+      #ffa949 url('./images/homev.png') no-repeat center;
   background-size: cover;
-  height: 100vh;
+  height: calc(100vh - 70px);
+  color: #000000a7;
   width: 100%;
   padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
   text-align: center;
 }
 
@@ -1225,6 +1226,7 @@ input[type="password"]:focus{
 @media (min-width: 481px) and (max-width: 768px) {
 
   /* CSS styles for tablets */
+  
  
 }
 
@@ -1232,5 +1234,8 @@ input[type="password"]:focus{
 @media (min-width: 769px) {
 
   /* CSS styles for desktop */
+  .bg-img {
+      justify-content: center;
+    }
 
 }

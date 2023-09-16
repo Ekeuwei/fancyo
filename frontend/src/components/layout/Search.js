@@ -16,7 +16,7 @@ const Search = ({ history }) => {
 
     return (
         <form onSubmit = { searchHandler } >
-            <div className="input-group bg-dark-4 rounded-pill mb-2">
+            <div className="input-group bg-dark-4 rounded-pill mb-2" style={{minHeight: '50px'}}>
                 <span className="input-group-text ms-2 border-0 bg-transparent">
                     <span className="text-white my-auto fa fa-search"></span>
                 </span>

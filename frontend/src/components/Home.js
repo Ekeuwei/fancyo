@@ -59,7 +59,7 @@ const Home = ({ match }) => {
                     <section >
                         <div className="bg-img">
                             {/* <h3 className="mb-4 text-white">Find the right worker for any task, easily and quickly</h3> */}
-                            <h1 className="mb-3 text-white">Unlocking Opportunities, Connecting Talents</h1>
+                            <h1 className="mt-4 mb-3 text-white">Unlocking Opportunities, Connecting Talents</h1>
                             <h4 className="mb-5 text-white">Ebiwoni - Your Bridge to Skilled Services and Reliable Gigs</h4>
                             {/* <p className="mb-4 text-white">Free up your time and energy by letting professionals handle your personal tasks.</p> */}
                             <div className="search-wrapper">
