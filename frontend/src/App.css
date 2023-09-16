@@ -175,7 +175,7 @@
 .bg-img {
   /* background: url("./images/homev.png"), no-repeat; */
   background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.5)),
-      #ffa949 url('./images/homev.png') no-repeat center;
+      #ffa949 url('./images/homev.jpg') no-repeat center;
   background-size: cover;
   height: calc(100vh - 70px);
   color: #000000a7;
@@ -191,6 +191,7 @@
 .search-wrapper{
   width: 100%;
   max-width: 600px;
+  margin-top: 50px;
 }
 
 .fit-cover {
