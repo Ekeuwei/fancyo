@@ -7,7 +7,7 @@ const Footer = () => {
                 <div className="container-fluid text-center mx-auto">
                     <hr/>
                     <h3>Ebiwoni</h3>
-                    <p>© ebiwoni 2023</p>
+                    <p>© ebiwoni 2023 All rights reserved</p>
                     <span>
                         <i className="p-2 fa fa-facebook" aria-hidden="true"></i>
                         <i className="p-2 fa fa-linkedin" aria-hidden="true"></i>

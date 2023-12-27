@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
+import ReactGA from 'react-ga'
 
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
@@ -47,6 +48,10 @@ import ContactUs from "./components/ContactUs";
 function App() {
   useEffect(() => {
     store.dispatch(loadUser());
+  }, []);
+
+  useEffect(() => {
+    ReactGA.pageview(window.location.pathname + window.location.search);
   }, []);
 
   const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
