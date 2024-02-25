@@ -17,8 +17,17 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const user = JSON.parse(localStorage.getItem('user'))
-  const [isDarkMode, setDarkMode] = useState(user?.preferences.darkMode)
+
+  const storedUser = localStorage.getItem('user');
+  let parsedUser;
+  if (storedUser) {
+    try {
+      parsedUser = JSON.parse(storedUser);
+    } catch (error) {
+      localStorage.clear('user')
+    }
+  }
+  const [isDarkMode, setDarkMode] = useState(parsedUser?.preferences.darkMode)
   const toggleDarkMode = ()=> setDarkMode(prev => !prev)
   
 
