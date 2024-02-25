@@ -23,7 +23,7 @@ const walletSchema = new mongoose.Schema({
 walletSchema.pre('save', async function(){
     if(this.isNew){
         this.walletId = await this.constructor.generateNextWalletId();
-    }
+    } 
 })
 
 walletSchema.statics.generateNextWalletId = async function () {

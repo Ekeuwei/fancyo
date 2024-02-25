@@ -8,52 +8,60 @@ const Wallet = require('./wallet');
 const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
-        required: true,
         maxlength: [20, 'Your name cannot exceed 20 characters']
     },
     lastName: {
         type: String,
-        // required: true,
         maxlength: [20, 'Your name cannot exceed 20 characters']
+    },
+    username: {
+        type: String,
+        unique: true,
+        sparse: true,
+        collation: { locale: 'en', caseLevel: true, strength: 2 },
     },
     email: {
         type: String,
-        required: true,
         unique: true,
+        sparse: true,
         validate: [validator.isEmail, 'Please enter valid email address'],
-        // validate: {
-        //     validator: function (value) {
-        //         if (this.allowBankEmail && !value) {
-        //             return true;
-        //         } else { 
-        //             return validator.isEmail(value);
-        //         }
-        //     },
-        //     message: 'Please enter valid email address'
-        // }
     },
     phoneNumber: {
         type: String,
-        required: true,
         unique: true,
+        sparse: true,
         minlength: [10, 'Phone number not complete']
     },
     gender: {
         type: String,
-        // required: true
     },
     contact: {
         address: String,
-        town: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Town'
-        },
     },
+    bankAccounts:[
+        {
+            _id: false,
+            name: String,
+            bankName: String,
+            bankCode: String,
+            accountName: String,
+            accountNumber: String,
+        }
+    ],
     password: {
         type: String,
-        // required: true,
-        // minlength: [6, 'Your password must be at least 6 characters long'],
+        minlength: [6, 'Your password must be at least 6 characters long'],
         select: false //the password should not be displayed when displaying the user
+    },
+    preferences:{
+        darkMode: {
+            type: Boolean,
+            default: false
+        },
+        stakeAlerts:{
+            type: Boolean,
+            default: false
+        }
     },
     isActivated: {
         type: Boolean,
@@ -61,29 +69,18 @@ const userSchema = new mongoose.Schema({
         default: false
     },
     avatar: {
-        public_id:{
-            type: String,
-            // required: true
-        },
-        url:{
-            type: String,
-            // required: true
-        }
+        type: String,
+        default: "avatar1"
     },
     role: {
         type: String,
+        enum: ["user", "punter", "admin"],
         default: 'user'
     },
     userMode: {
         type: Boolean,
         default: true
     },
-    workers: [
-        {
-            type: mongoose.Schema.ObjectId,
-            ref: 'Business'
-        }
-    ],
     walletId:{
         type: mongoose.Schema.Types.ObjectId
     },
@@ -94,16 +91,21 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    activationToken:{
+    token:{
         type: String,
         select: false
     },
+    tokenExpires: Date,
     resetPasswordToken: String,
     resetPasswordExpires: Date
 });
 
 // Encrypting password before saving
 userSchema.pre('save', async function (next){
+
+    if(this.isNew){
+        this.token = await this.getToken();
+    }
     
     if(!this.isModified('password')){
         next();
@@ -125,15 +127,20 @@ userSchema.methods.getJwtToken = function(){
     })
 }
 
-// Generate activation token
-userSchema.methods.getActivationToken = function(){
+// Generate token
+userSchema.methods.getToken = function(){
     // Generate token
-    const activationToken = crypto.randomBytes(20).toString('hex');
+    const min = 100;
+    const max = 999999;
+    const token = Math.floor(min + Math.random() * (max - min + 1))
+                        .toString().padStart(6, '0');
+  
+    // set to token
+    this.token = token;
 
-    // set to activationToken
-    this.activationToken = activationToken;
+    this.tokenExpires = Date.now() + 20 * 60 * 1000;
 
-    return activationToken;
+    return token;
 }
 
 // Generate password reset token
@@ -145,7 +152,7 @@ userSchema.methods.getResetPasswordToken = function(){
     this.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
     // Set token expire time
-    this.resetPasswordExpires = Date.now() + 30 * 60 * 1000;
+    this.resetPasswordExpires = Date.now() + 20 * 60 * 1000;
 
     return resetToken;
 }

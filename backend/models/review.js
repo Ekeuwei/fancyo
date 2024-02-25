@@ -1,9 +1,9 @@
 const mongoose = require('mongoose')
 
 const reviewSchema = new mongoose.Schema({
-    taskId: {
+    projectId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Task'
+        ref: 'Project'
     },
 
     userId: {
@@ -11,9 +11,9 @@ const reviewSchema = new mongoose.Schema({
         ref: 'User'
     },
 
-    workerId: {
+    punterId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Worker'
+        ref: 'User'
     },
 
     name: {

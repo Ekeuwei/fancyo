@@ -8,12 +8,18 @@ const {
     flwPaymentCallback, 
     flwPaymentWebhook, 
     flwPayment,
-    walletTransactions
+    walletTransactions,
+    flwVerifyAccount,
+    flwGetAllBanks,
+    cashout
 } = require('../controllers/paymentController')
 
 const { isAuthenticatedUser } = require('../midllewares/auth');
 
 router.route('/payment/process').post(isAuthenticatedUser, processPayment)
+router.route('/banks').get(isAuthenticatedUser, flwGetAllBanks);
+router.route('/verify/account').post(isAuthenticatedUser, flwVerifyAccount);
+router.route('/fund/cashout').post(isAuthenticatedUser, cashout);
 router.route('/stripeapi').get(isAuthenticatedUser, sendStripeApiKey)
 
 router.route('/wallet').get(isAuthenticatedUser, walletBalance);

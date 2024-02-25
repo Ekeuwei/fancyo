@@ -1,0 +1,13 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  font-family: 'Inter', sans-serif;
+  height: 100%;
+  margin: 0;
+}
+
+.react-datepicker-wrapper{
+  display: flex;
+}

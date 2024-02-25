@@ -4,192 +4,233 @@ const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../midllewares/catchAsyncErrors');
 const sendToken = require('../utils/jwtToken');
 const sendEmail = require('../utils/sendEmail');
+const validator = require('validator');
 
 const crypto = require('crypto');
 const cloudinary = require('cloudinary');
 const Wallet = require('../models/wallet');
-const Worker = require('../models/worker');
-const Town = require('../models/address/town');
-const { activationEmailTemplate, activationEmailTemplate2, passwordResetTemplate } = require('../utils/emailTemplates');
-const { creditWallet } = require('./paymentController');
+const sendSMS = require('../utils/sendSMS');
+const sendUserToken = require('../utils/sendUserToken');
  
+// Register a user => /api/v1/auth/validate
+exports.validateUser = catchAsyncErrors( async (req, res, next)=>{
+
+    const { loginId } = req.query;
+
+    // check if loginId is phone number or email
+    const validEmail = validator.isEmail(loginId)
+    let user;
+
+    try {
+        if(validEmail){
+
+            user = await User.findOne({email: req.query.loginId }).select('+isActivated +token')
+
+            if(!user){
+
+                user = await User.create({
+                    email: loginId
+                })
+            }
+            else if(user.isActivated){
+                return next(new ErrorHandler("Already has account! Please login to continue.", 404))
+            }
+            else{
+                user.getToken()
+                await user.save();
+            }
+
+        }
+        else{
+
+            user = await User.findOne({phoneNumber: req.query.loginId.slice(-10)}).select('+isActivated +token')
+
+            if(!user){
+                user = await User.create({
+                    phoneNumber: loginId.slice(-10)
+                })
+            }
+            else if(user.isActivated){
+                return next(new ErrorHandler("Already has account! Please login to continue.", 404))
+            }
+            else{
+                user.getToken()
+                await user.save();
+            }
+
+
+        }
+        
+    } catch (error) {
+        return next(new ErrorHandler(error.message, 500));
+    }
+
+    const token = user.token;
+
+    try {
+        const type = 'User Validation'
+        await sendUserToken(token, loginId, type)
+
+    } catch (error) {
+        
+        next(new ErrorHandler(error.message, 500))
+        
+    }
+
+    res.status(200).json({
+        success: true,
+        tokenExpires: user.tokenExpires,
+        message: `We've just sent a 6-digit code to your ${validEmail?'email':'phone number'}.`
+    })
+})
+
+// Validate token => /api/v1/auth/validatetoken
+exports.validateToken = catchAsyncErrors( async (req, res, next)=>{
+    let user;
+
+    const { loginId, token } = req.body;
+    
+    const validEmail = validator.isEmail(loginId)
+    
+    try {
+
+        if(validEmail){
+
+            user = await User.findOne({
+                email: loginId
+            }).select('+token')
+            
+        }else{
+
+            user = await User.findOne({
+                phoneNumber: loginId.slice(-10)
+            }).select('+token')
+
+        }
+
+        if(!user){
+            return next(new ErrorHandler("Not a valid user", 404))
+        }
+
+        const validToken = user.token!==undefined && user.token === token;
+        
+        const tokenExpired = user.tokenExpires < new Date()
+
+        if(!validToken){
+            return next(new ErrorHandler('Invalid token!', 500))
+        }
+
+        if(tokenExpired){
+            return next(new ErrorHandler('Token expired! Resend activation token', 500))
+        }
+
+    
+    } catch (error) {
+        return next(new ErrorHandler(error.message, 500))
+    }
+
+    res.status(200).json({
+        success: true,
+        isValidToken: true,
+        message: `Token validated.`
+    })
+})
+
+
 // Register a user => /api/v1/register
 exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
 
-    let activationToken = undefined;
+    const { loginId, password, username, token, referralId } = req.body;
 
-    const { firstName, lastName, phoneNumber, gender, email, password, avatar, referralId } = req.body;
-    
-    const result = await cloudinary.v2.uploader.upload(avatar, {
-        folder: 'avatars',
-        width: 600,
-        crop: 'scale'
-    })
+    const validEmail = validator.isEmail(loginId)
 
     let user;
 
     try {
-        user = await User.findOne({
-            phoneNumber: `0${phoneNumber.slice(-10)}`, 
-            email: { $regex: /ebiwoni\.com/i 
-        } })
 
-        if(user){
-            user.firstName = firstName,
-            user.lastName = lastName,
-            user.email = email,
-            user.gender = gender,
-            user.password = password,
-            user.avatar = {
-                public_id: result.public_id,
-                url: result.secure_url
-            }
-
-        }else{
-            user = await User.create({
-                firstName,
-                lastName,
-                phoneNumber: `0${phoneNumber.slice(-10)}`,
-                gender,
-                email,
-                password,
-                referralId,
-                // avatar
-                avatar: {
-                    public_id: result.public_id,
-                    url: result.secure_url
-                }
-            });
+        if(validEmail){
             
+            user = await User.findOne({
+                email: loginId
+            }).select('+isActivated +password +token')
+            
+        }else{
+
+            user = await User.findOne({
+                phoneNumber: loginId.slice(-10) 
+            }).select('+isActivated +password +token')
+
         }
 
+        if(!user){
+            return next(new ErrorHandler('Invalid login Id or Password', 401))
+        }
+
+        if(user.password){
+            return next(new ErrorHandler('Account already created! Login to continue.', 401))
+        }
+
+        const tokenExpired = user.tokenExpires < new Date();
+        user.isActivated = !tokenExpired && user.token!=undefined && user.token === token
+        
+        if(!user.isActivated){
+            return next(new ErrorHandler('Token expired or account not validated! Revalidate account', 500))
+        }
+        
         if(!user.walletId){
             const wallet = await Wallet.create({ userId: user._id })
             user.walletId = wallet._id;
         }
-        
-        activationToken = user.getActivationToken();
+
+        user.username = username
+        user.password = password
+        user.token = undefined
+        user.tokenExpires = undefined
 
         user = await user.save({ validateStateBeforeSave: false });
 
     } catch (error) {
-        await cloudinary.v2.uploader.destroy(result.public_id); // Delete uploaded image
         return next(new ErrorHandler(error.message, 500));
     }
 
-    // Create activation url
-    const activationUrl = `${process.env.FRONTEND_URL}/activate?token=${activationToken}`
-
-    // const message = `Please click on the following link to activate your account:\n\n${activationUrl}\n\nPlease ignore this message if you did authorize the requested.`
-    const message = activationEmailTemplate(activationUrl, user.firstName)
-
-    try {
-
-        await sendEmail({
-            email: user.email,
-            subject: `${process.env.APP_NAME} Account Activation`,
-            message
-        });
-
-    } catch (error) {
-
-        next(new ErrorHandler(error.message), 500)
-    }
-
-    // TODO: reqeust newly registered user to activate their account.
-    res.status(200).json({
-        success: true,
-        message: `We have sent a confirmation email to your email address. Please follow the instructions in the confirmation email in order to activate your account.`
-    })
-    // sendToken(user, 200, res);
-
-})
-
-// Register a user/worker => /api/v1/user/worker
-exports.registerUserAndWorker = catchAsyncErrors( async (req, res, next) =>{
-
-    const { firstName, lastName, phoneNumber, category, contact, referralId, description } = req.body;
-    
-    let user;
-    let worker;
-
-    try {
-        
-        user = await User.create({
-            firstName,
-            lastName,
-            phoneNumber:`0${phoneNumber.slice(-10)}`,
-            referralId,
-            contact
-        });
-
-        const wallet = await Wallet.create({ userId: user._id })
-        user.walletId = wallet._id;
-        
-    } catch (error) {
-        return next(new ErrorHandler(error.message, 500));
-    }
-
-    try {
-        
-        worker = await Worker.create({
-            owner: user._id,
-            description,
-            location,
-            localities: existingLocalities,
-            category
-        })
-
-        user.workers.push(worker._id)
-        user.role = 'worker'
-        user.userMode = !user.userMode
-
-    } catch (error) {
-        return next(new ErrorHandler(error.message, 500))
-    }
-        
-    if(user.workers.length === 1){
-        // credit the newly created worker account with 500 bonus 
-        creditWallet(500, "Complementary sign-up bonus", user._id);
-        const message = `Congratulations! ${worker.category.name} worker profile has been created. You now have N500 complementary work credit to use for tasks and services on our platform.`
-        const to = `234${user.phoneNumber.slice(-10)}`
-        sendSMS(message, to);
-    }
-
-
-    user = await user.save({ validateStateBeforeSave: false });
-
-    res.status(200).json({
-        success: true,
-        message: `User and worker profile created successfully`
-    })
+    sendToken(user, 200, res);
 
 })
 
 // Login user => /api/v1/login
 exports.loginUser = catchAsyncErrors( async (req, res, next)=>{
-    const { email, password } = req.body;
+    const { loginId, password } = req.body;
+
+    const validEmail = validator.isEmail(loginId)
 
     // Check if email is entered by user
-    if(!(email || password)){
-        return next(new ErrorHandler('Please enter email & password', 400))
+    if(!(loginId || password)){
+        return next(new ErrorHandler(`Invalid ${validEmail?'Email':'Phone Number'} or Password`, 400))
     }
 
     // Finding user in database
-    const user = await User.findOne({ email })
-                .populate({path: 'contact.town', select: 'name lga state', populate:{path: 'lga state', select: 'name sn'}})
-                .populate('workers', 'category', Worker)
-                .select('+password +isActivated');
+    let user;
+
+    if(validEmail){
+        user = await User.findOne({
+            email: loginId
+        }).select('+password +isActivated');
+    }
+    else{
+        user = await User.findOne({
+            phoneNumber: loginId.slice(-10) 
+        }).select('+password +isActivated');
+    }
 
     if(!user){
-        return next(new ErrorHandler('Invalid Email or Password', 401))
+        return next(new ErrorHandler(`Invalid ${validEmail?'Email':'Phone Number'} or Password`, 401))
     }
 
     // Check if password is correct or not
     const isPasswordMatched = await user.compareUserPassword(password);
     
     if(!isPasswordMatched){
-        return next(new ErrorHandler('Invalid Email or Password', 401))
+        return next(new ErrorHandler(`Invalid ${validEmail?'Email':'Phone Number'} or Password`, 401))
     }
     
     if(!user.isActivated){
@@ -214,141 +255,178 @@ exports.keepAlive = catchAsyncErrors(async (req, res, next)=>{
     })
 })
 
-// Reset password => /api/v1/activate
-exports.resendActivationToken = catchAsyncErrors( async (req, res, next) => {
+// Reset password => /api/v1/auth/requesttoken
+exports.requestToken = catchAsyncErrors( async (req, res, next) => {
 
-    const user = await User.findOne( { email: req.query.email });
+    const validEmail = validator.isEmail(req.query.loginId)
+
+    let user;// = await User.findOne( { email: req.query.email });
+
+    if(validEmail){
+        user = await User.findOne({
+            email: req.query.loginId
+        })
+    }
+    else{
+        user = await User.findOne({
+            phoneNumber: req.query.loginId.slice(-10) 
+        })
+    }
 
     if(!user){
-        return next(new ErrorHandler('User not found with this email', 404));
+        return next(new ErrorHandler(`User not found with this ${validEmail?'email':'number'}`, 404));
     }
 
     // Set up new password
-    const activationToken = user.getActivationToken();
+    const token = user.getToken();
     await user.save({ validateStateBeforeSave: false });
 
-    // Create activation url
-    const activationUrl = `${process.env.FRONTEND_URL}/activate?token=${activationToken}`
-
-    // const message = `Please click on the following link to activate your account:\n\n${activationUrl}\n\nPlease ignore this message if you did authorize the requested.`
-    const message = activationEmailTemplate2(activationUrl, user.firstName)
-
+    // Send email or SMS
     try {
-
-        await sendEmail({
-            email: user.email,
-            subject: `${process.env.APP_NAME} Account Activation`,
-            message
-        });
-
-        res.status(200).json({
-            success: true,
-            message: `Activation link sent`
-        });
+        // For ${type}
+        const type = "Account Validation"
+        await sendUserToken(token, req.query.loginId, type)
 
     } catch (error) {
-        user.activationToken = undefined;
-        await user.save({ validateStateBeforeSave: false });
-        next(new ErrorHandler(error.message), 500)
+        
+        next(new ErrorHandler(error.message, 500))
+
     }
-
-});
-
-// Activate user account => /api/v1/activate/:token
-exports.activateUser = catchAsyncErrors( async (req, res, next) => {
-
-    const user = await User.findOne({ activationToken: req.params.token });
-
-    if(!user){
-        return next(new ErrorHandler('Invalid activation token', 400));
-    }
-
-    // Set up new password
-    user.isActivated = true;
-    user.activationToken = undefined;
-
-    await user.save();
 
     res.status(200).json({
         success: true,
-        title: "Account activation successful",
-        message: `Congratulations! Your account has been successfully verified and activated. You can now fully access and enjoy all the features and services provided by ${process.env.APP_NAME}.`
-    })
+        tokenExpires: user.tokenExpires,
+        message: `A verification ${validEmail?'email':'sms'} has been sent.`
+    });
 
+});
+
+// Update / change password => /api/v1/password/update
+exports.updatePassword = catchAsyncErrors( async (req, res, next) => {
+    
+    const user = await User.findById(req.user.id).select('+password');
+
+    // Check previous user password
+
+    const isPasswordMatched = await user.compareUserPassword(req.body.oldPassword);
+
+    if(!isPasswordMatched){
+        return next(new ErrorHandler('Old pasword is incorect', 400));
+    }
+
+    user.password = req.body.password;
+    await user.save();
+
+    sendToken(user, 200, res);
 });
 
 // Forgot Password => /api/v1/password/forgot
 exports.forgotPassword = catchAsyncErrors( async (req, res, next) => {
-    const user = await User.findOne({ email: req.body.email });
+
+    const { loginId } = req.query;
+
+    let user;// = await User.findOne({ email: req.body.email });
+
+    const validEmail = validator.isEmail(loginId)
+
+    if(validEmail){
+        user = await User.findOne({
+            email: loginId
+        });
+    }
+    else{
+        user = await User.findOne({
+            phoneNumber: loginId.slice(-10) 
+        });
+    }
 
     if(!user){
-        return next(new ErrorHandler('User not found with this email', 404))
+        return next(new ErrorHandler(`User not found with this ${validEmail?'email':'phone number'}`, 404))
     }
 
     // Get reset token 
-    const resetToken = user.getResetPasswordToken();
+    const token = user.getToken();
 
     await user.save( { validateStateBeforeSave: false });
 
-    // Create reset password url
-    const resetUrl = `${process.env.FRONTEND_URL}/password/reset/${resetToken}` 
-    // const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/password/reset/${resetToken}` // Development
-
-    // const message = `Your password reset token is as follow:\n\n${resetUrl}\n\nPlease ignore this message if you did authorize the requested.`
-    const message = passwordResetTemplate(resetUrl, user.email, user.firstName)
-
+    // Send email or SMS
     try {
-
-        await sendEmail({
-            email: user.email,
-            subject: `${process.env.APP_NAME} Password Recovery`,
-            message
-        });
-
-        res.status(200).json({
-            success: true,
-            message: `email sent to: ${user.email}`
-        });
+        // For ${type}
+        const type = 'Password Reset'
+        await sendUserToken(token, loginId, type)
 
     } catch (error) {
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpires = undefined;
+        
+        return next(new ErrorHandler(error.message, 500))
 
-        await user.save( { validateStateBeforeSave: false } );
-
-        next(new ErrorHandler(error.message), 500)
     }
+
+    res.status(200).json({
+        success: true,
+        tokenExpires: user.tokenExpires,
+        message: `We've just sent a 6-digit code to your registered ${validEmail?'email':'phone number'}.`
+    });
 
 });
 
-// Reset password => /api/v1/password/:token
+// Reset password => /api/v1/password
 exports.resetPassword = catchAsyncErrors( async (req, res, next) => {
 
-    // Hash URL token
-    const resetPasswordToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+    const { loginId, token, password } = req.body
+
+    const validEmail = validator.isEmail(loginId)
+
+    let user;
+
+    if(validEmail){
+        user = await User.findOne({
+            email: loginId
+        }).select('+token');
+    }
+    else{
+        user = await User.findOne({
+            phoneNumber: loginId.slice(-10) 
+        }).select('+token');
+    }
     
+    const isResetToken = user.token!==undefined && user?.token === token
+    const tokenExpired = user?.tokenExpires < new Date()
+    
+    if(!isResetToken || tokenExpired){
+        return next(new ErrorHandler('Password reset token is invalid or has expired', 400));
+    }
+    
+    // Set up new password
+    user.password = password;
+    user.token = undefined;
+    user.tokenExpires = undefined;
+    
+    await user.save();
 
-    const user = await User.findOne( { 
-        resetPasswordToken,
-        resetPasswordExpires: { $gt: Date.now() }
-     });
+    res.status(200).json({
+       success: true,
+       message: "Password reset successful! Proceed to login."
+    })
+    //  sendToken(user, 200, res);
 
-     if(!user){
-         return next(new ErrorHandler('Password reset token is invalide or has expired', 400));
-     }
+});
 
-     if(req.body.password !== req.body.confirmPassword){
-         return next(new ErrorHandler('Password does not match', 400));
-     }
+// Update / change password => /api/v1/add/account
+exports.addBankAccount = catchAsyncErrors( async (req, res, next) => {
+    
+    const user = await User.findById(req.user.id);
 
-     // Set up new password
-     user.password = req.body.password;
-     user.resetPasswordToken = undefined;
-     user.resetPasswordExpires = undefined;
+    if(!user){
+        return next(new ErrorHandler('Not Allowed', 403));
+    }
 
-     await user.save();
+    user.bankAccounts.push(req.body.accountDetails)
+    await user.save();
 
-     sendToken(user, 200, res);
+    res.status(200).json({
+        success: true,
+        message: "Account details added"
+    })
 
 });
 
@@ -381,62 +459,9 @@ exports.changeMode = catchAsyncErrors(async(req, res, next) => {
     })
 })
 
-// Update / change password => /api/v1/password/update
-exports.updatePassword = catchAsyncErrors( async (req, res, next) => {
-    const user = await User.findById(req.user.id).select('+password');
-
-    // Check previous user password
-
-    const isPasswordMatched = await user.compareUserPassword(req.body.oldPassword);
-
-    if(!isPasswordMatched){
-        return next(new ErrorHandler('Old pasword is incorect', 400));
-    }
-
-    user.password = req.body.password;
-    await user.save();
-
-    sendToken(user, 200, res);
-});
-
 // Update user profile  => /api/v1/me/update
 exports.updateProfile = catchAsyncErrors( async (req, res, next) => {
-    const newUserData = JSON.parse(req.body.data)
-
-    
-    // Update avatar 
-    if(newUserData.avatar){
-        const user = await User.findById(req.user.id)
-        
-        const image_id = user.avatar.public_id
-        
-        const result = await cloudinary.v2.uploader.upload(req.body.avatar, {
-            folder: 'avatars',
-            width: 150,
-            crop: 'scale'
-        });
-        
-        await cloudinary.v2.uploader.destroy(image_id)
-        
-        newUserData.avatar = {
-            public_id: result.public_id,
-            url: result.secure_url
-        }
-    }
-
-    if(newUserData.contact){
-        
-        const filter = {
-            name: newUserData.contact.town,
-            lga: newUserData.contact.lga,
-            state: newUserData.contact.state
-        }
-        const options = {upsert: true, new: true}
-
-        const town = await Town.findOneAndUpdate(filter, newUserData.contact, options);
-        
-        newUserData.contact.town = town._id;
-    }
+    const newUserData = req.body
 
     const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
         new: true,
@@ -445,7 +470,8 @@ exports.updateProfile = catchAsyncErrors( async (req, res, next) => {
     });
 
     res.status(200).json({
-        success: true
+        success: true,
+        user
     });
 });
 

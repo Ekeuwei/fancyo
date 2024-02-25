@@ -1,8 +1,8 @@
-exports.activationEmailTemplate = (url, firstName)=>`
+exports.activationEmailTemplate = (token, type)=>`
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Activate Your ${process.env.APP_NAME} Account - Let's Get Started!</title>
+  <title>${process.env.APP_NAME} Security Notification - ${type}</title>
   <style>
     /* Basic styling for the email */
     body {
@@ -30,16 +30,8 @@ exports.activationEmailTemplate = (url, firstName)=>`
 </head>
 <body>
   <div class="container">
-    <h1>Activate Your ${process.env.APP_NAME} Account - Let's Get Started!</h1>
-    <p>Dear ${firstName},</p>
-    <p>Welcome to ${process.env.APP_NAME}, the platform that connects you with skilled service providers for your personal needs. We're thrilled to have you as part of our community! Before you can explore the wide range of services available, we kindly ask you to activate your account by following the activation link provided below:</p>
-    <p>
-      <a class="button" href="${url}">Activate My Account</a>
-    </p>
-    <p>If you're unable to click the button, please copy and paste the following link into your web browser to activate your account:</p>
-    <p>${url}</p>
-    <p>Activating your account is essential to unlock the full functionality of ${process.env.APP_NAME}, allowing you to browse, book, and connect with our dedicated workers seamlessly.</p>
-    <p>Join the ${process.env.APP_NAME} community today and discover the convenience and quality of our personalized services!</p>
+    <h1>${process.env.APP_NAME} ${type}</h1>
+    <p>Please use the following One Time Passord (OTP): ${token}. This Password would expire after 20 minutes</p>
     <p>Best regards,</p>
     <p>The ${process.env.APP_NAME} Team</p>
   </div>

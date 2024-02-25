@@ -1,0 +1,30 @@
+[
+    {
+        "label":"Description",
+        "details":"Get 30% of your contribution in 30 days. The investment will be managed by 7thPriest."
+    },
+    {
+        "label":"Author",
+        "details":"7thPriest"
+    },
+    {
+        "label":"Duration",
+        "details":"30 Days"
+    },
+    {
+        "label":"Starts",
+        "details":"7th June, 2024 | 12:00AM"
+    },
+    {
+        "label":"Ends",
+        "details":"6th July, 2024 | 12:00AM"
+    },
+    {
+        "label":"Current Contributors",
+        "details": 27
+    },
+    {
+        "label":"Amount Contributed",
+        "details": 500000
+    }
+]

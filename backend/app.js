@@ -14,7 +14,12 @@ const path = require('path')
 const errorMiddleware = require('./midllewares/errors');
 
 // Enable CORS using the cors middleware
-app.use(cors())
+const corsOptions = {
+  origin: 'http://localhost:5173',
+//   methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD'],
+  credentials: true, // Enable credentials (cookies, authorization headers)
+};
+app.use(cors(corsOptions))
 
 // Setting up config file
 // dotenv.config({ path: 'backend/config/config.env' });
@@ -28,27 +33,34 @@ app.use(cookieParser());
 app.use(fileUpload());
 
 //Import all routes 
+const auth = require('./routes/auth');
+const project = require('./routes/project');
+const payment = require('./routes/payment');
+/* 
 const settings = require('./routes/settings');
 const products = require('./routes/product');
 const artisans = require('./routes/artisan');
 const task = require('./routes/task');
-const auth = require('./routes/auth');
 const agent = require('./routes/agent');
-const payment = require('./routes/payment');
 const order = require('./routes/order');
 const worker = require('./routes/worker')
 const webhooks = require('./routes/webhooks')
+//*/
 
+app.use('/api/v1', auth);
+app.use('/api/v1', project);
+app.use('/api/v1', payment)
+
+/*
 app.use('/api/v1', settings);
 app.use('/api/v1', products);
 app.use('/api/v1', artisans);
 app.use('/api/v1', task);
-app.use('/api/v1', auth);
 app.use('/api/v1/agent', agent);
-app.use('/api/v1', payment)
 app.use('/api/v1', order)
 app.use('/api/v1', worker)
 app.use('/api/v1', webhooks)
+//*/
 
 if(process.env.NODE_ENV === 'PRODUCTION'){
     app.use(express.static(path.join(__dirname, '../frontend/build')))

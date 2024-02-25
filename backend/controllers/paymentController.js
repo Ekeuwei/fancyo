@@ -5,8 +5,9 @@ const Wallet = require("../models/wallet");
 const catchAsyncErrors = require("../midllewares/catchAsyncErrors");
 const ErrorHandler = require("../utils/errorHandler");
 const Agent = require('../models/agent')
-
 const got = require('got');
+const Bank = require("../models/bank");
+const Cashout = require("../models/cashout");
 
 const stripe = require('stripe')(process.env.STRIPE_SECRETE_KEY)
 
@@ -141,7 +142,7 @@ exports.debitWallet = async (amount, title, userId)=>{
     const wallet = await Wallet.findOne({userId});
 
     if(wallet.balance < amount){
-        return 'insufficient'
+        throw new Error ('Insufficient balance')
     }
 
     const transaction = await Transaction.create({
@@ -160,7 +161,10 @@ exports.debitWallet = async (amount, title, userId)=>{
 
     await Promise.all([wallet.save(), transaction.save()]);
     
-    return transaction.reference;
+    return { 
+        transactionRef: transaction.reference, 
+        walletBalance: wallet.balance
+    };
 }
 
 // debit wallet
@@ -234,7 +238,7 @@ exports.flwPayment = catchAsyncErrors( async(req, res, next)=>{
                 tx_ref: transaction.reference,
                 amount: transaction.amount,
                 currency: "NGN",
-                redirect_url: `${process.env.FRONTEND_URL}/dashboard`,
+                redirect_url: `${process.env.FRONTEND_URL}/receipt`,
                 // meta: {
                 //     consumer_id: 23,
                 //     consumer_mac: "92a3-912ba-1192a"
@@ -256,10 +260,47 @@ exports.flwPayment = catchAsyncErrors( async(req, res, next)=>{
 
     if(response.status==='success'){
         res.status(200).json({
-            ...response,
-            success: true
+            success: true,
+            link: response.data.link,
         })
     }
+
+});
+
+// Verify Account Number
+exports.flwVerifyAccount = catchAsyncErrors( async(req, res, next)=>{
+
+    const { credentials } =  req.body
+    
+    const flw = new Flutterwave(process.env.FLW_PUBLIC_KEY, process.env.FLW_SECRET_KEY);
+    
+    const response = await flw.Misc.verify_Account(credentials).then(response => response);
+
+    if(response.status==='error'){
+        return next(new ErrorHandler(response.message), 404)
+    }
+
+    res.status(200).json({
+        success: true,
+        bankAccountDetails: response.data,
+    })
+
+});
+
+// Get All Banks 
+exports.flwGetAllBanks = catchAsyncErrors( async(req, res, next)=>{
+
+    let banks;
+    try {
+        banks = await Bank.find().sort({ name: 'asc' })
+    } catch (err) {
+        return next(new ErrorHandler(err.message, err.code))
+    }
+
+    res.status(200).json({
+        success: true,
+        banks,
+    })
 
 });
 
@@ -277,6 +318,29 @@ exports.walletBalance = catchAsyncErrors(async(req,res,next)=>{
     })
 })
 
+// Cashout request     =>  /api/v1/fund/cashout
+exports.cashout = catchAsyncErrors(async(req,res,next)=>{
+
+    try {
+
+        // console.log(req.body.details);
+        await this.debitWallet(req.body.details.amount, "Cashout", req.user.id)
+
+        await Cashout.create(req.body.details)
+        
+    } catch (error) {
+        return next(new ErrorHandler(error.message, 500))
+    }
+
+    const wallet = await Wallet.findOne({userId: req.user.id});
+
+    res.status(200).json({
+        success: true,
+        walletBalance: wallet.balance,
+        message: 'Cashout request submitted successfully'
+    })
+})
+
 //Wallet transactions   =>   /api/v1/wallet/transactions
 exports.walletTransactions = catchAsyncErrors(async (req, res, next)=>{
     const transactions = await Transaction.find({userId: req.user.id}).sort({createdAt: -1})
@@ -291,10 +355,16 @@ exports.walletTransactions = catchAsyncErrors(async (req, res, next)=>{
 // Handle flutterwave payments Callback     Get =>  /api/v1/flwpayment/callback
 exports.flwPaymentCallback = catchAsyncErrors(async(req, res, next)=>{
     const flw = new Flutterwave(process.env.FLW_PUBLIC_KEY, process.env.FLW_SECRET_KEY);
-    if (req.query?.status) {
-        const transactionDetails = await Transaction.findOne({reference: req.query.tx_ref});
-        const wallet = await Wallet.findOne({userId: transactionDetails.userId});
+    const transactionDetails = await Transaction.findOne({reference: req.query.tx_ref});
+    const wallet = await Wallet.findOne({userId: transactionDetails.userId});
+    
+    let walletBalance;
+    
+    if (req.query?.status ==="completed" || req.query?.status ==="successful") {
+        
         const response = await flw.Transaction.verify({id: req.query.transaction_id});
+        // const response = await flw.Transaction.verify({id: req.query.transaction_id});
+        
         
         if (
             response?.data?.status === "successful"
@@ -302,26 +372,29 @@ exports.flwPaymentCallback = catchAsyncErrors(async(req, res, next)=>{
             && response.data.currency === "NGN") {
             // Success! Confirm the customer's payment
             if(transactionDetails.status !== response.data.status){
+                
                 wallet.balance += response.data.amount;
                 transactionDetails.status = "successful";
                 await Promise.all([wallet.save(), transactionDetails.save()]);
+
             }
+
+            walletBalance = wallet.balance;
 
         } else {
-            transactionDetails.status = "failed";
+            transactionDetails.status = response.data?.status;
             await transactionDetails.save();
         }
-        res.status(200).json({
-            success: transactionDetails.status==='successful',
-            topup: {
-                success: transactionDetails.status==='successful',
-                message: `Payment ${transactionDetails.status}`
-            }
-        })
+        
     }else{
-        return next(new ErrorHandler('Not Allowed', 501))
+        return next(new ErrorHandler(req.query?.status || 'Not Allowed', 501))
     }
 
+    res.status(200).json({
+        success: true,
+        message: `Payment ${transactionDetails.status}`,
+        walletBalance
+    })
 });
 
 // flutterwave payments webhook      Get =>  /api/v1/flwpayment/webhook
