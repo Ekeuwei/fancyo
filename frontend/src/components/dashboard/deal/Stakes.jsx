@@ -1,10 +1,10 @@
-import { faCaretSquareRight } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styled from 'styled-components'
 import StakeDetails from './StakeDetails'
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { formatNumberFraction } from '../../../common/utils'
+import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
 
 const Stakes = ({tickets}) => {
     const [openIndex, setOpenIndex] = useState(null)
@@ -46,7 +46,7 @@ const Stake = ({ticket, index, openIndex, handleToggle})=>{
         <StakeWrapper>
             <Header onClick={collapseHandler} value={color}>
                 <Icon value={value}>
-                    <FontAwesomeIcon icon={faCaretSquareRight} />
+                    <FontAwesomeIcon icon={faAngleRight} />
                 </Icon>
                 <Title>{title}</Title>
                 <Label value={{winning, color}}>{winning}</Label>

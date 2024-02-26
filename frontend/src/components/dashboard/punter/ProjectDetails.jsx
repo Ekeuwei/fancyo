@@ -38,7 +38,7 @@ const ProjectDetails = ({match}) => {
       <Wrapper>
           <NavHeader title={title}/>
           <BodyWrapper>
-            {loading?<Loading value={loading?'loading':''} />:<>
+            {loading &&isOpen==="closed"?<Loading value={loading?'loading':''} />:<>
               {projectDetails&& <ContentDetailsList project={projectDetails.project} title={title}/>}
               {user.role==='punter'&& <Btn onClick={handleModalOpen}>+ Add Ticket</Btn>}
               {projectDetails?.tickets.length > 0 && <Stakes tickets={projectDetails.tickets} />}

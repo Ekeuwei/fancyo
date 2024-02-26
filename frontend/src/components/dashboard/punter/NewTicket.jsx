@@ -112,7 +112,7 @@ const NewTicket = ({isOpen, handleModalClose, projectId}) => {
                                 autoComplete='off'
                                 placeholder='Ticket Id'
                                 onChange={onChange} />
-                            <SendButton type='button' disabled={loadingTicket} onClick={loadTicket}> Check <Loading value={loadingTicket?'':null} /></SendButton>
+                            <SendButton type='button' disabled={loadingTicket} onClick={loadTicket}> Check <Loading value={loadingTicket} /></SendButton>
                         </InputWrapper>
                     </Shake>
                     <Shake value={emptyFields.includes('bookie')?'animate':''}>
@@ -152,7 +152,7 @@ const NewTicket = ({isOpen, handleModalClose, projectId}) => {
                     
                     <NoticeMessage value={error||submitError?'error':''} >{error||submitError||message}</NoticeMessage>
                     
-                    <Button type='submit' disabled={loading} ><Loading value={loading?'':null} />Submit Ticket</Button>
+                    <Button type='submit' disabled={loading} ><Loading value={loading} />Submit Ticket</Button>
                 </FormControl>
             </>
 

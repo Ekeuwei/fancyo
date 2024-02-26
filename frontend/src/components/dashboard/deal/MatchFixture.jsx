@@ -3,12 +3,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 import dateFormat from 'dateformat'
+import { faHourglassHalf } from '@fortawesome/free-solid-svg-icons'
 
 const MatchFixture = ({fixture}) => {
   return (
     <FixturWrapper>
-        <Icon value={fixture.outcome==1?'won':'lost'}>
-            <FontAwesomeIcon icon={fixture.outcome==1?faCheckCircle:faTimesCircle} size='lg' />
+        <Icon value={fixture.scores.ft===''?'warning':fixture.outcome==1?'won':'lost'}>
+            <FontAwesomeIcon icon={fixture.scores.ft===''?faHourglassHalf:fixture.outcome==1?faCheckCircle:faTimesCircle} size='lg' />
         </Icon>
         <Match>
             <TextField>{`${fixture.league} | ${dateFormat(fixture.time, 'dd/mm/yyyy - HH:mm')}`}</TextField>
@@ -49,7 +50,8 @@ const TextField = styled.p`
     margin: 0;
 `
 const Icon = styled.div`
-    margin: 0 5px;
+    margin: 0 10px;
+    padding: 5px;
     color: ${({theme, value})=> theme.colors[value]};
 `
 const Scores = styled(TextField)`

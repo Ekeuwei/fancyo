@@ -63,6 +63,8 @@ exports.contribute = catchAsyncErrors(async (req, res, next)=>{
         }else{
             project.contributors[contributorIndex].amount += parseInt(amount)
         }
+        
+        project.availableBalance += parseInt(amount)
     
         await project.save();
 
