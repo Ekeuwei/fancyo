@@ -70,7 +70,6 @@ const Login = () => {
                         <Button type="submit" disabled={loading}> <Loading value={loading} /> Login</Button>
                         <RedirectAccess onClick={()=>history.push('/register')}>Doesn’t have an account?
                             <div className="" style={{marginLeft: "5px", color:"green"}}>Register Now</div>
-
                         </RedirectAccess>
                     </Wrapper>
                 </FormControlWrapper>
@@ -100,6 +99,7 @@ const Label = styled.div`
     margin-bottom: 10px;
     text-align: right;
     color: green;
+    cursor: pointer;
 `
 const RedirectAccess = styled.div`
     margin-top: 5px;
@@ -107,6 +107,7 @@ const RedirectAccess = styled.div`
     font-weight: 500;
     display: flex;
     justify-content: center;
+    cursor: pointer;
 `
 const FormControl = styled.div`
     display: flex;

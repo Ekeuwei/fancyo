@@ -137,6 +137,7 @@ const RedirectAccess = styled.div`
     font-weight: 500;
     display: flex;
     justify-content: center;
+    cursor: pointer;
 `
 const FormControl = styled.div`
     display: flex;

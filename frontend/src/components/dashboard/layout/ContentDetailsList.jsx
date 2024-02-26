@@ -5,38 +5,38 @@ import { formatAmountFraction } from '../../../common/utils'
 
 const ContentDetailsList = ({project, title}) => {
     const contributedAmount = project.contributors.reduce((acc, contributor)=>acc+contributor.amount, 0)
-  return (
-    <Content>
-        {project.notes&&<Item>
-            <Label>{'Description'}</Label>
-            <Details>{project.notes}</Details>
-        </Item>}
-        <Item>
-            <Label>{'Author'}</Label>
-            <Details>{project.punter?.username}</Details>
-        </Item>
-        <Item>
-            <Label>{'Project Duration'}</Label>
-            <Details>{title.split(' in ')[1]}</Details>
-        </Item>
-        <Item>
-            <Label>{'Starts'}</Label>
-            <Details>{dateFormat(project.startAt, 'ddd mmm dS')}</Details>
-        </Item>
-        <Item>
-            <Label>{'Ends'}</Label>
-            <Details>{dateFormat(project.endAt, 'ddd mmm dS')}</Details>
-        </Item>
-        <Item>
-            <Label>{'Contributors'}</Label>
-            <Details>{project.contributors.length}</Details>
-        </Item>
-        <Item>
-            <Label>{'Amount Contributed'}</Label>
-            <Details>{formatAmountFraction(contributedAmount)}</Details>
-        </Item>
-    </Content>
-  )
+    return (
+        <Content>
+            {project.notes&&<Item>
+                <Label>{'Description'}</Label>
+                <Details>{project.notes}</Details>
+            </Item>}
+            <Item>
+                <Label>{'Punter'}</Label>
+                <Details>{project.punter?.username}</Details>
+            </Item>
+            <Item>
+                <Label>{'Project Duration'}</Label>
+                <Details>{title.split(' in ')[1]}</Details>
+            </Item>
+            <Item>
+                <Label>{'Starts'}</Label>
+                <Details>{dateFormat(project.startAt, 'ddd mmm dS')}</Details>
+            </Item>
+            <Item>
+                <Label>{'Ends'}</Label>
+                <Details>{dateFormat(project.endAt, 'ddd mmm dS')}</Details>
+            </Item>
+            <Item>
+                <Label>{'Contributors'}</Label>
+                <Details>{project.contributors.length}</Details>
+            </Item>
+            <Item>
+                <Label>{'Amount Contributed'}</Label>
+                <Details>{formatAmountFraction(contributedAmount)}</Details>
+            </Item>
+        </Content>
+    )
 }
 
 ContentDetailsList.propTypes = {

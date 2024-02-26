@@ -14,7 +14,7 @@ const Stakes = ({tickets}) => {
     };
     return (
         <Wrapper>
-            <TitleHead>Game Tickets</TitleHead>
+            <TitleHead>Tickets</TitleHead>
             <StakesWrapper>
                 {tickets.map((ticket, index) =>(
                     <Stake key={index} ticket={ticket} index={index} openIndex={openIndex} handleToggle={handleToggle}/>

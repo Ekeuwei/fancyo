@@ -170,7 +170,7 @@ exports.getProjectPunter = catchAsyncErrors(async (req, res, next) => {
 // Get project by Id => /api/v1/project/:id
 exports.getSingleProject = catchAsyncErrors(async (req, res, next) => {
 
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findById(req.params.id).populate('punter', 'username');
 
     if(!project){
         return next(new ErrorHandler('Project Not Found', 404));
