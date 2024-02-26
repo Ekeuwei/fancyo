@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
 import { Button, FormControlWrapper, HomeStyle, Input, InputLabel, InputWrapper, Loading } from "../../theme/ThemeStyle"
 import styled from 'styled-components'
-import { appName } from "../../App"
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
 import { useDispatch, useSelector } from "react-redux"
 import { api } from "../../common/api"
 import { clearAuthError } from "../../app/auth/authSlice"
+import Logo from "../dashboard/layout/Logo"
 
 const Login = () => {
     const dispatch = useDispatch()
@@ -36,11 +36,9 @@ const Login = () => {
     return (
         <HomeStyle>
             <FormControl>
-                <IconWrapper>
-
-                <img src="../src/assets/fancyO.png" alt={appName} width="100px"/>
-                </IconWrapper>
                 
+                <Logo />
+
                 <FormControlWrapper onSubmit={submitHandler} >
                     <Wrapper>
                         <Title>Welcome back</Title>
@@ -79,10 +77,6 @@ const Login = () => {
     )
 }
 
-const IconWrapper = styled.div`
-    display: flex;
-    justify-content: center;
-`
 
 const Message = styled.div`
     color: ${({theme, value})=> value==="error"?theme.colors.lost:theme.colors.won};

@@ -13,7 +13,7 @@ const ProfileSettings = () => {
             <SettingsHeading title={"Profile"} />
             <BodyWrapper>
                 <AvatarO>
-                    <Avatar src='../src/assets/avatar.png'/>
+                    <Avatar src='../assets/avatar.png'/>
                 </AvatarO>
                 <OptionsWrapper>
                     <UpdateUsername userName={user?.username}/>

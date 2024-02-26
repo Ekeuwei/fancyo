@@ -1,6 +1,5 @@
 import styled from 'styled-components'
 import { Button, HomeStyle } from "../theme/ThemeStyle";
-import logo from '../assets/fancyO.png'
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 const Home = () => {
     const appName = import.meta.env.VITE_APP_NAME
@@ -10,8 +9,7 @@ const Home = () => {
         <HomeStyle>
             Home
             <Wrapper style={{alignItems:"center"}}>
-                <img src={logo} alt={appName} width="100px"/>
-
+                <img src="assets/fancyO.png" alt={appName} width="100px"/>
             </Wrapper>
             <Wrapper>
                 <WelcomeMessage>Welcome to {appName} your go-to platform for low risk investment in the world of sports betting!</WelcomeMessage>

@@ -18,7 +18,7 @@ const Header = () => {
     return (
         <Wrapper>
             <Avatar>
-                <AvatarImage src='../src/assets/avatar.png' />
+                <AvatarImage src='assets/avatar.png' />
             </Avatar>
             <Details>
                 <Title>Hi {user.username}</Title>
