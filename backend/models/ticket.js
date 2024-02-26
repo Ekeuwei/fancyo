@@ -44,6 +44,7 @@ const ticketSchema = new mongoose.Schema({
                 },
             },
             prediction: String,
+            market: String,
             outcome: Number,
             matchStatus: String,
             satus: String,

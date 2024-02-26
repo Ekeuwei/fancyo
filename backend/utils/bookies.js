@@ -20,6 +20,7 @@ exports.sporty = async (ticketId)=> {
             awayTeam: game.awayTeamName,
             scores: game.status===0?{ft:"",ht:""}:{ht: game.gameScore?.[0], ft: game.setScore},
             prediction: game.markets[0].outcomes[0].desc,
+            market: game.markets[0].desc,
             outcome: game.markets[0].outcomes[0].isWinning,
             odds: game.markets[0].outcomes[0].odds,
             matchStatus: game.matchStatus,

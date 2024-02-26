@@ -4,7 +4,7 @@ import MatchFixture from "../deal/MatchFixture"
 
 const Ticket = ({value, stakeAmount, picks}) => {
     const totalOdds = picks.reduce((acc, pick)=> acc*pick.odds, 1).toFixed(2)
-    const roi = stakeAmount * totalOdds
+    const roi = (stakeAmount * totalOdds).toFixed(2)
     return (
         <Details value={value} >
             <Title>Details</Title>

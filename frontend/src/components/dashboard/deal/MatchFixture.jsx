@@ -18,9 +18,12 @@ const MatchFixture = ({fixture}) => {
                 <Scores>{fixture.scores?.ft || 'Vs'}</Scores>
                 <TextField>{fixture.awayTeam}</TextField>
             </Wrapper>
-            <Wrapper>
-                <TextField>{`${fixture.prediction} @${fixture.odds}`}</TextField>
-            </Wrapper>
+            <Prediction>
+                <TextField>
+                    <Market>{fixture.market}</Market>
+                    {`${fixture.prediction} @${fixture.odds}`}
+                </TextField>
+            </Prediction>
         </Match>
     </FixturWrapper>
   )
@@ -61,6 +64,16 @@ const Scores = styled(TextField)`
     color: ${({theme})=>theme.colors.white};
     border-radius: 5px;
     margin: 0 5px;
+`
+const Prediction = styled(Wrapper)`
+    margin: 5px 0;
+`
+const Market = styled.span`
+    padding: 2px 5px;
+    background-color: ${({theme})=>theme.colors.dark2};
+    color: ${({theme})=>theme.colors.white};
+    margin-right: 5px;
+    border-radius: 5px;
 `
 
 export default MatchFixture
