@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { api } from "../../../common/api"
 import { clearLink, clearUserErrors, createUserError } from "../../../app/user/userSlice"
 import { formatAmount } from "../../../common/utils"
+import NavHeader from "../layout/NavHeader"
 
 const FundWallet = () => {
   const dispatch = useDispatch()
@@ -50,9 +51,9 @@ const FundWallet = () => {
   },[dispatch, paymentLink])
 
   return (
-    <BodyWrapper>
-      <form onSubmit={handleCardPayment}>
-
+    <>
+      <NavHeader title={'Fund Wallet'} />
+      <BodyWrapper>
         <p>Select Payment method</p>
         <PaymentMethods>
           <PaymentButton onClick={()=>setPaymentOption("transfer")} value={paymentOption==="transfer"?"active":""}>Bank transer</PaymentButton>
@@ -75,7 +76,7 @@ const FundWallet = () => {
             { error }
         </NoticeMessage>}
 
-        {paymentOption==="card"&&<>
+        {paymentOption==="card"&&<form onSubmit={handleCardPayment}>
           <InputWrapper>
             <InputLabel value={amount} >Amount</InputLabel>
             <Input 
@@ -84,16 +85,16 @@ const FundWallet = () => {
               value={amount} 
               onChange={handleAmount} 
               placeholder="Enter amount"/>
-        </InputWrapper>
+          </InputWrapper>
 
 
         <Button disabled={loading} type="submit">
             Proceed {loading&&<Loading />}
         </Button>
 
-        </>}
-      </form>
-    </BodyWrapper>
+        </form>}
+      </BodyWrapper>
+    </>
   )
 }
 

@@ -17,7 +17,7 @@ const Header = () => {
     
     return (
         <Wrapper>
-            <Avatar>
+            <Avatar onClick={()=>history.push('/settings/profile')}>
                 <AvatarImage src='assets/avatar.png' />
             </Avatar>
             <Details>

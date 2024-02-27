@@ -95,7 +95,7 @@ const instance = axios.create({
 })
 // Login
 export const api = {
-    login: (loginId, password) => async (dispatch) =>{
+    login: (loginDetails) => async (dispatch) =>{
         try {
 
             dispatch(loginStart())
@@ -104,7 +104,7 @@ export const api = {
                 headers: {'content-Type': 'application/json'},
             }
 
-            const { data } = await instance.post('/api/v1/login', {loginId, password}, config)
+            const { data } = await instance.post('/api/v1/login', loginDetails, config)
 
             localStorage.setItem('user', JSON.stringify(data.user))
 
@@ -215,7 +215,7 @@ export const api = {
             const { data } = await instance.put('/api/v1/password/reset', credentials, config)
 
             
-            dispatch(resetPasswordSuccess(data))
+            dispatch(resetPasswordSuccess(data.message))
 
         } catch (error) {
 
@@ -345,6 +345,9 @@ export const api = {
             const { data } = await instance.put(`/api/v1/add/account`, {accountDetails}, config)
             
             dispatch(addAccountDetailsSuccess(data.message))
+
+            localStorage.setItem('user', JSON.stringify(data.user))
+            dispatch(loginSuccess(data.user))
 
         } catch (error) {
 

@@ -5,6 +5,7 @@ const catchAsyncErrors = require('../midllewares/catchAsyncErrors');
 const sendToken = require('../utils/jwtToken');
 const sendEmail = require('../utils/sendEmail');
 const validator = require('validator');
+const Flutterwave = require("flutterwave-node-v3");
 
 const crypto = require('crypto');
 const cloudinary = require('cloudinary');
@@ -18,13 +19,16 @@ exports.validateUser = catchAsyncErrors( async (req, res, next)=>{
     const { loginId } = req.query;
 
     // check if loginId is phone number or email
+    const phoneRegex = /^(\+[0-9]{1,3})?(\s?[0-9]){10,14}[0-9]$/;
+    const validPhoneNumber = phoneRegex.test(loginId)
     const validEmail = validator.isEmail(loginId)
+
     let user;
 
     try {
         if(validEmail){
 
-            user = await User.findOne({email: req.query.loginId }).select('+isActivated +token')
+            user = await User.findOne({ email: req.query.loginId }).select('+isActivated +token')
 
             if(!user){
 
@@ -41,10 +45,10 @@ exports.validateUser = catchAsyncErrors( async (req, res, next)=>{
             }
 
         }
-        else{
+        else if(validPhoneNumber){
 
-            user = await User.findOne({phoneNumber: req.query.loginId.slice(-10)}).select('+isActivated +token')
-
+            user = await User.findOne({ phoneNumber: req.query.loginId.slice(-10) }).select('+isActivated +token')
+                
             if(!user){
                 user = await User.create({
                     phoneNumber: loginId.slice(-10)
@@ -59,6 +63,8 @@ exports.validateUser = catchAsyncErrors( async (req, res, next)=>{
             }
 
 
+        }else{
+            return next(new ErrorHandler('Please enter a valid email or phone number', 500));
         }
         
     } catch (error) {
@@ -91,21 +97,22 @@ exports.validateToken = catchAsyncErrors( async (req, res, next)=>{
     const { loginId, token } = req.body;
     
     const validEmail = validator.isEmail(loginId)
-    
+    const phoneRegex = /^(\+[0-9]{1,3})?(\s?[0-9]){10,14}[0-9]$/;
+    const validPhoneNumber = phoneRegex.test(loginId)
+
     try {
 
         if(validEmail){
 
-            user = await User.findOne({
-                email: loginId
-            }).select('+token')
+            user = await User.findOne({ email: loginId }).select('+token')
             
+        }else if(validPhoneNumber){
+
+            user = await User.findOne({ phoneNumber: loginId.slice(-10) }).select('+token')
+
         }else{
-
-            user = await User.findOne({
-                phoneNumber: loginId.slice(-10)
-            }).select('+token')
-
+            
+            return next(new ErrorHandler("Invalid email or phone number", 404))
         }
 
         if(!user){
@@ -143,27 +150,24 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
     const { loginId, password, username, token, referralId } = req.body;
 
     const validEmail = validator.isEmail(loginId)
-
+    const phoneRegex = /^(\+[0-9]{1,3})?(\s?[0-9]){10,14}[0-9]$/;
+    const validPhoneNumber = phoneRegex.test(loginId)
+    
     let user;
 
     try {
 
         if(validEmail){
             
-            user = await User.findOne({
-                email: loginId
-            }).select('+isActivated +password +token')
+            user = await User.findOne({ email: loginId }).select('+isActivated +password +token')
             
+        }else if(validPhoneNumber){
+
+            user = await User.findOne({ phoneNumber: loginId.slice(-10) }).select('+isActivated +password +token')
+
         }else{
 
-            user = await User.findOne({
-                phoneNumber: loginId.slice(-10) 
-            }).select('+isActivated +password +token')
-
-        }
-
-        if(!user){
-            return next(new ErrorHandler('Invalid login Id or Password', 401))
+            return next(new ErrorHandler('Invalid email or phone number', 401))
         }
 
         if(user.password){
@@ -182,7 +186,7 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
             user.walletId = wallet._id;
         }
 
-        user.username = username
+        user.username = username?username:undefined
         user.password = password
         user.token = undefined
         user.tokenExpires = undefined
@@ -212,18 +216,14 @@ exports.loginUser = catchAsyncErrors( async (req, res, next)=>{
     let user;
 
     if(validEmail){
-        user = await User.findOne({
-            email: loginId
-        }).select('+password +isActivated');
+        user = await User.findOne({ email: loginId }).select('+password +isActivated');
     }
     else{
-        user = await User.findOne({
-            phoneNumber: loginId.slice(-10) 
-        }).select('+password +isActivated');
+        user = await User.findOne({ phoneNumber: loginId.slice(-10) }).select('+password +isActivated');
     }
 
     if(!user){
-        return next(new ErrorHandler(`Invalid ${validEmail?'Email':'Phone Number'} or Password`, 401))
+        return next(new ErrorHandler(`Invalid ${validEmail?'email':'phone number'} or password`, 401))
     }
 
     // Check if password is correct or not
@@ -263,14 +263,10 @@ exports.requestToken = catchAsyncErrors( async (req, res, next) => {
     let user;// = await User.findOne( { email: req.query.email });
 
     if(validEmail){
-        user = await User.findOne({
-            email: req.query.loginId
-        })
+        user = await User.findOne({ email: req.query.loginId })
     }
     else{
-        user = await User.findOne({
-            phoneNumber: req.query.loginId.slice(-10) 
-        })
+        user = await User.findOne({ phoneNumber: req.query.loginId.slice(-10) })
     }
 
     if(!user){
@@ -330,14 +326,10 @@ exports.forgotPassword = catchAsyncErrors( async (req, res, next) => {
     const validEmail = validator.isEmail(loginId)
 
     if(validEmail){
-        user = await User.findOne({
-            email: loginId
-        });
+        user = await User.findOne({ email: loginId });
     }
     else{
-        user = await User.findOne({
-            phoneNumber: loginId.slice(-10) 
-        });
+        user = await User.findOne({ phoneNumber: loginId.slice(-10) });
     }
 
     if(!user){
@@ -379,14 +371,10 @@ exports.resetPassword = catchAsyncErrors( async (req, res, next) => {
     let user;
 
     if(validEmail){
-        user = await User.findOne({
-            email: loginId
-        }).select('+token');
+        user = await User.findOne({ email: loginId }).select('+token');
     }
     else{
-        user = await User.findOne({
-            phoneNumber: loginId.slice(-10) 
-        }).select('+token');
+        user = await User.findOne({ phoneNumber: loginId.slice(-10) }).select('+token');
     }
     
     const isResetToken = user.token!==undefined && user?.token === token
@@ -420,11 +408,46 @@ exports.addBankAccount = catchAsyncErrors( async (req, res, next) => {
         return next(new ErrorHandler('Not Allowed', 403));
     }
 
+    /*
+    // Authenticate user before adding account details
+    const validToken = user.token!==undefined && user.token === req.body.token;
+    const tokenExpired = user.tokenExpires < new Date()
+    if(tokenExpired || !validToken){
+        return next(new ErrorHandler('Token invalid or expired'))
+    }
+    */
+        
+
+    const namesUpdated  = (user.firstName && user.otherNames)
+
+    if(!namesUpdated){
+        return next(new ErrorHandler('Please update your profile names before adding account details.', 403))
+    }
+
+    // Verify the account details from backend
+    const { bankCode, accountNumber } = req.body.accountDetails
+
+    const flw = new Flutterwave(process.env.FLW_PUBLIC_KEY, process.env.FLW_SECRET_KEY);
+    const response = await flw.Misc.verify_Account({account_bank:bankCode, account_number:accountNumber}).then(response => response);
+    
+    if(response.status==='error'){
+        return next(new ErrorHandler('System error! Unable to add account number'), 500)
+    }
+
+    const accountName = response.data.account_name.toLowerCase()
+
+    const detailsMatchesUsersRecord = accountName.includes(user.firstName.toLowerCase()) && user.otherNames.split(/\s+/).some(name => accountName.includes(name.toLowerCase()));
+
+    if(!detailsMatchesUsersRecord){
+        return next(new ErrorHandler('Names on bank account does not match your profile names.'))
+    }
+
     user.bankAccounts.push(req.body.accountDetails)
     await user.save();
 
     res.status(200).json({
         success: true,
+        user,
         message: "Account details added"
     })
 
@@ -462,6 +485,19 @@ exports.changeMode = catchAsyncErrors(async(req, res, next) => {
 // Update user profile  => /api/v1/me/update
 exports.updateProfile = catchAsyncErrors( async (req, res, next) => {
     const newUserData = req.body
+
+    delete newUserData.bankAccounts
+
+    const { firstName, otherNames } = req.body;
+    if(firstName || otherNames){
+        // User wants to update names
+        if(req.user.bankAccounts.length > 0){
+            // User has added account details 
+            // names update not permitted when user has updated account details
+            return next(new ErrorHandler('Contact admin for names update', 500))
+        }
+    }
+
 
     const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
         new: true,

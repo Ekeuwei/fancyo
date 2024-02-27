@@ -321,6 +321,12 @@ exports.walletBalance = catchAsyncErrors(async(req,res,next)=>{
 // Cashout request     =>  /api/v1/fund/cashout
 exports.cashout = catchAsyncErrors(async(req,res,next)=>{
 
+    const namesUpdated  = (req.user.firstName && req.user.otherNames)
+
+    if(!namesUpdated){
+        return next(new ErrorHandler('Please update your profile names before cashing out.', 403))
+    }
+
     try {
 
         // console.log(req.body.details);

@@ -175,6 +175,10 @@ const authSlice = createSlice({
         state.isValidToken = null;
     },
     
+    createAuthError: (state, action) => {
+        state.error = action.payload;
+    },
+    
     // Logout 
     logout: (state) => {
         state.loading = false;
@@ -217,6 +221,7 @@ export const {
   resetPasswordFailure,
   
   clearAuthError,
+  createAuthError,
   logout,
 } = authSlice.actions;
 

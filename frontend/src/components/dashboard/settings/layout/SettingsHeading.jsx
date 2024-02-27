@@ -1,11 +1,12 @@
 import styled from "styled-components"
 import PropTypes from 'prop-types'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faTimes } from "@fortawesome/free-solid-svg-icons"
+import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons"
 
 const SettingsHeading = ({title, handleClose}) => {
   return (
     <Wrapper>
+      <Backdrop icon={faArrowLeft} onClick={()=>window.history.back()}/>
       <Header>{title}</Header>
       {handleClose&&<CloseButton onClick={handleClose}><FontAwesomeIcon icon={faTimes}/></CloseButton>}
     </Wrapper>
@@ -15,13 +16,19 @@ const SettingsHeading = ({title, handleClose}) => {
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
-  padding: 15px 10px;
+  padding: 15px 5px;
+  color: ${({theme})=>theme.colors.white};
   background-color: ${({theme})=>theme.colors.dark2};
 `
 SettingsHeading.propTypes = {
     title: PropTypes.string,
     handleClose: PropTypes.func,
 }
+
+const Backdrop = styled(FontAwesomeIcon)`
+  padding: 10px;
+  margin-right: 5px;
+`
 
 const Header = styled.div`
     flex: 1;

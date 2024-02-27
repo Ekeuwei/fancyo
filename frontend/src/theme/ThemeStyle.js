@@ -229,7 +229,7 @@ export const Button = styled.button`
   border-radius: 4px;
 `
 
-export const FormControlWrapper = styled.form`
+export const FormControlWrapper = styled.div`
     position: relative;
     border-radius: 20px;
     padding: 30px 20px;
@@ -334,3 +334,8 @@ export const ToastContainer = styled.div`
   /* Optional: Add more styling to fit your design */
 `;
 
+export const SubtleLabel = styled.p`
+    margin: 3px 0;
+    font-size: 12px;
+    color: ${({value, theme})=>theme.colors[value]};
+`

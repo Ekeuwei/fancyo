@@ -8,15 +8,18 @@ const Wallet = require('./wallet');
 const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
+        trim: true,
         maxlength: [20, 'Your name cannot exceed 20 characters']
     },
-    lastName: {
+    otherNames: {
         type: String,
+        trim: true,
         maxlength: [20, 'Your name cannot exceed 20 characters']
     },
     username: {
         type: String,
         unique: true,
+        trim: true,
         sparse: true,
         collation: { locale: 'en', caseLevel: true, strength: 2 },
     },
@@ -25,6 +28,7 @@ const userSchema = new mongoose.Schema({
         unique: true,
         sparse: true,
         validate: [validator.isEmail, 'Please enter valid email address'],
+        set: (value) => validator.normalizeEmail(value, { lowercase: true })
     },
     phoneNumber: {
         type: String,

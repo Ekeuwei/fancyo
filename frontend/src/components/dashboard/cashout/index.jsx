@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { api } from "../../../common/api"
 import { createUserError } from "../../../app/user/userSlice"
 import { formatAmount, formatAmountFraction, formatNumber, formatNumberToFloat } from "../../../common/utils"
+import NavHeader from "../layout/NavHeader"
 
 const Cashout = () => {
 
@@ -51,33 +52,36 @@ const Cashout = () => {
   }
 
   return (
-    <BodyWrapper>
-      <Wrapper onSubmit={handleCashout}>
-        {bankAccounts&& <SelectOption 
-          options={bankAccounts} 
-          placeHolder={'Select Account'} 
-          selectedOption={selectedOption}
-          handleModalOpen={handleModalOpen} 
-          handleSelection={handleSelection} />}
+    <>
+      <NavHeader title={'Fund Cashout'} />
+      <BodyWrapper>
+        <Wrapper onSubmit={handleCashout}>
+          {bankAccounts&& <SelectOption 
+            options={bankAccounts} 
+            placeHolder={'Select Account'} 
+            selectedOption={selectedOption}
+            handleModalOpen={handleModalOpen} 
+            handleSelection={handleSelection} />}
 
-        <Balance>Balance {formatAmountFraction(walletBalance)}</Balance>
-        <Amount 
-          placeholder={`min. ${formatAmount(1000)}`}
-          value = {amount}
-          onChange={(e)=>setAmount(formatNumber(e.target.value))}/>
+          <Balance>Balance {formatAmountFraction(walletBalance)}</Balance>
+          <Amount 
+            placeholder={`min. ${formatAmount(1000)}`}
+            value = {amount}
+            onChange={(e)=>setAmount(formatNumber(e.target.value))}/>
 
-        <List>
-          <ListItem>Minimum per transaction NGN 1,000</ListItem>
-          <ListItem>Maximum per transaction NGN 10,000,000</ListItem>
-        </List>
-        <NoticeMessage value={error?"error":message?"message":""}>{error || message}</NoticeMessage>
-        <Button type="submit">Submit</Button>
-      </Wrapper>
+          <List>
+            <ListItem>Minimum per transaction NGN 1,000</ListItem>
+            <ListItem>Maximum per transaction NGN 10,000,000</ListItem>
+          </List>
+          <NoticeMessage value={error?"error":message?"message":""}>{error || message}</NoticeMessage>
+          <Button type="submit">Submit</Button>
+        </Wrapper>
 
-      <ModalContainter isOpen={isOpen} handleModalClose={handleModalClose}>
-        <AddAccount handleModalClose={handleModalClose} />
-      </ModalContainter>
-    </BodyWrapper>
+        <ModalContainter isOpen={isOpen} handleModalClose={handleModalClose}>
+          <AddAccount handleModalClose={handleModalClose} />
+        </ModalContainter>
+      </BodyWrapper>
+    </>
   )
 }
 

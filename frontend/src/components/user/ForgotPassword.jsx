@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react"
-import { Button, FormControlWrapper, HomeStyle, Input, InputLabel, InputWrapper, Loading, NoticeMessage } from "../../theme/ThemeStyle"
-import styled from 'styled-components'
+import { Button, FormControlWrapper, HomeStyle, Input, InputLabel, InputWrapper, Loading, NoticeMessage, SubtleLabel } from "../../theme/ThemeStyle"
 import TokenInput from "./layout/TokenInput"
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
 import { useDispatch, useSelector } from "react-redux"
 import { api } from "../../common/api"
 import Logo from "../dashboard/layout/Logo"
+import { clearAuthError } from "../../app/auth/authSlice"
+import styled from "styled-components"
 
 const ForgotPassword = () => {
     const history = useHistory()
@@ -54,13 +55,18 @@ const ForgotPassword = () => {
             dispatch(api.resetPassword(credentials))
         }
     }
+
+    useEffect(()=>{
+        dispatch(clearAuthError())
+    },[dispatch])
+
     return (
         <HomeStyle>
-            <FormControl>
+            <FormControl onSubmit={submitHandler}>
 
                 <Logo />
                 
-                <FormControlWrapper onSubmit={submitHandler}>
+                <FormControlWrapper >
                     <Wrapper>
                         <Title>Forgot Password</Title>
                         <Subtitle>Reset your password</Subtitle>
@@ -101,6 +107,10 @@ const ForgotPassword = () => {
                                     invalid={confirmPassword.length > 0 && !isSamePassword?"error":""}
                                     type="password"
                                     onChange={(e)=>setConfirmPassword(e.target.value)}/>
+
+                                {confirmPassword.length > 0 && !isSamePassword&&
+                                    <SubtleLabel value="error">Password does not match</SubtleLabel>}
+                                    
                             </InputWrapper>
                             <Button type="submit" disabled={loading}>Submit <Loading value={loading}/></Button>
                         </>}
@@ -133,7 +143,7 @@ const RedirectAccess = styled.div`
     justify-content: center;
     cursor: pointer;
 `
-const FormControl = styled.div`
+const FormControl = styled.form`
     display: flex;
     flex-direction: column;
     justify-content: center;

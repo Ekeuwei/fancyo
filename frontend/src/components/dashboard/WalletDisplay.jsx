@@ -1,5 +1,4 @@
 import styled from "styled-components"
-import { useTheme } from "../../theme/ThemeProvider"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faMoneyBill1 } from "@fortawesome/free-regular-svg-icons"
 import { useEffect } from "react"
@@ -19,10 +18,9 @@ const WalletDisplay = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
     
-    const { toggleDarkMode } = useTheme()
     return (
         <Wrapper>
-            <MainView onClick={()=>toggleDarkMode()}>
+            <MainView>
                 <Title>My portfolio</Title>
                 <Balance>{formatAmountFraction(walletBalance)}</Balance>
             </MainView>

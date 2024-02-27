@@ -4,22 +4,41 @@ import styled from 'styled-components'
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
 import { useDispatch, useSelector } from "react-redux"
 import { api } from "../../common/api"
-import { clearAuthError } from "../../app/auth/authSlice"
+import { clearAuthError, createAuthError } from "../../app/auth/authSlice"
 import Logo from "../dashboard/layout/Logo"
+
 
 const Login = () => {
     const dispatch = useDispatch()
-    const [loginId, setLoginId] = useState("")
-    const [password, setPassword] = useState("")
     const history = useHistory();
+
+    const [emptyFields, setEmptyFields] = useState([])
+    const [loginDetails, setLoginDetails] = useState({loginId:'', password:''})
 
     const redirect = location.search ? location.search.split('=')[1] : '/dashboard';
     
     const { isAuthenticated, loading, message, error } = useSelector(state => state.auth)
 
+    const onChange = (e)=>{
+
+        dispatch(clearAuthError())
+        
+        setLoginDetails(prevData =>({...prevData, [e.target.name]:e.target.value}))
+
+    }
+
     const submitHandler = (e)=>{
         e.preventDefault();
-        dispatch(api.login(loginId, password))
+
+        const emptyFields = Object.keys(loginDetails).filter(key => loginDetails[key]==='')
+        
+        setEmptyFields(emptyFields)
+
+        if(emptyFields.length === 0){
+            dispatch(api.login(loginDetails))
+        }else{
+            dispatch(createAuthError(`Provide ${emptyFields[0]==="loginId"?'email or phone number':'password'} to proceed`))
+        }
     }
 
     useEffect(()=>{
@@ -30,16 +49,23 @@ const Login = () => {
     },[isAuthenticated, history, redirect])
 
     useEffect(()=>{
+        if(emptyFields.length>0){
+            const timeoutId = setTimeout(()=>setEmptyFields([]),1000)
+            return ()=>clearTimeout(timeoutId)
+        }
+    },[emptyFields])
+
+    useEffect(()=>{
         dispatch(clearAuthError())
     },[dispatch])
     
     return (
         <HomeStyle>
-            <FormControl>
+            <FormControl onSubmit={submitHandler}>
                 
                 <Logo />
 
-                <FormControlWrapper onSubmit={submitHandler} >
+                <FormControlWrapper >
                     <Wrapper>
                         <Title>Welcome back</Title>
                         <Subtitle>Login to continue</Subtitle>
@@ -50,18 +76,26 @@ const Login = () => {
                     </Message>}
 
                     <Wrapper>
-                        <InputWrapper>
-                            <InputLabel value={loginId}>Username</InputLabel>
-                            <Input placeholder="Username" label={loginId} value={loginId} onChange={e => setLoginId(e.target.value)}/>
+                        <InputWrapper value={emptyFields.includes('loginId')?'error':''}>
+                            <InputLabel value={loginDetails.loginId}>Username</InputLabel>
+                            <Input 
+                                placeholder="Username" 
+                                name="loginId"
+                                invalid={emptyFields.includes('loginId')}
+                                label={loginDetails.loginId} value={loginDetails.loginId} 
+                                onChange={onChange}
+                            />
                         </InputWrapper>
-                        <InputWrapper>
-                            <InputLabel value={password}>Password</InputLabel>
+                        <InputWrapper value={emptyFields.includes('password')?'error':''}>
+                            <InputLabel value={loginDetails.password}>Password</InputLabel>
                             <Input 
                                 placeholder="Password" 
-                                label={password} 
-                                value={password}
+                                label={loginDetails.password} 
+                                value={loginDetails.password}
+                                invalid={emptyFields.includes('password')}
                                 type="password"
-                                onChange={e => setPassword(e.target.value)}
+                                name="password"
+                                onChange={onChange}
                             />
                         </InputWrapper>
                         <Label onClick={()=>history.push('/password/forgot')}>Forgot password</Label>
@@ -103,7 +137,7 @@ const RedirectAccess = styled.div`
     justify-content: center;
     cursor: pointer;
 `
-const FormControl = styled.div`
+const FormControl = styled.form`
     display: flex;
     flex-direction: column;
     justify-content: center;

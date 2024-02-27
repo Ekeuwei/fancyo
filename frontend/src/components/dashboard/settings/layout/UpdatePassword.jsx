@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Button, Input, InputLabel, InputWrapper, Loading, NoticeMessage } from '../../../../theme/ThemeStyle'
+import { Button, Input, InputLabel, InputWrapper, Loading, NoticeMessage, SubtleLabel } from '../../../../theme/ThemeStyle'
 import PropTypes from 'prop-types'
 import SettingsHeading from './SettingsHeading'
 import ModalContainter from '../../modals/ModalContainter'
@@ -107,6 +107,10 @@ const UpdatePassword = () => {
                   name="confirmPassword"
                   type='password'
                   onChange={onChange}/>
+
+                {emptyFields.includes('confirmPassword')||(data.confirmPassword.length > 0 && !isSamePassword)&&
+                  <SubtleLabel value="error">Password does not match</SubtleLabel>}
+                  
             </InputWrapper>
 
             <Button type='submit'>Update <Loading value={loading}/></Button>

@@ -5,8 +5,9 @@ import TokenInput from "./layout/TokenInput"
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
 import { useDispatch, useSelector } from "react-redux"
 import { api } from "../../common/api"
-import { clearAuthError } from "../../app/auth/authSlice"
+import { clearAuthError, createAuthError } from "../../app/auth/authSlice"
 import Logo from "../dashboard/layout/Logo"
+import validator from "validator"
 
 const Register = () => {
     const history = useHistory()
@@ -32,12 +33,21 @@ const Register = () => {
     useEffect(()=>{
         dispatch(clearAuthError())
     },[dispatch])
+    
 
-    const validateUserHandler = ()=>{
-        if(loginId.length > 3){
+    const validateUserHandler = (e)=>{
+        e.preventDefault()
+        
+        const phoneRegex = /^(\+[0-9]{1,3})?(\s?[0-9]){10,14}[0-9]$/;
+        const validEmail = validator.isEmail(loginId)
+        const validNumber = phoneRegex.test(loginId)
+
+        if(validEmail || validNumber){
             
             dispatch(api.validateUser(loginId))
         }else{
+            
+            dispatch(createAuthError('Enter a valid email or phone number'))
             // Report that user need to enter a valid userId
         }
     }
@@ -65,7 +75,7 @@ const Register = () => {
                 
                 <Logo />
                 
-                <FormControlWrapper onSubmit={submitHandler}>
+                <FormControlWrapper >
                     <Wrapper>
                         <Title>Unlock a world of possibilities</Title>
                         <Subtitle>Register to continue</Subtitle>
@@ -76,18 +86,20 @@ const Register = () => {
                     </Error>}
 
                     <Wrapper>
-                        <InputWrapper>
-                            <InputLabel value={loginId}>Email or Phone Number</InputLabel>
-                            <Input disabled={isValidToken} placeholder="Email or Phone Number" label={loginId.length} value={loginId} onChange={e => setLoginId(e.target.value)}/>
-                        </InputWrapper>
+                        <form onSubmit={validateUserHandler}>
+                            <InputWrapper>
+                                <InputLabel value={loginId}>Email or Phone Number</InputLabel>
+                                <Input disabled={isValidToken} placeholder="Email or Phone Number" label={loginId.length} value={loginId} onChange={e => setLoginId(e.target.value)}/>
+                            </InputWrapper>
 
-                        {!(message || isValidToken)&& <Button disabled={loading} onClick={validateUserHandler}> <Loading value={loading} /> Get code</Button>}
+                            {!(message || isValidToken)&& <Button disabled={loading} type="submit"> <Loading value={loading} /> Get code</Button>}
+                        </form>
 
                         {message && <CodeInputWrapper>
                             <TokenInput loginId={loginId} token={token} setToken={setToken} tokenExpires={tokenExpires}/>
                         </CodeInputWrapper>}
 
-                        {isValidToken&&<>
+                        {isValidToken&&<form onSubmit={submitHandler}>
                             <InputWrapper>
                                 <InputLabel value={username}>Username</InputLabel>
                                 <Input 
@@ -117,7 +129,7 @@ const Register = () => {
                             </InputWrapper>
                             <TermsAndCond>I agree with the Terms & Conditions</TermsAndCond>
                             <Button type="submit" disabled={loading}> <Loading value={loading}/> Register</Button>
-                        </>}
+                        </form>}
                         
                         <RedirectAccess onClick={()=>history.push('/login')}>Already have an account?
                             <div className="" style={{marginLeft: "5px", color:"green"}}>Login Here</div>

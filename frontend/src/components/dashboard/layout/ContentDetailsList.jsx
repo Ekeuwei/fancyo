@@ -28,12 +28,16 @@ const ContentDetailsList = ({project, title}) => {
                 <Details>{dateFormat(project.endAt, 'ddd mmm dS')}</Details>
             </Item>
             <Item>
-                <Label>{'Contributors'}</Label>
+                <Label>{'Number of contributors'}</Label>
                 <Details>{project.contributors.length}</Details>
             </Item>
             <Item>
-                <Label>{'Amount Contributed'}</Label>
+                <Label>{'Total value locked'}</Label>
                 <Details>{formatAmountFraction(contributedAmount)}</Details>
+            </Item>
+            <Item>
+                <Label>{'Available Balance'}</Label>
+                <Details>{formatAmountFraction(project.availableBalance)}</Details>
             </Item>
         </Content>
     )

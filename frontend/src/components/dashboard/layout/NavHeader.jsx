@@ -4,11 +4,16 @@ import PropTypes from 'prop-types'
 import { faLongArrowLeft, faTimes } from '@fortawesome/free-solid-svg-icons'
 
 const NavHeader = ({handleModalClose, title}) => {
+    const handleBackdrop = ()=>{
+        if(handleModalClose){
+            handleModalClose()
+        }else{
+            window.history.back()
+        }
+    }
     return (
         <Header>
-            <Backdrop>
-                <FontAwesomeIcon icon={faLongArrowLeft}/>
-            </Backdrop>
+            <Backdrop onClick={handleBackdrop} icon={faLongArrowLeft} />
             <Title>{title}</Title>
             {handleModalClose&& <Backdrop onClick={handleModalClose}>
                 <FontAwesomeIcon icon={faTimes}/>
@@ -31,7 +36,7 @@ const Header = styled.div`
     color: ${({theme})=>theme.colors.white};
     background-color: ${({theme})=>theme.colors.primary};
 `
-const Backdrop = styled.div`
+const Backdrop = styled(FontAwesomeIcon)`
     padding: 10px;
 `
 const Title = styled.h2`

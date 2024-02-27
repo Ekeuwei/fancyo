@@ -1,4 +1,4 @@
-import { Button, Input, InputLabel, InputWrapper } from '../../../theme/ThemeStyle'
+import { Button, Input, InputLabel, InputWrapper, Loading, NoticeMessage, Shake } from '../../../theme/ThemeStyle'
 import styled from 'styled-components'
 import { useEffect, useState } from 'react'
 import NavHeader from '../layout/NavHeader'
@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { api } from '../../../common/api'
 import InputWithSearch from './InputWithSearch'
 import { clearUserErrors } from '../../../app/user/userSlice'
+import UpdateNames from '../settings/layout/UpdateNames'
 
 const AddAccount = ({handleModalClose}) => {
     const dispatch = useDispatch()
@@ -14,12 +15,14 @@ const AddAccount = ({handleModalClose}) => {
 
     const [selectedOption, setSelectedOption] = useState({name:""});
 
+    const [showError, setShowError] = useState('')
+
     const handleSelection = (e) => {
         // const option = banks.find(bank => bank.name === e.target.value)||{name:""}
         const option = banks.find(bank => bank.name === e)||{name:""}
         setSelectedOption(option);
     }
-    const { bankAccountDetails, error, message, banks } = useSelector(state => state.user)
+    const { bankAccountDetails, error, loading, message, banks } = useSelector(state => state.user)
 
     useEffect(()=>{
         if(selectedOption!=='' && accountNumber.length === 10){
@@ -53,23 +56,37 @@ const AddAccount = ({handleModalClose}) => {
             accountNumber,
             accountName: bankAccountDetails?.account_name,
         }
+
         const allFieldsPolulated = Object.keys(accountDetails).every(key=> accountDetails[key] !== undefined)
+        
         if(allFieldsPolulated){
             dispatch(api.addAccountDetails(accountDetails))
         }else{
-            // console.log('Some fields are not populated', accountDetails);
+            setShowError('animate')
+            
         }
 
     }
+
+    useEffect(()=>{
+        if(showError==='animate'){
+            const timeoutId = setTimeout(()=>setShowError(''),500)
+            return ()=> clearTimeout(timeoutId)
+        }
+    },[showError])
+    
     return (
         <>
             <NavHeader title={"Add Bank Account"} handleModalClose={handleModalClose} />
+
+            <Shake value={showError}>
+                <NoticeMessage value={error?'error':''}>
+                    {error||message}
+                    <UpdateNames accountUpdateError={error}/>
+                </NoticeMessage>
+            </Shake>
+
             <Wrapper onSubmit={handleSubmit}>
-                {/* <SelectOption 
-                    options={banks} 
-                    placeHolder={'Select Bank'} 
-                    selectedOption={selectedOption}
-                    handleSelection={handleSelection}/> */}
                 <InputWithSearch 
                     options={banks} 
                     placeHolder={'Bank Name'}
@@ -87,7 +104,7 @@ const AddAccount = ({handleModalClose}) => {
                         label={accountNumber} />
                     <AccountName>{bankAccountDetails?.account_name || error}</AccountName>
                 </InputWrapper>
-                <Button type='submit'>Add Account</Button>
+                <Button type='submit' disabled={loading}><Loading value={loading}/> Add Account</Button>
             </Wrapper>
         </>
     )

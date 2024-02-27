@@ -8,7 +8,7 @@ import ModalContainter from './ModalContainter'
 import { useDispatch, useSelector } from 'react-redux'
 import { api } from '../../../common/api'
 import { clearProjectErrors } from '../../../app/project/projectSlice'
-import { formatAmountFraction, formatNumber, formatNumberToFloat } from '../../../common/utils'
+import { formatAmount, formatAmountFraction, formatNumber, formatNumberToFloat } from '../../../common/utils'
 
 const DealEngagement = ({isOpen, handleModalClose, project, title, idx}) => {
     const dispatch = useDispatch()
@@ -73,7 +73,7 @@ const DealEngagement = ({isOpen, handleModalClose, project, title, idx}) => {
         <>
             <ModalContainter isOpen={isOpen} handleModalClose={handleModalClose}>
                 <>
-                    <NavHeader handleModalClose={handleModalClose} title={`7thPriest | ${title}`} />
+                    <NavHeader handleModalClose={handleModalClose} title={`Project ${project.uniqueId} | ${title}`} />
                     <ParentWrap>
                         <Wrapper value={nextPage==='yes'?'slideOut':''}>
                             <ContentDetailsList project={project} title = {title}/>
@@ -117,7 +117,7 @@ const DealEngagement = ({isOpen, handleModalClose, project, title, idx}) => {
 
             <ModalContainter isOpen={confirmDialog} handleModalClose={null}>
                 <>
-                    <Text>Please confirm the contribution of ${amount} to project ID: {project.uniqueId}</Text>
+                    <Text>Please confirm the contribution of {formatAmount(amount)} to project ID: {project.uniqueId}</Text>
                     <ButtonWrapper>
                         <ButtonClose onClick={closeConfirmDialog}>Cancel</ButtonClose>
                         <Btn onClick={confirmContribution}> {loading&&<Loading />} I Confirm</Btn>
