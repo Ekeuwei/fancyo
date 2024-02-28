@@ -38,13 +38,13 @@ const FloatingButton = ({title, isOpen, handleButtonClick}) => {
   };
 
   return (
-    <FloatButton visible={!(isScrolledDown||isOpen==='opened')} onClick={handleButtonClick}> <FontAwesomeIcon icon={faPlus} /> {title}  </FloatButton>
+    <FloatButton visible={+!(isScrolledDown||isOpen==='opened')} onClick={handleButtonClick}> <FontAwesomeIcon icon={faPlus} /> {title}  </FloatButton>
   );
 };
 
 FloatingButton.propTypes = {
     title: PropTypes.string,
-    isOpen: PropTypes.bool,
+    isOpen: PropTypes.string,
     handleButtonClick: PropTypes.func,
 }
 

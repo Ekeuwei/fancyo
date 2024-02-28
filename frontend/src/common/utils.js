@@ -1,8 +1,22 @@
-export const formatAmount = value => `₦${Number(value).toLocaleString("en-US")}`;
+export const formatAmount = value => `₦${new Intl.NumberFormat('en-US').format(parseFloat(value.toString().replace(/[^\d.]/g, '')).toFixed(2))}`;
+// export const formatAmount = value => `₦${Number(value).toLocaleString("en-US")}`;
 export const formatAmountFraction = value => `₦${Number(value).toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits:2})}`;
-export const formatNumber = value => new Intl.NumberFormat('en-US').format(value.toString().replace(/\D/g, ''));
+export const formatNumber = value => new Intl.NumberFormat('en-US').format(parseFloat(value.toString().replace(/[^\d.]/g, '')).toFixed(2));
 export const formatNumberToFloat = value => parseFloat(value.toString().replace(/,/g, ''));
 export const formatNumberFraction = value => Number(value).toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits:2});
+
+export const formatNumber_ = (value) => {
+  // const stringValue = value.toString().replace(/[^\d.]/g, ''); // Remove non-numeric characters
+  // const numericValue = parseInt(stringValue, 10); // Convert the string to a numeric value
+  const numericValue = parseFloat(value.toString().replace(/[^\d.]/g, '')).toFixed(2); // Remove non-numeric characters except the dot
+  
+  if (isNaN(numericValue)) {
+    // Handle the case where the value is not a valid number
+    return ''; // or any other default value or error handling strategy
+  }
+
+  return new Intl.NumberFormat('en-US').format(numericValue);
+};
 
 export const calculateTimeLeft = (targetDate) => {
   const now = new Date().getTime();

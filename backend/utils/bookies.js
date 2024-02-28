@@ -14,18 +14,18 @@ exports.sporty = async (ticketId)=> {
 
     try {
             games = response.data.outcomes.map((game)=>({
-            league: `${game.sport.category.name}, ${game.sport.category.tournament.name}`,
-            time: game.estimateStartTime,
-            homeTeam: game.homeTeamName,
-            awayTeam: game.awayTeamName,
-            scores: game.status===0?{ft:"",ht:""}:{ht: game.gameScore?.[0], ft: game.setScore},
-            prediction: game.markets[0].outcomes[0].desc,
-            market: game.markets[0].desc,
-            outcome: game.markets[0].outcomes[0].isWinning,
-            odds: game.markets[0].outcomes[0].odds,
-            matchStatus: game.matchStatus,
-            status: game.status,
-        }))
+                league: `${game.sport.category.name}, ${game.sport.category.tournament.name}`,
+                time: game.estimateStartTime,
+                homeTeam: game.homeTeamName,
+                awayTeam: game.awayTeamName,
+                scores: game.status===0?{ft:"",ht:""}:{ht: game.gameScore?.[0], ft: game.setScore},
+                prediction: game.markets[0].outcomes[0].desc,
+                market: game.markets[0].desc,
+                outcome: game.markets[0].outcomes[0].isWinning,
+                odds: game.markets[0].outcomes[0].odds,
+                matchStatus: game.matchStatus,
+                status: game.status,
+            }))
         
     } catch (error) {
         throw new Error()

@@ -4,7 +4,9 @@ import DealEngagement from "./modals/DealEngagement"
 import { useState } from "react"
 import PropTypes from 'prop-types'
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
-import { formatAmount, formatNumber, formatNumberFraction } from "../../common/utils"
+import { formatAmount, formatNumber } from "../../common/utils"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons"
 
 const DealAds = ({project, idx}) => {
     const history = useHistory()
@@ -34,7 +36,7 @@ const DealAds = ({project, idx}) => {
 
     const profit = project.availableBalance - contributedAmount
     const balance = formatAmount(project.availableBalance)
-    const percentIncrease = formatNumberFraction(profit/contributedAmount * 100)
+    const percentIncrease = formatNumber(profit/contributedAmount * 100)
   
     return (
         <>
@@ -59,9 +61,9 @@ const DealAds = ({project, idx}) => {
                 </StatusWrapper>:
                 <EarningsWrapper>
                     {profit!==0&&<>
-                        <Profit value={profit}>{`${profit>0?'+':'-'}${formatNumber(profit)}`}</Profit>
+                        <Profit value={profit}><FontAwesomeIcon icon={profit>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{formatNumber(profit)}</Profit>
                         <Balance>{balance}</Balance>
-                        <PercentIncrease>{percentIncrease}%</PercentIncrease>
+                        <PercentIncrease>{percentIncrease}% {profit>0?'up':'down'}</PercentIncrease>
                     </>}
                 </EarningsWrapper>}
 
@@ -82,7 +84,6 @@ const DealAds = ({project, idx}) => {
 DealAds.propTypes = {
     project: PropTypes.object.isRequired,
     idx: PropTypes.number.isRequired,
-    tabDirection: PropTypes.string.isRequired,
 }
 
 const Wrapper = styled.div`
@@ -191,7 +192,8 @@ const Profit = styled(Label)`
     color: ${({value, theme})=>value>0?theme.colors.won:theme.colors.lost}
 `
 const PercentIncrease = styled(Profit)`
-    color:${({theme})=>theme.colors.dark2}
+    color:${({theme})=>theme.colors.dark2};
+    text-transform: capitalize;
 `
 
 const calculateCountdown = (timestamp)=>{

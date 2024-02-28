@@ -4,7 +4,7 @@ import StakeDetails from './StakeDetails'
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { formatNumberFraction } from '../../../common/utils'
-import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
+import { faAngleRight, faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
 
 const Stakes = ({tickets}) => {
     const [openIndex, setOpenIndex] = useState(null)
@@ -24,15 +24,15 @@ const Stakes = ({tickets}) => {
     )
 }
 Stakes.propTypes = {
-    tickets: PropTypes.object, 
+    tickets: PropTypes.array, 
 }
 
 const Stake = ({ticket, index, openIndex, handleToggle})=>{
     
     const collapseHandler = ()=> handleToggle(index)
     const value = openIndex === index?"collapsing":"";
-    const combinedOdds = ticket.games.reduce((acc, game)=> acc * game.odds, 1)
-    const expectedRoi = combinedOdds * ticket.stakeAmount
+    const combinedOdds = (ticket.games.reduce((acc, game)=> acc * game.odds, 1))
+    const expectedRoi = formatNumberFraction(combinedOdds * ticket.stakeAmount)
     const gameType = ticket.games.length > 1? 'Accumulator':'Single'
     const title = `Ticket ${index+1} - ${gameType} @${formatNumberFraction(combinedOdds)} Odds`
 
@@ -49,7 +49,10 @@ const Stake = ({ticket, index, openIndex, handleToggle})=>{
                     <FontAwesomeIcon icon={faAngleRight} />
                 </Icon>
                 <Title>{title}</Title>
-                <Label value={{winning, color}}>{winning}</Label>
+                <Label value={{winning, color}}>
+                    <FontAwesomeIcon icon={winning<0? faMinus:faPlus} size='xs' style={{marginRight:'2px'}}/>
+                    {winning}
+                </Label>
             </Header>
             <StakeDetails ticket={ticket} value={value} />
         </StakeWrapper>
@@ -115,6 +118,7 @@ const Title = styled.h3`
 const Label = styled.p`
     display: ${({value})=>value?.winning?'':'none'};
     margin: 0;
+    /* letter-spacing: 1px; */
     font-size: 14px;
     padding: 5px 10px;
     margin-right: 5px;

@@ -15,9 +15,7 @@ const NavHeader = ({handleModalClose, title}) => {
         <Header>
             <Backdrop onClick={handleBackdrop} icon={faLongArrowLeft} />
             <Title>{title}</Title>
-            {handleModalClose&& <Backdrop onClick={handleModalClose}>
-                <FontAwesomeIcon icon={faTimes}/>
-            </Backdrop>}
+            {handleModalClose&& <Backdrop onClick={handleModalClose} icon={faTimes} />}
         </Header>
     )
 }
