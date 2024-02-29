@@ -8,7 +8,7 @@ const { connect } = require("mongoose");
 const sendSMS = require("./sendSMS");
 const Ticket = require("../models/ticket");
 const Project = require("../models/project");
-const { getTicketStatus } = require("./routineTasks");
+const { getTicketStatus, updateProjectProgress } = require("./routineTasks");
 
 // Setting dotenv file
 dotenv.config({ path: "backend/config/config.env" });
@@ -63,5 +63,12 @@ const updateTickets = async ()=>{
     process.exit(1)
 }
 
-updateTickets();
+const updateProject = async ()=>{
+  const response = await updateProjectProgress()
+  console.log(response);
+  process.exit(1)
+}
+
+updateProject();
+// updateTickets();
 // seedBanks();

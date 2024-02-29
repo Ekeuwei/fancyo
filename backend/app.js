@@ -37,7 +37,7 @@ app.use(fileUpload());
 const auth = require('./routes/auth');
 const project = require('./routes/project');
 const payment = require('./routes/payment');
-const { updateTicketProgress } = require('./utils/routineTasks');
+const { updateTicketProgress, updateProjectProgress } = require('./utils/routineTasks');
 /* 
 const settings = require('./routes/settings');
 const products = require('./routes/product');
@@ -65,8 +65,16 @@ app.use('/api/v1', webhooks)
 //*/
 
 cron.schedule('*/30 * * * *', async () => {
-  console.log('Running routine update...');
+  // runs every 30 minues
+  console.log('Running 30minutes routine update...');
   const response = await updateTicketProgress();
+  console.log(response);
+})
+
+cron.schedule('0 * * * *', async () => {
+  // runs every hour
+  console.log('Running hourly routine update...');
+  const response = await updateProjectProgress();
   console.log(response);
 })
 

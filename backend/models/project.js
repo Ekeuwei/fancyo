@@ -47,7 +47,7 @@ const projectSchema = new mongoose.Schema({
     ],
     status: {
         type: String,
-        enum: ['pending', 'in progress', '', 'failed'],
+        enum: ['pending', 'in progress', 'failed'],
         default: 'pending'
     },
     balanceBefore: {
