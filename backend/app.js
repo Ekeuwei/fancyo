@@ -4,6 +4,7 @@ const serverless = require('serverless-http');
 const app = express();
 
 const cors = require('cors')
+const cron = require('node-cron')
 
 const cookieParser = require('cookie-parser')
 const bodyparser = require('body-parser')
@@ -36,6 +37,7 @@ app.use(fileUpload());
 const auth = require('./routes/auth');
 const project = require('./routes/project');
 const payment = require('./routes/payment');
+const { updateTicketProgress } = require('./utils/routineTasks');
 /* 
 const settings = require('./routes/settings');
 const products = require('./routes/product');
@@ -62,7 +64,13 @@ app.use('/api/v1', worker)
 app.use('/api/v1', webhooks)
 //*/
 
-if(process.env.NODE_ENV === 'PRODUCTION'){
+cron.schedule('*/30 * * * *', async () => {
+  console.log('Running routine update...');
+  const response = await updateTicketProgress();
+  console.log(response);
+})
+
+if(process.env.NODE_ENV === 'PRODUCTION_'){
     app.use(express.static(path.join(__dirname, '../frontend/build')))
 
     app.get('*', (req, res)=>{

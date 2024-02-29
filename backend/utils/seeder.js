@@ -8,7 +8,7 @@ const { connect } = require("mongoose");
 const sendSMS = require("./sendSMS");
 const Ticket = require("../models/ticket");
 const Project = require("../models/project");
-const { updateTicketScores } = require("./updateScores");
+const { getTicketStatus } = require("./routineTasks");
 
 // Setting dotenv file
 dotenv.config({ path: "backend/config/config.env" });
@@ -37,11 +37,7 @@ const updateTickets = async ()=>{
      // Step 2: Manipulate the documents
     const updatedTickets = tickets.map(async (ticket, idx) => {
 
-      if (!(ticket instanceof Ticket)) {
-        throw new Error('Invalid document type');
-      }
-
-      let newTicket = await updateTicketScores(ticket)
+      let newTicket = await getTicketStatus(ticket)
       ticket.games = newTicket.games
 
       // Update status

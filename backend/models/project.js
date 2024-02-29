@@ -40,8 +40,8 @@ const projectSchema = new mongoose.Schema({
             },
             status: {
                 type: String,
-                enum: ['Pending', 'Settled', 'Lost'],
-                default: 'Pending'
+                enum: ['pending', 'settled', 'lost'],
+                default: 'pending'
             }
         }
     ],

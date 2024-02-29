@@ -24,8 +24,8 @@ const ticketSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['progress', 'successful', 'failed'],
-        default: 'progress'
+        enum: ['in progress', 'successful', 'failed'],
+        default: 'in progress'
     },
     games: [
         {
