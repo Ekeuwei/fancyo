@@ -18,7 +18,7 @@ exports.sporty = async (ticketId)=> {
                 time: game.estimateStartTime,
                 homeTeam: game.homeTeamName,
                 awayTeam: game.awayTeamName,
-                scores: game.status===0?{ft:"",ht:""}:{ht: game.gameScore?.[0], ft: game.setScore},
+                scores: (game.status===0||game.matchStatus!=='Ended' || game.matchStatus!=='AP')? {ft:"",ht:""} : {ht: game.gameScore?.[0], ft: game.setScore},
                 prediction: game.markets[0].outcomes[0].desc,
                 market: game.markets[0].desc,
                 outcome: game.markets[0].outcomes[0].isWinning,

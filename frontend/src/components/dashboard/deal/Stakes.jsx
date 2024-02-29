@@ -51,7 +51,7 @@ const Stake = ({ticket, index, openIndex, handleToggle})=>{
                 <Title>{title}</Title>
                 <Label value={{winning, color}}>
                     <FontAwesomeIcon icon={winning<0? faMinus:faPlus} size='xs' style={{marginRight:'2px'}}/>
-                    {winning}
+                    {Math.abs(winning)}
                 </Label>
             </Header>
             <StakeDetails ticket={ticket} value={value} />
