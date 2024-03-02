@@ -16,12 +16,13 @@ const DealsWrapper = () => {
     const [myDealActive, setMyDealsActive] = useState('')
     const [tabDirection, setTabDirection] = useState('general')
 
-    const { projects, loading, error } = useSelector(state => state.project)
+    const { projects, myProjects, loading, error } = useSelector(state => state.project)
 
     const user = JSON.parse(localStorage.getItem('user'))
     
     useEffect(()=>{
         dispatch(api.getProjects())
+        dispatch(api.getMyProjects())
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
 
@@ -46,7 +47,8 @@ const DealsWrapper = () => {
         setTabDirection('personal')
     }
 
-    const generalProjects = []
+    /*const generalProjects = []
+
     const myProjects = projects?.projects.filter(project => {
         let isContributor = project.contributors.find(contributor => contributor.userId === user._id)
         let isManager = user._id===project.punter._id
@@ -56,7 +58,7 @@ const DealsWrapper = () => {
         }else{
             generalProjects.push(project)
         }
-    })
+    })*/
 
     return (
         <Wrapper>
@@ -70,12 +72,12 @@ const DealsWrapper = () => {
                 <SearchDeals />
                 {loading?<Loading value={loading?'loading':''} />:<>
                     {tabDirection==='general'?
-                        generalProjects.map((project, index) => <DealAds key={index} idx={index} project={project} />):
-                        myProjects.map((project, index) => <DealAds key={index} idx={index} project={project} />)
+                        projects?.projects.map((project, index) => <DealAds key={index} idx={index} project={project} />):
+                        myProjects?.projects.map((project, index) => <DealAds key={index} idx={index} project={project} />)
                     }
                 </>}
             </List>
-            
+
             {user.role==='punter'&&<>
                 <FloatingButton title={'New Project'} isOpen={isOpen} handleButtonClick={handleModalOpen} />
                 <NewProject isOpen={isOpen} handleCloseModal={handleModalClose} />

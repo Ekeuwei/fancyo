@@ -65,6 +65,16 @@ const userSchema = new mongoose.Schema({
         stakeAlerts:{
             type: Boolean,
             default: false
+        },
+        getNotified: {
+            sms: {
+                type: Boolean,
+                default: false
+            },
+            email: {
+                type: Boolean,
+                default: false
+            },
         }
     },
     isActivated: {

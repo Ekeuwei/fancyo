@@ -26,6 +26,7 @@ router.route('/ticket/new').post(isAuthenticatedUser, /*authorizeRoles('admin', 
 router.route('/bookie/loadticket').get(isAuthenticatedUser, /*authorizeRoles('admin', 'punter'),*/ loadBookieTicket); 
 
 router.route('/projects').get(isAuthenticatedUser, getProjects); // more roles can be pass to the authorizeRole function like 'admin, editor, superAdmin...'
+router.route('/projects/me').get(isAuthenticatedUser, getProjects); // more roles can be pass to the authorizeRole function like 'admin, editor, superAdmin...'
 router.route('/project/:id').get(getSingleProject);
 router.route('/project/punter/:id').get(getProjectPunter);
 

@@ -30,7 +30,7 @@ const projectSchema = new mongoose.Schema({
     },
     contributors: [
         {
-            userId: { 
+            user: { 
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'User'
             },
@@ -47,7 +47,7 @@ const projectSchema = new mongoose.Schema({
     ],
     status: {
         type: String,
-        enum: ['pending', 'in progress', 'failed'],
+        enum: ['pending', 'in progress', 'successful', 'failed'],
         default: 'pending'
     },
     balanceBefore: {

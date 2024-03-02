@@ -32,7 +32,7 @@ const seedBanks = async () => {
 };
 
 const updateTickets = async ()=>{
-    const tickets = await Ticket.find({status: 'progress'})
+    const tickets = await Ticket.find({status: 'in progress'})
 
      // Step 2: Manipulate the documents
     const updatedTickets = tickets.map(async (ticket, idx) => {

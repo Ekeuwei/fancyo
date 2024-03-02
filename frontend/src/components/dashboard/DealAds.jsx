@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
 import { formatAmount, formatNumber } from "../../common/utils"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons"
+import { faCheck, faCheckCircle, faMinus, faPlus, faTimesCircle } from "@fortawesome/free-solid-svg-icons"
 
 const DealAds = ({project, idx}) => {
     const history = useHistory()
@@ -28,10 +28,10 @@ const DealAds = ({project, idx}) => {
     }
 
     const projectDuration = Math.ceil(Math.abs(new Date(project.endAt).getTime() - new Date(project.startAt).getTime())/(1000 * 60 * 60 * 24))
-    const title = `${project.eRoi}% in ${projectDuration} days`
+    const title = `${project.eRoi}% in ${projectDuration} day${projectDuration>1?'s':''}`
     const toStartIn = calculateCountdown(project.startAt)
     const toEndIn = calculateCountdown(project.endAt)
-    const projectStarted = toStartIn[0] <= 0;
+    const projectStarted = project.status==='in progress';
     const contributedAmount = project.contributors.reduce((total, contributor) => total + contributor.amount, 0)
 
     const profit = project.availableBalance - contributedAmount
@@ -42,15 +42,22 @@ const DealAds = ({project, idx}) => {
         <>
             <Wrapper onClick={handleOpenProject}>
                 <Timer>
-                    <Label>{projectStarted?'Ends':'Starts'} in</Label>
-                    <Time>{projectStarted? toEndIn.split(" ")[0]:toStartIn.split(" ")[0]}</Time>
-                    <TimeValue>{projectStarted? toEndIn.split(" ")[1]:toStartIn.split(" ")[1]}</TimeValue>
+                    {toEndIn.split(" ")[0]==0?
+                    <Completed>
+                        <FontAwesomeIcon icon={faTimesCircle}size="lg"/>
+                        <TimeValue>Ended</TimeValue>
+                    </Completed>:
+                    <>
+                        <Label>{projectStarted?'Ends':'Starts'} in</Label>
+                        <Time>{projectStarted? toEndIn.split(" ")[0]:toStartIn.split(" ")[0]}</Time>
+                        <TimeValue>{projectStarted? toEndIn.split(" ")[1]:toStartIn.split(" ")[1]}</TimeValue>
+                    </>}
                 </Timer>
                 <Details>
                     <Title>{title}</Title>
                     <InvestmentType>Sports Betting</InvestmentType>
                     <Author>Author: {project.punter.username}</Author>
-                    {projectStarted&&<Status>In progress</Status>}
+                    <Status>{project.status}</Status>
                     {/* <ProgressBar width={10} content={''}/> */}
                 </Details>
                 {!projectStarted?
@@ -133,8 +140,16 @@ const Status = styled.p`
     margin: 0;
     font-size: 10px;
     font-weight: 600;
+    text-transform: capitalize;
     font-style: italic;
 `
+const Completed = styled.div`
+    display: flex;
+    flex-direction: column;
+    row-gap: 5px;
+    justify-items: center;
+`
+
 const InvestmentType = styled(Label)`
     text-transform: capitalize;
     font-size: 12px;

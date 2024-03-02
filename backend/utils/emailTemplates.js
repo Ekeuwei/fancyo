@@ -39,6 +39,201 @@ exports.activationEmailTemplate = (token, type)=>`
 </html>
 `
 
+exports.projectSuccessNotificationEmailTemplateUser = (details)=>`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Project Completion and Returns Notification</title>
+  <style>
+    /* Basic styling for the email */
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .button {
+      display: inline-block;
+      background-color: #007bff;
+      color: #fff;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p>Dear ${details.username},</p>
+    <p>We are excited to share that Project ${details.projectId} has successfully concluded. Here are the details of your returns:</p>
+    <ul>
+      <li>Contribution Amount: [${details.contributedAmount}]</li>
+      <li>Returns : [${details.profit}]</li>
+      <li>Total Credited to Wallet: [${(details.profit + details.contributedAmount)}]</li>
+    </ul>
+    <p>Thank you for your valuable contribution to this project. If you have any questions or need further assistance, please don't hesitate to reach out.</p>
+    <p>Best regards,</p>
+    <p>The ${process.env.APP_NAME} Team</p>
+  </div>
+</body>
+</html>
+`
+
+exports.projectSuccessNotificationEmailTemplatePunter = (details)=>`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Project Completion and Punter Commission Notification</title>
+  <style>
+    /* Basic styling for the email */
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .button {
+      display: inline-block;
+      background-color: #007bff;
+      color: #fff;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p>Dear ${details.username},</p>
+    <p>We are pleased to inform you that Project ${details.projectId} has been successfully completed.</p>
+    
+    <p>Project Summary:</p>
+    <ul>
+      <li>Project Unique ID: ${details.projectId}</li>
+      <li>Total Contribution Amount: ${details.contributedAmount}</li>
+      <li>Project Returns: ${details.profit}</li>
+      <li>Punter Commission: [${details.commission}]</li>
+    </ul>
+
+    <p>Your Wallet Has Been Credited:</p>
+    <ul>
+      <li>Credited Amount: ${details.commission}</li>
+      <li>New Wallet Balance: ${details.walletBalance}</li>
+    </ul>
+    <p>Thank you for choosing us for your projects. If you have any questions or require further assistance, please contact our support team.</p>
+    <p>Best regards,</p>
+    <p>The ${process.env.APP_NAME} Team</p>
+  </div>
+</body>
+</html>
+`
+
+exports.projectFailureNotificationEmailTemplateUser = (details)=>`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Project Completion and Returns Notification</title>
+  <style>
+    /* Basic styling for the email */
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .button {
+      display: inline-block;
+      background-color: #007bff;
+      color: #fff;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p>Dear ${details.username},</p>
+    <p>We regret to inform you that Project ${details.projectId} did not yield any profit, and there was a loss in the project. Here are the details:</p>
+    <ul>
+      <li>Contribution Amount: ${details.contributedAmount}</li>
+      <li>Loss Incurred: ${Math.abs(details.profit)}</li>
+      <li>Total Amount Returned: ${(details.profit + details.contributedAmount) <= 1? 0: (details.contributedAmount + details.profit)}</li>
+    </ul>
+    <p>We understand that this outcome may be disappointing. If you have any questions or concerns, please don't hesitate to reach out. We appreciate your participation in this project.</p>
+    <p>Best regards,</p>
+    <p>The ${process.env.APP_NAME} Team</p>
+  </div>
+</body>
+</html>
+`
+
+exports.projectFailureNotificationEmailTemplatePunter = (details)=>`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Project Completion and Returns Notification</title>
+  <style>
+    /* Basic styling for the email */
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .button {
+      display: inline-block;
+      background-color: #007bff;
+      color: #fff;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p>Dear ${details.username},</p>
+
+    <p>We want to inform you that Project ${details.projectId} has concluded, but unfortunately, there was no profit generated. As a result, no punter commission is applicable for this project.</p>
+   
+    <p>If you have any questions or need further clarification, please feel free to contact us. We appreciate your involvement in this project.</p>
+    
+    <p>Best regards,</p>
+    <p>The ${process.env.APP_NAME} Team</p>
+  </div>
+</body>
+</html>
+`
+
 exports.activationEmailTemplate2 = (url, firstName)=>`
 <!DOCTYPE html>
 <html>

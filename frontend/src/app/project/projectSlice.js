@@ -23,6 +23,19 @@ const projectSlice = createSlice({
             state.error = action.payload;
         },
         
+        getMyProjectsStart: state => {
+            state.loading = true;
+            state.error = null;
+        },
+        getMyProjectsSuccess: (state, action) => {
+            state.myProjects = action.payload;
+            state.loading = false;
+        },
+        getMyProjectsFailure: (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        },
+        
         // Create New Project 
         createProjectStart: state => {
             state.loading = true;
@@ -110,6 +123,9 @@ export const {
     getProjectsStart,
     getProjectsSuccess,
     getProjectsFailure,
+    getMyProjectsStart,
+    getMyProjectsSuccess,
+    getMyProjectsFailure,
     getProjectDetailsStart,
     getProjectDetailsSuccess,
     getProjectDetailsFailure,

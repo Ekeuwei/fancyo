@@ -3,7 +3,9 @@ const Ticket = require('../models/ticket');
 const Project = require('../models/project');
 const User = require('../models/user');
 const { creditWallet } = require('../controllers/paymentController');
-const logger = require('../config/logger')
+const logger = require('../config/logger');
+const { ProjectCompletionNotification } = require('./notifications');
+const Wallet = require('../models/wallet');
 
 exports.getTicketStatus = async (ticket)=> {
 
@@ -70,7 +72,7 @@ exports.updateTicketProgress_ = async ()=>{
 
 exports.updateTicketProgress = async () => {
   try {
-    const tickets = await Ticket.find({ status: 'progress' });
+    const tickets = await Ticket.find({ status: 'in progress' });
 
     const updatedTickets = await Promise.all(tickets.map(async (ticket, idx) => {
       // Get updated ticket status
@@ -109,14 +111,15 @@ exports.updateProjectProgress = async () => {
   const currentDate = new Date();
 
   try {
-    const projects = await Project.find({ endAt: { $lte: currentDate }, status: 'in progress' });
-    const pendingProjects = await Project.find({ startAt: { $lte: currentDate }, status: 'pending' });
+    const projects = await Project.find({ endAt: { $lte: currentDate }, status: 'in progress' })
+                          .populate('punter', 'username')
+                          .populate('contributors.user', 'username');
 
     const updatedRunningProjects = await Promise.all(projects.map(async (project) => {
       let tickets = await Ticket.find({ projectId: project._id });
-      const isProjectInprogress = tickets.some(ticket => ticket.status === 'in progress');
+      const isTicketInprogress = tickets.some(ticket => ticket.status === 'in progress');
 
-      if (!isProjectInprogress) {
+      if (!isTicketInprogress) {
         const contributedAmount = project.contributors.reduce((amount, contributor) => amount + contributor.amount, 0);
         const projectCurrentBalance = tickets.reduce((prev, ticket) => {
           const totalOdds = ticket.games.reduce((odds, game) => odds * game.odds, 1);
@@ -125,25 +128,56 @@ exports.updateProjectProgress = async () => {
         }, contributedAmount);
 
         const profit = projectCurrentBalance - contributedAmount;
-        const platformCommission = profit * 0.05; // 5%
-        const punterCommission = profit * 0.2; // 20%
+        project.status = profit>0?'successful':'failed'
+
+        const platformCommission = project.status==='successful'? profit * 0.05 : 0; // 5%
+        const punterCommission = project.status==='successful'? profit * 0.2 : 0; // 20%
         const contributorsCommission = profit - platformCommission - punterCommission;
+
 
         // Settle contributors
         await Promise.all(project.contributors.map(async (contributor) => {
-          if (contributor.status !== 'settled') {
+          if (contributor.status === 'pending') {
             const investmentQuota = contributor.amount / contributedAmount;
             const contributorProfit = contributorsCommission * investmentQuota;
-            contributor.status = 'settled';
+
+            if(contributorProfit > 0){
+              // At least 1 NGN remaining
+              contributor.status = 'settled';
+              await creditWallet((contributorProfit + contributor.amount), `Investment capital and returns. Project: ${project.uniqueId}`, contributor.user._id);
+              // Send notification to contributor 
+
+            }else{
+              contributor.status = 'failed';
+            }
+
+            // Send notification contributor
+            ProjectCompletionNotification({
+              username: contributor.user.username,
+              userId: contributor.user._id,
+              projectId: project._id,
+              contributedAmount: contributor.amount,
+              profit: contributorProfit,
+            })
+
             await project.save();
-            await creditWallet((contributorProfit + contributor.amount), `Investment capital and returns. Project: ${project.uniqueId}`, contributor.userId);
-            // TODO: Send notifications to user.
           }
         }));
 
         // Settle punter
-        const punter = await User.findById(project.punter._id);
-        await creditWallet(punterCommission, `Punter settlement. Project: ${project.uniqueId}`, project.punter._id);
+        await creditWallet(punterCommission, `Project commission. Project: ${project.uniqueId}`, project.punter._id);
+        const wallet = await Wallet.findOne({userId: project.punter._id});
+
+        // Send notification punter
+        ProjectCompletionNotification({
+          username: project.punter.username,
+          userId: project.punter._id,
+          projectId: project._id,
+          commission: punterCommission,
+          profit,
+          contributedAmount,
+          walletBalance: wallet.balance,
+        })
 
         // Settle platform
         // await creditWallet(platformCommission, `Platform commission settlement. Project: ${project.uniqueId}`, 'platform purse');
@@ -152,6 +186,7 @@ exports.updateProjectProgress = async () => {
       return project.save();
     }));
 
+    const pendingProjects = await Project.find({ startAt: { $lte: currentDate }, status: 'pending' });
     const updatedPendingProjects = await Promise.all(pendingProjects.map(async (project) => {
       project.status = 'in progress';
       return project.save();

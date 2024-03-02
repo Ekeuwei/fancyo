@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Button, FormControlWrapper, HomeStyle, Input, InputLabel, InputWrapper, Loading } from "../../theme/ThemeStyle"
+import { Button, FormControlWrapper, HomeStyle, Input, InputLabel, InputWrapper, Loading, SubtleLabel } from "../../theme/ThemeStyle"
 import styled from 'styled-components'
 import TokenInput from "./layout/TokenInput"
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
@@ -121,14 +121,17 @@ const Register = () => {
                                 <InputLabel value={confirmPassword}>Confirm Password</InputLabel>
                                 <Input 
                                     placeholder="Confirm Password" 
+                                    invalid={confirmPassword.length > 0 && !isSamePassword}
                                     label={confirmPassword} 
                                     value={confirmPassword}
                                     valid={confirmPassword.length > 0 && !isSamePassword?"no":""}
                                     type="password"
                                     onChange={(e)=>setConfirmPassword(e.target.value)}/>
+                                    {confirmPassword.length > 0 && !isSamePassword&&
+                                    <SubtleLabel value="error">Password does not match</SubtleLabel>}
                             </InputWrapper>
                             <TermsAndCond>I agree with the Terms & Conditions</TermsAndCond>
-                            <Button type="submit" disabled={loading}> <Loading value={loading}/> Register</Button>
+                            <Button type="submit" disabled={loading || !isSamePassword}> <Loading value={loading}/> Register</Button>
                         </form>}
                         
                         <RedirectAccess onClick={()=>history.push('/login')}>Already have an account?

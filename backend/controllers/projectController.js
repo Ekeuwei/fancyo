@@ -86,9 +86,40 @@ exports.contribute = catchAsyncErrors(async (req, res, next)=>{
 exports.getProjects = catchAsyncErrors(async (req, res, next) => {
 
     const resPerPage = 10;
-    const projectsCount = await Project.countDocuments();
+    const projectsCount = await Project.countDocuments({ status: 'in progress' });
 
-    const apiFeatures = new APIFeatures(Project.find().populate('punter', 'username', User), req.query)
+    const apiFeatures = new APIFeatures(Project.find({ status: 'in progress' }).populate('punter', 'username', User), req.query)
+                        .search()
+                        .filter()
+    
+    let projects = apiFeatures.query;
+    let filteredProjectsCount = projects.length
+
+    apiFeatures.pagination(resPerPage)
+    projects = await apiFeatures.query;
+
+    res.status(200).json({
+        success: true,
+        projectsCount,
+        resPerPage,
+        filteredProjectsCount,
+        projects
+    });
+});
+
+// Get all projects => /api/v1/projects/me?keyword=sports
+exports.getMyProjects = catchAsyncErrors(async (req, res, next) => {
+
+    const resPerPage = 10;
+    const searchQuery = {
+        $or: [ 
+            { 'contributors.userId': req.user._id }, 
+            { punter: req.user._id } 
+        ]
+    }
+    const projectsCount = await Project.countDocuments(searchQuery);
+
+    const apiFeatures = new APIFeatures(Project.find(searchQuery).populate('punter', 'username', User), req.query)
                         .search()
                         .filter()
     

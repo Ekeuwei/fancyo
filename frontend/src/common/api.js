@@ -64,6 +64,9 @@ import {
     getProjectsStart,
     getProjectsSuccess,
     getProjectsFailure,
+    getMyProjectsStart,
+    getMyProjectsSuccess,
+    getMyProjectsFailure,
     getProjectDetailsStart,
     getProjectDetailsSuccess,
     getProjectDetailsFailure,
@@ -436,6 +439,21 @@ export const api = {
         } catch (error) {
 
             dispatch(getProjectsFailure(error.response.data.message))
+        }
+    },
+    
+    // Get My Projects 
+    getMyProjects: () => async (dispatch) =>{
+        try {
+            dispatch(getMyProjectsStart())
+
+            const { data } = await instance.get(`/api/v1/projects/me`)
+            
+            dispatch(getMyProjectsSuccess(data))
+
+        } catch (error) {
+
+            dispatch(getMyProjectsFailure(error.response.data.message))
         }
     },
     
