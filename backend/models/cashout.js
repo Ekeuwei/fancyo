@@ -44,6 +44,9 @@ cashoutSchema.pre('save', async function(){
     if (!this.uniqueId) {
         this.uniqueId = await this.constructor.generateNextId();
     }
+    if(this.amount && typeof this.amount==='string'){
+        this.amount = parseFloat(this.amount.replace(/[^\d.]/g, ''))
+    }
 })
 
 cashoutSchema.statics.generateNextId = async function () {

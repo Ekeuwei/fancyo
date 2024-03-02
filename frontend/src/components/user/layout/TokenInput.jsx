@@ -59,7 +59,7 @@ const TokenInput = ({loginId, token, tokenExpires, setToken})=>{
                     <TokenValueInput
                         key={index}
                         id={`box-${index}`}
-                        type="text"
+                        type="number"
                         maxLength="1"
                         autoComplete='off'
                         value={value}

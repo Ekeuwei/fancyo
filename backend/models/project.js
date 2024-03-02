@@ -72,6 +72,20 @@ projectSchema.pre('save', async function(){
     if (!this.uniqueId) {
         this.uniqueId = await this.constructor.generateNextId();
     }
+
+    ['budget', 'eRoi', 'availableBalance', 'roi'].forEach(field =>{
+        if(this[field] && typeof this[field]==='string'){
+            this[field] = parseFloat(this[field].replace(/[^\d.]/g, ''))
+        }
+    })
+    
+    if(this.contributors && Array.isArray(this.contributors)){
+        this.contributors.forEach(contributor =>{
+            if(contributor.amount && typeof contributor.amount==='string'){
+                contributor.amount = parseFloat(contributor.amount.replace(/[^\d.]/g, ''))
+            }
+        })
+    }
 })
 
 projectSchema.statics.generateNextId = async function () {

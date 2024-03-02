@@ -61,6 +61,10 @@ ticketSchema.pre('save', async function(){
     if (!this.uniqueId) {
         this.uniqueId = await this.constructor.generateNextId();
     }
+
+    if(this.stakeAmount && typeof this.stakeAmount==='string'){
+        this.stakeAmount = parseFloat(this.stakeAmount.replace(/[^\d.]/g, ''))
+    }
 })
 
 

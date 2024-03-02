@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
 import { formatAmount, formatNumber } from "../../common/utils"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCheck, faCheckCircle, faMinus, faPlus, faTimesCircle } from "@fortawesome/free-solid-svg-icons"
+import { faMinus, faPlus, faTimesCircle } from "@fortawesome/free-solid-svg-icons"
 
 const DealAds = ({project, idx}) => {
     const history = useHistory()
