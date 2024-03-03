@@ -120,6 +120,7 @@ exports.updateProjectProgress = async () => {
       const isTicketInprogress = tickets.some(ticket => ticket.status === 'in progress');
 
       if (!isTicketInprogress) {
+
         const contributedAmount = project.contributors.reduce((amount, contributor) => amount + contributor.amount, 0);
         
         if(contributedAmount == 0){
@@ -130,32 +131,30 @@ exports.updateProjectProgress = async () => {
 
         const projectCurrentBalance = tickets.reduce((prev, ticket) => {
           const totalOdds = ticket.games.reduce((odds, game) => odds * game.odds, 1);
-          const outcome = ticket.status === 'success' ? (ticket.stakeAmount * totalOdds - ticket.stakeAmount) : -ticket.stakeAmount;
+          const outcome = ticket.status === 'successful' ? (ticket.stakeAmount * totalOdds - ticket.stakeAmount) : -ticket.stakeAmount;
           return prev + outcome;
         }, contributedAmount);
 
         const profit = projectCurrentBalance - contributedAmount;
         project.status = profit>0?'successful':'failed'
-
+        
         const platformCommission = project.status==='successful'? profit * 0.05 : 0; // 5%
         const punterCommission = project.status==='successful'? profit * 0.2 : 0; // 20%
         const contributorsCommission = profit - platformCommission - punterCommission;
-
-
+        
         // Settle contributors
         await Promise.all(project.contributors.map(async (contributor) => {
           if (contributor.status === 'pending') {
             const investmentQuota = contributor.amount / contributedAmount;
             const contributorProfit = contributorsCommission * investmentQuota;
-
-            if(contributorProfit > 0){
+            
+            if(projectCurrentBalance >= 1){
               // At least 1 NGN remaining
-              contributor.status = 'settled';
               await creditWallet((contributorProfit + contributor.amount), `Investment capital and returns. Project: ${project.uniqueId}`, contributor.user._id);
-              // Send notification to contributor 
+              contributor.status = 'settled';
 
             }else{
-              contributor.status = 'failed';
+              contributor.status = 'lost';
             }
 
             // Send notification contributor
@@ -170,12 +169,12 @@ exports.updateProjectProgress = async () => {
             await project.save();
           }
         }));
-
+        
         // Settle punter
         await creditWallet(punterCommission, `Project commission. Project: ${project.uniqueId}`, project.punter._id);
         const wallet = await Wallet.findOne({userId: project.punter._id});
 
-        // Send notification punter
+        // Send notification to punter
         ProjectCompletionNotification({
           username: project.punter.username,
           userId: project.punter._id,
@@ -193,6 +192,7 @@ exports.updateProjectProgress = async () => {
       return project.save();
     }));
 
+    // Update pending projects to 'in progress' when startAt is reached
     const pendingProjects = await Project.find({ startAt: { $lte: currentDate }, status: 'pending' });
     const updatedPendingProjects = await Promise.all(pendingProjects.map(async (project) => {
       project.status = 'in progress';

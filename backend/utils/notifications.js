@@ -16,8 +16,8 @@ exports.ProjectCompletionNotification = async (details)=>{
     const punterText = isRoi? successTextPunter:failureTextPunter
     const contributorText = isRoi? successTextContributor:failureTextContributor
 
-    const punterEmailBody = isRoi? projectSuccessNotificationEmailTemplatePunter():projectFailureNotificationEmailTemplatePunter()
-    const userEmailBody = isRoi? projectSuccessNotificationEmailTemplateUser():projectFailureNotificationEmailTemplateUser()
+    const punterEmailBody = isRoi? projectSuccessNotificationEmailTemplatePunter(details):projectFailureNotificationEmailTemplatePunter(details)
+    const userEmailBody = isRoi? projectSuccessNotificationEmailTemplateUser(details):projectFailureNotificationEmailTemplateUser(details)
     // username
     // projectId
     // profit
@@ -44,11 +44,11 @@ exports.ProjectCompletionNotification = async (details)=>{
 
     const user = await User.findById(details.userId)
     if(user.role === 'punter'){
-        if(user.getNotified.sms){
+        if(user.preferences.getNotified.sms){
             sendSMS(punterText)
         }
 
-        if(user.getNotified.email){
+        if(user.preferences.getNotified.email){
             // send email
             sendEmail({
                 email: user.email,
@@ -58,11 +58,11 @@ exports.ProjectCompletionNotification = async (details)=>{
         }
     }
     else {
-        if(user.getNotified.sms){
+        if(user.preferences.getNotified.sms){
             sendSMS(contributorText)
         }
 
-        if(user.getNotified.email){
+        if(user.preferences.getNotified.email){
             // send email
             sendEmail({
                 email: user.email,

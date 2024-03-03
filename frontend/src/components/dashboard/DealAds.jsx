@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
 import { formatAmount, formatNumber, setAlpha } from "../../common/utils"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCheck, faMinus, faPlus, faTimesCircle } from "@fortawesome/free-solid-svg-icons"
+import { faCheckCircle, faMinus, faPlus, faTimesCircle } from "@fortawesome/free-solid-svg-icons"
 
 const DealAds = ({project, idx}) => {
     const history = useHistory()
@@ -44,10 +44,10 @@ const DealAds = ({project, idx}) => {
                 <Timer color={project.status==='successful'?'success':project.status==='failed'?'error':''}>
                     {toEndIn.split(" ")[0]==0?
                     <Completed>
-                        {['successfu', 'failed'].includes(project.status)?
+                        {['successful', 'failed'].includes(project.status)?
                         <StatusIcon 
                             color={project.status==='successful'?'success':'error'} 
-                            icon={project.satus==='successful'?faCheck:faTimesCircle}
+                            icon={project.status==='successful'? faCheckCircle:faTimesCircle}
                             size="2x"/>:
                         <Ended>Ended</Ended>}
                     </Completed>:
