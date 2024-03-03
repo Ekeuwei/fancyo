@@ -18,29 +18,6 @@ exports.ProjectCompletionNotification = async (details)=>{
 
     const punterEmailBody = isRoi? projectSuccessNotificationEmailTemplatePunter(details):projectFailureNotificationEmailTemplatePunter(details)
     const userEmailBody = isRoi? projectSuccessNotificationEmailTemplateUser(details):projectFailureNotificationEmailTemplateUser(details)
-    // username
-    // projectId
-    // profit
-    // contributedAmount
-    // amountReturned = profit + contributedAmount
-
-    // username
-    // projectId
-    // profit
-    // totalContributions
-    // commission
-    // amountCredited = commission
-    // walletBalance
-
-    // username
-    // projectId
-    // profit
-    // contributedAmount
-    // totalAmountReturned = profit + contributedAmount
-
-    // username
-    // projectId
-
 
     const user = await User.findById(details.userId)
     if(user.role === 'punter'){

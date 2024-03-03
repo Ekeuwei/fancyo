@@ -15,12 +15,18 @@ const Settings = () => {
     const user = JSON.parse(localStorage.getItem('user'))
     const dispatch = useDispatch()
     const history = useHistory();
-    const [stakeAlerts, setStakeAlerts] = useState(user.preferences.stakeAlerts);
+    const [preferences, setPreferences] = useState(user.preferences)
     
-    const handleToggle = () => {
-        let newStakeAlerts = !stakeAlerts
-        setStakeAlerts(newStakeAlerts)
-        dispatch(api.updateProfile({preferences:{stakeAlerts:newStakeAlerts}}))
+    const handleToggle = (name) => {
+        let newStakeAlerts = !preferences.getNotified[name]
+        setPreferences(prevPreference => ({
+            ...prevPreference, 
+                getNotified:{
+                    ...prevPreference.getNotified, 
+                    [name]: newStakeAlerts
+                }
+            }))
+        dispatch(api.updateProfile({preferences}))
     }
 
   return (
@@ -34,8 +40,12 @@ const Settings = () => {
         </Option>
         <SettingsSubHeading title={"Notification"} />
         <Option>
-            <Text>Stake Alert</Text>
-            <ToggleButton isChecked={stakeAlerts} handleToggle={handleToggle}/>
+            <Text>Email Notification</Text>
+            <ToggleButton value='email' isChecked={preferences.getNotified.email} handleToggle={()=>handleToggle('email')}/>
+        </Option>
+        <Option>
+            <Text>SMS Notification</Text>
+            <ToggleButton value='sms' isChecked={preferences.getNotified.sms} handleToggle={()=>handleToggle('sms')}/>
         </Option>
         <SettingsSubHeading title={"Security & Safety"} />
         <UpdatePassword />
