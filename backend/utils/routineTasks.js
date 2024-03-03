@@ -121,6 +121,13 @@ exports.updateProjectProgress = async () => {
 
       if (!isTicketInprogress) {
         const contributedAmount = project.contributors.reduce((amount, contributor) => amount + contributor.amount, 0);
+        
+        if(contributedAmount == 0){
+          // no one contributed to this project
+          project.status = 'no engagement'
+          return project.save()
+        }
+
         const projectCurrentBalance = tickets.reduce((prev, ticket) => {
           const totalOdds = ticket.games.reduce((odds, game) => odds * game.odds, 1);
           const outcome = ticket.status === 'success' ? (ticket.stakeAmount * totalOdds - ticket.stakeAmount) : -ticket.stakeAmount;

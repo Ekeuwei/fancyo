@@ -41,3 +41,41 @@ export const calculateTimeLeft = (targetDate) => {
     return formattedTime;
   }
 };
+
+export const setAlpha = (color, alpha)=> {
+    let rgb;
+
+  // If the input is in hexadecimal format, convert it to RGB
+  if (color.startsWith('#')) {
+    rgb = hexToRgb(color);
+  } else if (color.startsWith('rgba')) {
+    // If the input is already in RGBA format
+    const match = color.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/);
+    if (match) {
+      rgb = { r: parseInt(match[1]), g: parseInt(match[2]), b: parseInt(match[3]) };
+    }
+  } else if (color.startsWith('rgb')) {
+    // If the input is in RGB format
+    const match = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (match) {
+      rgb = { r: parseInt(match[1]), g: parseInt(match[2]), b: parseInt(match[3]) };
+    }
+  }
+
+  if (rgb) {
+    // Return the RGBA value with the specified alpha
+    return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+  }
+
+  // If the input is not recognized, return null or handle accordingly
+  return null;
+}
+
+const hexToRgb = (hex)=> {
+  hex = hex.replace(/^#/, '');
+  const bigint = parseInt(hex, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return { r, g, b };
+}

@@ -6,7 +6,7 @@ import { faCopy } from "@fortawesome/free-regular-svg-icons"
 import { useDispatch, useSelector } from "react-redux"
 import { api } from "../../../common/api"
 import { clearLink, clearUserErrors, createUserError } from "../../../app/user/userSlice"
-import { formatAmount } from "../../../common/utils"
+import { formatAmount, formatNumber } from "../../../common/utils"
 import NavHeader from "../layout/NavHeader"
 
 const FundWallet = () => {
@@ -17,7 +17,8 @@ const FundWallet = () => {
   const { error } = useSelector(state => state.user)
 
   const handleAmount = (e)=> {
-    setAmount(e.target.value)
+    console.log(e.target.value);
+    setAmount(e.target.value <1? '' : formatNumber(e.target.value))
     dispatch(clearUserErrors())
   }
   
@@ -81,8 +82,8 @@ const FundWallet = () => {
             <InputLabel value={amount} >Amount</InputLabel>
             <Input 
               label={amount} 
-              type="number" 
               value={amount} 
+              type="text"
               onChange={handleAmount} 
               placeholder="Enter amount"/>
           </InputWrapper>

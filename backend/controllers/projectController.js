@@ -45,8 +45,8 @@ exports.contribute = catchAsyncErrors(async (req, res, next)=>{
         if(!project){
             return next(new ErrorHandler("Project Not Found"))
         }
-        
-        const contributorIndex = project.contributors.findIndex(contributor => contributor.userId.equals(req.user._id))
+
+        const contributorIndex = project.contributors.findIndex(contributor => contributor.user.equals(req.user._id))
         const projectStarted = new Date() > new Date(project.startAt)
 
         if(projectStarted){
@@ -57,7 +57,7 @@ exports.contribute = catchAsyncErrors(async (req, res, next)=>{
         
         if(contributorIndex === -1){
             project.contributors.push({
-                userId: req.user._id,
+                user: req.user._id,
                 amount
             })
         }else{
@@ -86,9 +86,9 @@ exports.contribute = catchAsyncErrors(async (req, res, next)=>{
 exports.getProjects = catchAsyncErrors(async (req, res, next) => {
 
     const resPerPage = 10;
-    const projectsCount = await Project.countDocuments({ status: 'in progress' });
+    const projectsCount = await Project.countDocuments({ status: 'pending' });
 
-    const apiFeatures = new APIFeatures(Project.find({ status: 'in progress' }).populate('punter', 'username', User), req.query)
+    const apiFeatures = new APIFeatures(Project.find({ status: 'pending' }).populate('punter', 'username', User), req.query)
                         .search()
                         .filter()
     

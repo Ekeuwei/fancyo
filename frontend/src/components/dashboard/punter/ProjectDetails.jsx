@@ -17,6 +17,7 @@ const ProjectDetails = ({match}) => {
     const handleModalClose = ()=> setOpen("closed")
 
     const { projectDetails, loading, error } = useSelector(state => state.project)
+    const user = JSON.parse(localStorage.user)
 
     useEffect(()=>{
       // Get project, get tickets
@@ -32,15 +33,15 @@ const ProjectDetails = ({match}) => {
 
     const projectDuration = Math.ceil(Math.abs(new Date(projectDetails?.project.endAt).getTime() - new Date(projectDetails?.project.startAt).getTime())/(1000 * 60 * 60 * 24))
     const title = projectDetails?`Project ${projectDetails.project.uniqueId} | ${projectDetails.project.eRoi}% in ${projectDuration} days`:'Project'
+    const canCreateTicket = projectDetails?.project.punter._id===user._id && projectDetails?.project.status==='in progress'
 
-    const user = JSON.parse(localStorage.user)
     return (
       <Wrapper>
           <NavHeader title={title}/>
           <BodyWrapper>
             {loading &&isOpen==="closed"?<Loading value={loading?'loading':''} />:<>
               {projectDetails&& <ContentDetailsList project={projectDetails.project} title={title}/>}
-              {user.role==='punter'&& <Btn onClick={handleModalOpen}>+ Add Ticket</Btn>}
+              {canCreateTicket&& <Btn onClick={handleModalOpen}>+ Add Ticket</Btn>}
               {projectDetails?.tickets.length > 0 && <Stakes tickets={projectDetails.tickets} />}
               <NewTicket isOpen={isOpen} handleModalClose={handleModalClose} projectId={projectDetails?.project._id} />
             </>}

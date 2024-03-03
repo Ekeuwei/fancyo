@@ -47,7 +47,7 @@ const projectSchema = new mongoose.Schema({
     ],
     status: {
         type: String,
-        enum: ['pending', 'in progress', 'successful', 'failed'],
+        enum: ['pending', 'in progress', 'successful', 'failed', 'no engagement'],
         default: 'pending'
     },
     balanceBefore: {
@@ -79,13 +79,6 @@ projectSchema.pre('save', async function(){
         }
     })
     
-    if(this.contributors && Array.isArray(this.contributors)){
-        this.contributors.forEach(contributor =>{
-            if(contributor.amount && typeof contributor.amount==='string'){
-                contributor.amount = parseFloat(contributor.amount.replace(/[^\d.]/g, ''))
-            }
-        })
-    }
 })
 
 projectSchema.statics.generateNextId = async function () {

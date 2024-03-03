@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { api } from '../../../../common/api'
 import { createToast } from '../../../../app/user/userSlice'
 import { clearAuthError } from '../../../../app/auth/authSlice'
+import PassworVisibilityIcon from '../../../user/layout/PassworVisibilityIcon'
 
 const UpdatePassword = () => {
   const dispatch = useDispatch()
@@ -22,6 +23,7 @@ const UpdatePassword = () => {
   const [emptyFields, setEmptyFields] = useState([])
   const [isSamePassword, setSamePassword] = useState(false)
   const { loading, error, message } = useSelector(state => state.auth)
+  const [showPassword, setShowPassword] = useState(false)
   
   const onChange = (e)=> setData(prevData => ({...prevData, [e.target.name]:e.target.value}))
   
@@ -83,8 +85,9 @@ const UpdatePassword = () => {
                   value={data.oldPassword} 
                   placeholder='Old Password' 
                   name="oldPassword"
-                  type='password'
+                  type={showPassword?'text':'password'}
                   onChange={onChange}/>
+                  <PassworVisibilityIcon showPassword={showPassword} setShowPassword={setShowPassword}/>
             </InputWrapper>
             <InputWrapper value={emptyFields.includes('password')?"error":""}>
                 <InputLabel value={data.password}>New Password</InputLabel>
@@ -94,7 +97,7 @@ const UpdatePassword = () => {
                   value={data.password} 
                   placeholder='New Password' 
                   name="password"
-                  type='password'
+                  type={showPassword?'text':'password'}
                   onChange={onChange}/>
             </InputWrapper>
             <InputWrapper value={emptyFields.includes('confirmPassword')?"error":""}>
@@ -105,12 +108,12 @@ const UpdatePassword = () => {
                   value={data.confirmPassword} 
                   placeholder='Confirm Password' 
                   name="confirmPassword"
-                  type='password'
+                  type={showPassword?'text':'password'}
                   onChange={onChange}/>
 
                 {emptyFields.includes('confirmPassword')||(data.confirmPassword.length > 0 && !isSamePassword)&&
                   <SubtleLabel value="error">Password does not match</SubtleLabel>}
-                  
+
             </InputWrapper>
 
             <Button type='submit'>Update <Loading value={loading}/></Button>

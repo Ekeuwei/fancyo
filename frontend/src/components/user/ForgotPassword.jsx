@@ -7,6 +7,7 @@ import { api } from "../../common/api"
 import Logo from "../dashboard/layout/Logo"
 import { clearAuthError } from "../../app/auth/authSlice"
 import styled from "styled-components"
+import PassworVisibilityIcon from "./layout/PassworVisibilityIcon"
 
 const ForgotPassword = () => {
     const history = useHistory()
@@ -17,6 +18,7 @@ const ForgotPassword = () => {
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [isSamePassword, setSamePassword] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
     
     const { isAuthenticated, message, isValidToken, tokenExpires, passwordReset, loading, error } = useSelector(state => state.auth)
     const redirect = location.search ? location.search.split('=')[1] : '/dashboard';
@@ -95,8 +97,9 @@ const ForgotPassword = () => {
                                     placeholder="New Password" 
                                     label={password} 
                                     value={password}
-                                    type="password"
+                                    type={showPassword?'text':'password'}
                                     onChange={e => setPassword(e.target.value)}/>
+                                <PassworVisibilityIcon showPassword={showPassword} setShowPassword={setShowPassword}/>
                             </InputWrapper>
                             <InputWrapper value="shake">
                                 <InputLabel value={confirmPassword}>Confirm Password</InputLabel>
@@ -105,7 +108,7 @@ const ForgotPassword = () => {
                                     label={confirmPassword} 
                                     value={confirmPassword}
                                     invalid={confirmPassword.length > 0 && !isSamePassword?"error":""}
-                                    type="password"
+                                    type={showPassword?'text':'password'}
                                     onChange={(e)=>setConfirmPassword(e.target.value)}/>
 
                                 {confirmPassword.length > 0 && !isSamePassword&&

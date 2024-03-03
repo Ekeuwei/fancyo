@@ -39,6 +39,10 @@ const ContentDetailsList = ({project, title}) => {
                 <Label>{'Available Balance'}</Label>
                 <Details>{formatAmountFraction(project.availableBalance)}</Details>
             </Item>
+            <Item>
+                <Label>{'Project Status'}</Label>
+                <Details>{project.status.toUpperCase()}</Details>
+            </Item>
         </Content>
     )
 }
@@ -64,12 +68,15 @@ const Item = styled.div`
 const Label = styled.p`
     color: ${({theme})=>theme.colors.dark2};
     font-size: 12px;
+    text-transform: uppercase;
+    margin: 10px 0;
 
 `
-const Details = styled(Label)`
+const Details = styled.p`
     color: ${({theme})=>theme.colors.text};
-    font-size: 14px;
-    margin-top: 0;
+    font-size: 16px;
+    line-height: 1.3;
+    margin: 0 0 10px;
 `
 
 export default ContentDetailsList

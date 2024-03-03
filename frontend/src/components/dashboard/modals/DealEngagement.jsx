@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 import { Button, Input, Loading, Shake, slideIn, slideOut } from '../../../theme/ThemeStyle'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import NavHeader from '../layout/NavHeader'
 import ContentDetailsList from '../layout/ContentDetailsList'
 import ModalContainter from './ModalContainter'
@@ -9,14 +9,16 @@ import { useDispatch, useSelector } from 'react-redux'
 import { api } from '../../../common/api'
 import { clearProjectErrors } from '../../../app/project/projectSlice'
 import { formatAmount, formatAmountFraction, formatNumber, formatNumberToFloat } from '../../../common/utils'
+import Disclaimer from './Disclaimer'
 
 const DealEngagement = ({isOpen, handleModalClose, project, title, idx}) => {
     const dispatch = useDispatch()
-    const [nextPage, setNextPage] = useState("")
     const [fieldErrors, setFieldErrors] = useState('')
     const [hasAcknowledgedTerms, setHasAcknowledgedTerms] = useState(false)
     const [amount, setAmount] = useState('')
     const [sufficientFunds, setSufficientFunds] = useState(true)
+
+    const modalRef = useRef(null);
 
     const handleAmountInput = (e)=>{
         setAmount(e.target.value==0?'':formatNumber(e.target.value))
@@ -30,35 +32,15 @@ const DealEngagement = ({isOpen, handleModalClose, project, title, idx}) => {
     const openConfirmDialog = ()=> setConfirmDialog("opened")
     const closeConfirmDialog = ()=> setConfirmDialog("closed")
 
-    const handleBackButton = ()=>{
-        handleModalClose()
-        setNextPage('')
-    }
-
-    const handleContribution = ()=> {
-        if(nextPage === ''){
-            setNextPage('yes')
-        }
-        if(nextPage === 'yes'){
-            // show confirm dialog befor confirming
-            const inputFields = []
-            if(amount < 100)inputFields.push('amount')
-            if(!hasAcknowledgedTerms)inputFields.push('hasAcknowledgedTerms')
-            if(!sufficientFunds) inputFields.push('lowBal')
-
-            setFieldErrors(inputFields)
-            setTimeout(()=>setFieldErrors([]), 500)
-
-            if(inputFields.length === 0 && sufficientFunds){
-                setNextPage('')
-                handleModalClose()
-                openConfirmDialog()
-            }
-        }
+    const resetScrollPosition = ()=>{
+        modalRef.current.scrollIntoView({
+            behavior: 'auto',
+            block: 'start',
+        })
     }
 
     const confirmContribution = ()=>{
-        dispatch(api.contribute({amount, projectId: project._id}, projects, idx))
+        dispatch(api.contribute({amount:formatNumberToFloat(amount), projectId: project._id}, projects, idx))
     }
 
     useEffect(()=>{
@@ -69,50 +51,82 @@ const DealEngagement = ({isOpen, handleModalClose, project, title, idx}) => {
         }
     },[error, message, dispatch])
 
+    const [currentIndex, setCurrentIndex] = useState(0);
+    
+    const nextView = () => {
+        if(currentIndex === 1){
+            const inputFields = []
+            if(amount < 100)inputFields.push('amount')
+            if(!hasAcknowledgedTerms)inputFields.push('hasAcknowledgedTerms')
+            if(!sufficientFunds) inputFields.push('lowBal')
+
+            setFieldErrors(inputFields)
+            setTimeout(()=>setFieldErrors([]), 500)
+
+            if(inputFields.length === 0 && sufficientFunds){
+                handleModalClose()
+                openConfirmDialog()
+            }
+        }else{
+            resetScrollPosition()
+            setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, 1));
+        }
+    };
+
+    const prevView = () => {
+        if(currentIndex === 0){
+            handleModalClose()
+        }else{
+            resetScrollPosition()
+            setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+        }
+    };
+
     return (
         <>
             <ModalContainter isOpen={isOpen} handleModalClose={handleModalClose}>
-                <>
+                <SliderWrapper ref={modalRef}>
                     <NavHeader handleModalClose={handleModalClose} title={`Project ${project.uniqueId} | ${title}`} />
-                    <ParentWrap>
-                        <Wrapper value={nextPage==='yes'?'slideOut':''}>
-                            <ContentDetailsList project={project} title = {title}/>
-                            <DealId>Ref ID: {project.uniqueId}</DealId>
-                        </Wrapper>
-
-                        <Wrapper value={nextPage==='yes'?'slideIn':''}>
-                            <Content>
-                                <Title>Terms of Engagement</Title>
-                                <Terms>
-                                    Aliqua id fugiat nostrud irure ex duis ea quis id quis ad et. Sunt qui esse pariatur duis deserunt mollit dolore cillum minim tempor enim. Elit aute irure tempor cupidatat incididunt sint deserunt ut voluptate aute id deserunt nisi. Aliqua id fugiat nostrud irure ex duis ea quis id quis ad et. Sunt qui esse pariatur duis deserunt mollit dolore cillum minim tempor enim. Elit aute irure tempor cupidatat incididunt sint deserunt ut voluptate aute id deserunt nisi.
-                                </Terms>
-                                <Shake value={fieldErrors.includes('hasAcknowledgedTerms')?'animate':''}>
-                                    <CheckBoxWrapper onClick={()=>setHasAcknowledgedTerms(!hasAcknowledgedTerms)}>
-                                        <Checkbox type='checkbox' onChange={()=>setHasAcknowledgedTerms(!hasAcknowledgedTerms)} checked={hasAcknowledgedTerms}/>
-                                        <CheckBoxLabel checked={hasAcknowledgedTerms}>I Agree</CheckBoxLabel>
-                                    </CheckBoxWrapper>
-                                </Shake>
-                                <CommitmentWrapper>
-                                    <Title>Enter Amount</Title>
-                                    {!sufficientFunds&& <Shake value={fieldErrors.includes('lowBal')?'animate':''}>
-                                        <SmallText>Insufficient Funds</SmallText>
-                                    </Shake>}
-                                    <Shake value={fieldErrors.includes('amount')?'animate':''}>
-                                        <Commitment>
-                                            <AmountInput placeholder='0.00' value={amount} onChange={handleAmountInput} />
-                                            <AccountBalance>{formatAmountFraction(walletBalance)}</AccountBalance>
-                                        </Commitment>
-                                    </Shake>
-                                </CommitmentWrapper>
-                            </Content>
-                        </Wrapper>
+                    <ParentWrap >
+                        {Array.from({ length: 2 }, (_, index) => (
+                            <View key={index} style={{ transform: `translateX(${(index - currentIndex*2) * 100}%)` }}>
+                                {currentIndex===0?
+                                <Wrapper>
+                                    <ContentDetailsList project={project} title = {title}/>
+                                    <DealId>Ref ID: {project.uniqueId}</DealId>
+                                </Wrapper> :
+                                <Wrapper>
+                                    <Content>
+                                        <Disclaimer />
+                                        <Shake value={fieldErrors.includes('hasAcknowledgedTerms')?'animate':''}>
+                                            <CheckBoxWrapper onClick={()=>setHasAcknowledgedTerms(!hasAcknowledgedTerms)}>
+                                                <Checkbox type='checkbox' onChange={()=>setHasAcknowledgedTerms(!hasAcknowledgedTerms)} checked={hasAcknowledgedTerms}/>
+                                                <CheckBoxLabel checked={hasAcknowledgedTerms}>I undertand and agree</CheckBoxLabel>
+                                            </CheckBoxWrapper>
+                                        </Shake>
+                                        <CommitmentWrapper>
+                                            <Title>Enter Amount</Title>
+                                            {!sufficientFunds&& <Shake value={fieldErrors.includes('lowBal')?'animate':''}>
+                                                <SmallText>Insufficient Funds</SmallText>
+                                            </Shake>}
+                                            <Shake value={fieldErrors.includes('amount')?'animate':''}>
+                                                <Commitment>
+                                                    <AmountInput placeholder='0.00' value={amount} onChange={handleAmountInput} />
+                                                    <AccountBalance>Bal. {formatAmountFraction(walletBalance)}</AccountBalance>
+                                                </Commitment>
+                                            </Shake>
+                                        </CommitmentWrapper>
+                                    </Content>
+                                </Wrapper>}
+                            </View>
+                        ))}
                     </ParentWrap>
                     <ButtonWrapper>
-                        <ButtonClose onClick={handleBackButton}>Close</ButtonClose>
-                        <Btn onClick={handleContribution}>Contribute</Btn>
+                        <ButtonClose onClick={prevView}>{currentIndex==0?'Close':'Back'}</ButtonClose>
+                        <Btn onClick={nextView}>{currentIndex===1?'Contribute':'Next'}</Btn>
                     </ButtonWrapper>
 
-                </>
+                </SliderWrapper>
             </ModalContainter>
 
             <ModalContainter isOpen={confirmDialog} handleModalClose={null}>
@@ -140,11 +154,24 @@ const ParentWrap = styled.div`
     display: flex;
     overflow: hidden;
     width: 200%;
-    /* flex-direction: column; */
+    /* width: ${({value})=>value==='prev'?'200%':'100%'};
+    flex-direction: row; */
+`
+const View = styled.div`
+  flex: 1;
+  transition: transform 0.5s ease;
+  /* display: flex;
+  justify-content: center;
+  align-items: center; */
+`;
+const SliderWrapper = styled.div`
+    
 `
 const Wrapper = styled.div`
     flex: 1;
-    animation: ${({value}) => value==='slideIn'? slideIn : value==='slideOut'? slideOut:'' } 1s forwards;
+    display: ${({value})=>value};
+    /* display: ${({value})=>value==='slideOut'?'':'none'}; */
+    /* animation: ${({value}) => value==='slideIn'? slideIn : value==='slideOut'? slideOut:'' } 1s forwards; */
     background-color: ${({theme})=>theme.colors.white};
 `
 const Title = styled.h2`
@@ -176,11 +203,7 @@ const Label = styled.p`
     font-size: 12px;
 
 `
-const Details = styled(Label)`
-    color: ${({theme})=>theme.colors.text};
-    font-size: 14px;
-    margin-top: 0;
-`
+
 // DealId
 const DealId = styled(Label)`
     text-align: center;
@@ -203,23 +226,21 @@ const ButtonClose = styled(Btn)`
     background-color: ${({theme})=>theme.colors.dark3};
 `
 
-// Aggrement
-const Terms = styled(Details)`
-    line-height: 1.35;
-    text-align: justify;
-`
 const Checkbox = styled.input`
-    
+    width: 18px;
+    height: 18px;
+    margin-right: 5px;
 `
 const CheckBoxLabel = styled(Label)`
     margin: 0;
-    color: ${({checked, theme})=>checked?theme.colors.text:theme.colors.dark2};
+    color: ${({checked, theme})=>checked?theme.colors.text:theme.colors.dark1};
     font-weight: ${({checked})=>checked?700:500};
-    font-size: 14px;
+    font-size: 16px;
 `
 const CheckBoxWrapper = styled.div`
     display: flex;
     align-items: center;
+    cursor: pointer;
 `
 const Commitment = styled(CheckBoxWrapper)`
     column-gap: 10px;

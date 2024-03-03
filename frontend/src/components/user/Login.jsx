@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { api } from "../../common/api"
 import { clearAuthError, createAuthError } from "../../app/auth/authSlice"
 import Logo from "../dashboard/layout/Logo"
+import PassworVisibilityIcon from "./layout/PassworVisibilityIcon"
 
 
 const Login = () => {
@@ -14,6 +15,7 @@ const Login = () => {
 
     const [emptyFields, setEmptyFields] = useState([])
     const [loginDetails, setLoginDetails] = useState({loginId:'', password:''})
+    const [showPassword, setShowPassword] = useState(false)
 
     const redirect = location.search ? location.search.split('=')[1] : '/dashboard';
     
@@ -93,10 +95,11 @@ const Login = () => {
                                 label={loginDetails.password} 
                                 value={loginDetails.password}
                                 invalid={emptyFields.includes('password')}
-                                type="password"
+                                type={showPassword?'text':'password'}
                                 name="password"
                                 onChange={onChange}
                             />
+                            <PassworVisibilityIcon showPassword={showPassword} setShowPassword={setShowPassword}/>
                         </InputWrapper>
                         <Label onClick={()=>history.push('/password/forgot')}>Forgot password</Label>
                         <Button type="submit" disabled={loading}> <Loading value={loading} /> Login</Button>

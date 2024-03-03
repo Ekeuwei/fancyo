@@ -24,6 +24,10 @@ exports.newTicket = catchAsyncErrors( async (req, res, next) => {
         return next(new ErrorHandler("Unauthorized action", 403))
     }
 
+    if(project.status !== 'in progress'){
+        return next(new ErrorHandler("Project cannot receive tickets", 403))
+    }
+
     if(project.availableBalance < parseInt(req.body.stakeAmount)){
         return next(new ErrorHandler("Bankroll too lower! Try lower stake amount", 403))
     }

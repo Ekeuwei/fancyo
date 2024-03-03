@@ -4,9 +4,9 @@ import DealEngagement from "./modals/DealEngagement"
 import { useState } from "react"
 import PropTypes from 'prop-types'
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
-import { formatAmount, formatNumber } from "../../common/utils"
+import { formatAmount, formatNumber, setAlpha } from "../../common/utils"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faMinus, faPlus, faTimesCircle } from "@fortawesome/free-solid-svg-icons"
+import { faCheck, faMinus, faPlus, faTimesCircle } from "@fortawesome/free-solid-svg-icons"
 
 const DealAds = ({project, idx}) => {
     const history = useHistory()
@@ -31,7 +31,7 @@ const DealAds = ({project, idx}) => {
     const title = `${project.eRoi}% in ${projectDuration} day${projectDuration>1?'s':''}`
     const toStartIn = calculateCountdown(project.startAt)
     const toEndIn = calculateCountdown(project.endAt)
-    const projectStarted = project.status==='in progress';
+    const projectStarted = project.status!=='pending';
     const contributedAmount = project.contributors.reduce((total, contributor) => total + contributor.amount, 0)
 
     const profit = project.availableBalance - contributedAmount
@@ -41,11 +41,15 @@ const DealAds = ({project, idx}) => {
     return (
         <>
             <Wrapper onClick={handleOpenProject}>
-                <Timer>
+                <Timer color={project.status==='successful'?'success':project.status==='failed'?'error':''}>
                     {toEndIn.split(" ")[0]==0?
                     <Completed>
-                        <FontAwesomeIcon icon={faTimesCircle}size="lg"/>
-                        <TimeValue>Ended</TimeValue>
+                        {['successfu', 'failed'].includes(project.status)?
+                        <StatusIcon 
+                            color={project.status==='successful'?'success':'error'} 
+                            icon={project.satus==='successful'?faCheck:faTimesCircle}
+                            size="2x"/>:
+                        <Ended>Ended</Ended>}
                     </Completed>:
                     <>
                         <Label>{projectStarted?'Ends':'Starts'} in</Label>
@@ -110,7 +114,7 @@ const Timer = styled.div`
     min-width: 75px;
     border-radius: 50%;
     color: ${({theme})=> theme.colors.primaryColor};
-    background-color: ${({theme})=> theme.colors.light};
+    background-color: ${({theme, color})=> color?setAlpha(theme.colors[color], 0.1): theme.colors.light};
     padding: 15px;
 `
 const Label = styled.p`
@@ -123,9 +127,12 @@ const Label = styled.p`
 const TimeValue = styled(Label)`
     color: ${({theme})=> theme.colors.primaryColor};
 `
+const StatusIcon = styled(FontAwesomeIcon)`
+    color: ${({theme, color})=> theme.colors[color]};
+`
 const Time = styled.h2`
     margin: 0;
-    font-size: 25px;
+    font-size: 22px;
 `
 const Details = styled.div`
     display: flex;
@@ -157,6 +164,10 @@ const InvestmentType = styled(Label)`
 `
 const Author = styled(InvestmentType)`
     color: ${({theme})=>theme.colors.text};
+`
+
+const Ended = styled(TimeValue)`
+    font-size: 75%;
 `
 
 // Status Starts 

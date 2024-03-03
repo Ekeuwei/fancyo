@@ -26,6 +26,10 @@ const Cashout = () => {
       setSelectedOption(option);
   }
 
+  const handleAmountChange = (e)=>{
+    setAmount(e.target.value < 1? '': formatNumber(e.target.value))
+  }
+
   const dispatch = useDispatch()
   
   useEffect(()=>{
@@ -43,8 +47,10 @@ const Cashout = () => {
 
   const handleCashout = (e)=>{
     e.preventDefault()
-
-    if(parseFloat(walletBalance) >= formatNumberToFloat(amount) ){
+    const cashoutAmount = formatNumberToFloat(amount)
+    if(cashoutAmount < 100){
+      dispatch(createUserError(`Minimum cashout amount is ${formatAmount(100)}`))
+    }else if(parseFloat(walletBalance) >= cashoutAmount){
       dispatch(api.cashoutRequest({...selectedOption, amount:formatNumberToFloat(amount)}))
     }else{
       dispatch(createUserError("Cashout amount lower than current balance"))
@@ -67,7 +73,7 @@ const Cashout = () => {
           <Amount 
             placeholder={`min. ${formatAmount(1000)}`}
             value = {amount}
-            onChange={(e)=>setAmount(formatNumber(e.target.value))}/>
+            onChange={handleAmountChange}/>
 
           <List>
             <ListItem>Minimum per transaction NGN 1,000</ListItem>
