@@ -66,14 +66,14 @@ const userSchema = new mongoose.Schema({
             type: Boolean,
             default: false
         },
-        getNotified: {
+        getNotifiedBy: {
             sms: {
                 type: Boolean,
                 default: false
             },
             email: {
                 type: Boolean,
-                default: false
+                default: true
             },
         }
     },
@@ -84,7 +84,7 @@ const userSchema = new mongoose.Schema({
     },
     avatar: {
         type: String,
-        default: "avatar1"
+        default: "avatar1.png"
     },
     role: {
         type: String,

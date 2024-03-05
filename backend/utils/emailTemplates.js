@@ -1,3 +1,5 @@
+const formatAmount = value => `₦${new Intl.NumberFormat('en-US').format(parseFloat((value?value:0).toString().replace(/[^\d.]/g, '')).toFixed(2))}`;
+
 exports.activationEmailTemplate = (token, type)=>`
 <!DOCTYPE html>
 <html>
@@ -74,9 +76,9 @@ exports.projectSuccessNotificationEmailTemplateUser = (details)=>`
     <p>Dear ${details.username},</p>
     <p>We are excited to share that Project ${details.projectId} has successfully concluded. Here are the details of your returns:</p>
     <ul>
-      <li>Contribution Amount: [${details.contributedAmount}]</li>
-      <li>Returns : [${details.profit}]</li>
-      <li>Total Credited to Wallet: [${(details.profit + details.contributedAmount)}]</li>
+      <li>Contribution Amount: ${formatAmount(details.contributedAmount)}</li>
+      <li>Returns : ${formatAmount(details.profit)}</li>
+      <li>Total Credited to Wallet: ${formatAmount(details.profit + details.contributedAmount)}</li>
     </ul>
     <p>Thank you for your valuable contribution to this project. If you have any questions or need further assistance, please don't hesitate to reach out.</p>
     <p>Best regards,</p>
@@ -124,15 +126,15 @@ exports.projectSuccessNotificationEmailTemplatePunter = (details)=>`
     <p>Project Summary:</p>
     <ul>
       <li>Project Unique ID: ${details.projectId}</li>
-      <li>Total Contribution Amount: ${details.contributedAmount}</li>
-      <li>Project Returns: ${details.profit}</li>
-      <li>Punter Commission: [${details.commission}]</li>
+      <li>Total Contribution Amount: ${formatAmount(details.contributedAmount)}</li>
+      <li>Project Returns: ${formatAmount(details.profit)}</li>
+      <li>Punter Commission: ${formatAmount(details.commission)}</li>
     </ul>
 
     <p>Your Wallet Has Been Credited:</p>
     <ul>
-      <li>Credited Amount: ${details.commission}</li>
-      <li>New Wallet Balance: ${details.walletBalance}</li>
+      <li>Credited Amount: ${formatAmount(details.commission)}</li>
+      <li>New Wallet Balance: ${formatAmount(details.walletBalance)}</li>
     </ul>
     <p>Thank you for choosing us for your projects. If you have any questions or require further assistance, please contact our support team.</p>
     <p>Best regards,</p>

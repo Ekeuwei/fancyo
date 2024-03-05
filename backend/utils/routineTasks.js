@@ -158,10 +158,10 @@ exports.updateProjectProgress = async () => {
             }
 
             // Send notification contributor
-            ProjectCompletionNotification({
+            await ProjectCompletionNotification({
               username: contributor.user.username,
               userId: contributor.user._id,
-              projectId: project._id,
+              projectId: project.uniqueId,
               contributedAmount: contributor.amount,
               profit: contributorProfit,
             })
@@ -175,10 +175,10 @@ exports.updateProjectProgress = async () => {
         const wallet = await Wallet.findOne({userId: project.punter._id});
 
         // Send notification to punter
-        ProjectCompletionNotification({
+        await ProjectCompletionNotification({
           username: project.punter.username,
           userId: project.punter._id,
-          projectId: project._id,
+          projectId: project.uniqueId,
           commission: punterCommission,
           profit,
           contributedAmount,
@@ -188,6 +188,9 @@ exports.updateProjectProgress = async () => {
         // Settle platform
         // await creditWallet(platformCommission, `Platform commission settlement. Project: ${project.uniqueId}`, 'platform purse');
       }
+
+      project.availableBalance = 0
+      project.roi = profit
 
       return project.save();
     }));

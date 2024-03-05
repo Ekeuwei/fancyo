@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 import dateFormat from 'dateformat'
-import { formatAmountFraction } from '../../../common/utils'
+import { formatAmountFraction, formatNumber } from '../../../common/utils'
 
 const ContentDetailsList = ({project, title}) => {
     const contributedAmount = project.contributors.reduce((acc, contributor)=>acc+contributor.amount, 0)
@@ -35,10 +35,16 @@ const ContentDetailsList = ({project, title}) => {
                 <Label>{'Total value locked'}</Label>
                 <Details>{formatAmountFraction(contributedAmount)}</Details>
             </Item>
-            <Item>
-                <Label>{'Available Balance'}</Label>
-                <Details>{formatAmountFraction(project.availableBalance)}</Details>
-            </Item>
+            {project.availableBalance > 0?
+                <Item>
+                    <Label>{'Available Balance'}</Label>
+                    <Details>{formatAmountFraction(project.availableBalance)}</Details>
+                </Item>:
+                <Item>
+                    <Label>{'Return on investment (ROI)'}</Label>
+                    <Details>{`${formatAmountFraction(project.roi)} (${formatNumber(project.roi/contributedAmount*100)}%)`} </Details>
+                </Item>
+            }
             <Item>
                 <Label>{'Project Status'}</Label>
                 <Details>{project.status.toUpperCase()}</Details>

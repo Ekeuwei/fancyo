@@ -32,7 +32,7 @@ const Stake = ({ticket, index, openIndex, handleToggle})=>{
     const collapseHandler = ()=> handleToggle(index)
     const value = openIndex === index?"collapsing":"";
     const combinedOdds = (ticket.games.reduce((acc, game)=> acc * game.odds, 1))
-    const expectedRoi = formatNumberFraction(combinedOdds * ticket.stakeAmount)
+    const expectedRoi = formatNumberFraction(combinedOdds * ticket.stakeAmount - ticket.stakeAmount)
     const gameType = ticket.games.length > 1? 'Accumulator':'Single'
     const title = `Ticket ${index+1} - ${gameType} @${formatNumberFraction(combinedOdds)} Odds`
 

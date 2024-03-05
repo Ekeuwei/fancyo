@@ -4,3 +4,19 @@
 {"_message":"Project validation failed","errors":{"contributors.0.status":{"kind":"enum","message":"`failed` is not a valid enum value for path `status`.","name":"ValidatorError","path":"status","properties":{"enumValues":["pending","settled","lost"],"message":"`failed` is not a valid enum value for path `status`.","path":"status","type":"enum","value":"failed"},"value":"failed"}},"level":"error","message":"Project validation failed: contributors.0.status: `failed` is not a valid enum value for path `status`.","name":"ValidationError","timestamp":"2024-03-03T15:10:00.161Z"}
 {"_message":"Project validation failed","errors":{"contributors.0.status":{"kind":"enum","message":"`failed` is not a valid enum value for path `status`.","name":"ValidatorError","path":"status","properties":{"enumValues":["pending","settled","lost"],"message":"`failed` is not a valid enum value for path `status`.","path":"status","type":"enum","value":"failed"},"value":"failed"}},"level":"error","message":"Project validation failed: contributors.0.status: `failed` is not a valid enum value for path `status`.","name":"ValidationError","timestamp":"2024-03-03T15:11:00.229Z"}
 {"_message":"Project validation failed","errors":{"contributors.0.status":{"kind":"enum","message":"`failed` is not a valid enum value for path `status`.","name":"ValidatorError","path":"status","properties":{"enumValues":["pending","settled","lost"],"message":"`failed` is not a valid enum value for path `status`.","path":"status","type":"enum","value":"failed"},"value":"failed"}},"level":"error","message":"Project validation failed: contributors.0.status: `failed` is not a valid enum value for path `status`.","name":"ValidationError","timestamp":"2024-03-03T15:12:00.290Z"}
+{"level":"error","timestamp":"2024-03-04T09:47:04.829Z"}
+{"level":"error","timestamp":"2024-03-04T09:48:49.730Z"}
+{"level":"error","timestamp":"2024-03-04T09:51:44.159Z"}
+{"level":"error","timestamp":"2024-03-04T09:53:14.393Z"}
+{"level":"error","timestamp":"2024-03-04T09:54:09.761Z"}
+{"level":"error","timestamp":"2024-03-04T09:55:02.946Z"}
+{"level":"error","timestamp":"2024-03-04T09:55:29.466Z"}
+{"level":"error","timestamp":"2024-03-04T09:56:05.700Z"}
+{"level":"error","timestamp":"2024-03-04T09:57:56.090Z"}
+{"level":"error","timestamp":"2024-03-04T09:58:10.181Z"}
+{"level":"error","timestamp":"2024-03-04T09:59:05.088Z"}
+{"level":"error","timestamp":"2024-03-04T09:59:24.648Z"}
+{"level":"error","timestamp":"2024-03-04T09:59:40.249Z"}
+{"level":"error","timestamp":"2024-03-04T09:59:57.319Z"}
+{"level":"error","timestamp":"2024-03-04T10:00:00.652Z"}
+{"level":"error","timestamp":"2024-03-04T10:00:28.397Z"}

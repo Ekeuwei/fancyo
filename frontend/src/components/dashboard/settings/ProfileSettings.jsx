@@ -4,7 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import UpdateEmail from './layout/UpdateEmail'
 import UpdateUsername from './layout/UpdateUsername'
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
-import { Avatar, AvatarOverlay, BodyWrapper } from '../../../theme/ThemeStyle'
+import { BodyWrapper } from '../../../theme/ThemeStyle'
+import AvatarGallery from './layout/AvatarGallery'
 
 const ProfileSettings = () => {
     const user = JSON.parse(localStorage.getItem('user'))
@@ -12,9 +13,7 @@ const ProfileSettings = () => {
         <div>
             <SettingsHeading title={"Profile"} />
             <BodyWrapper>
-                <AvatarO>
-                    <Avatar src='../assets/avatar.png'/>
-                </AvatarO>
+                <AvatarGallery />
                 <OptionsWrapper>
                     <UpdateUsername userName={user?.username}/>
                     <Option>
@@ -57,11 +56,6 @@ const Text = styled.p`
     margin: 0;
 `
 
-const AvatarO = styled(AvatarOverlay)`
-    width: 120px;
-    height: 120px;
-    align-self: center;
-`
 
 
 export default ProfileSettings

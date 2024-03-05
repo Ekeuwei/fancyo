@@ -79,3 +79,5 @@ const hexToRgb = (hex)=> {
   const b = bigint & 255;
   return { r, g, b };
 }
+
+export const avatars = Object.values(import.meta.glob('../../public/assets/avatars/*.{png,jpg,jpeg,PNG,JPEG}', { eager: true, as: 'url' }))

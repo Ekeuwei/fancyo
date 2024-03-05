@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGear, faSignOut } from '@fortawesome/free-solid-svg-icons'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { api } from '../../common/api'
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min'
 
@@ -14,15 +14,18 @@ const Header = () => {
     }
 
     const user = JSON.parse(localStorage.getItem('user'))
+    const { myProjects } = useSelector(state => state.project)
     
     return (
         <Wrapper>
             <Avatar onClick={()=>history.push('/settings/profile')}>
-                <AvatarImage src='assets/avatar.png' />
+                <AvatarImage src={user?`/public/assets/avatars/${user.avatar.includes('.')?user.avatar:user.avatar+'.png'}`:'/public/assets/avatars/avatar1.png'} />
             </Avatar>
             <Details>
                 <Title>Hi {user.username}</Title>
-                <Subtitle>You have 7 projects in progress</Subtitle>
+                {myProjects?.runningProjectsCount > 0?
+                    <Subtitle>{`You have ${myProjects.runningProjectsCount} project${myProjects.runningProjectsCount>1?'s':''} in progress`}</Subtitle>:
+                    <Subtitle>Bet Smarter, Earn Bigger! 🚀</Subtitle>}
             </Details>
             <Notification onClick={()=>history.push('/settings')}>
                 <FontAwesomeIcon icon={faGear} size='lg'/>

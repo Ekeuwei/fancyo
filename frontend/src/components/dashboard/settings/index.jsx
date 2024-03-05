@@ -18,15 +18,16 @@ const Settings = () => {
     const [preferences, setPreferences] = useState(user.preferences)
     
     const handleToggle = (name) => {
-        let newStakeAlerts = !preferences.getNotified[name]
-        setPreferences(prevPreference => ({
-            ...prevPreference, 
-                getNotified:{
-                    ...prevPreference.getNotified, 
-                    [name]: newStakeAlerts
+        let newPreferences = {
+            ...preferences, 
+                getNotifiedBy:{
+                    ...preferences.getNotifiedBy, 
+                    [name]: !preferences.getNotifiedBy[name]
                 }
-            }))
-        dispatch(api.updateProfile({preferences}))
+            }
+        
+        setPreferences(newPreferences)
+        dispatch(api.updateProfile({preferences: newPreferences}))
     }
 
   return (
@@ -41,11 +42,11 @@ const Settings = () => {
         <SettingsSubHeading title={"Notification"} />
         <Option>
             <Text>Email Notification</Text>
-            <ToggleButton value='email' isChecked={preferences.getNotified.email} handleToggle={()=>handleToggle('email')}/>
+            <ToggleButton value='email' isChecked={preferences.getNotifiedBy.email} handleToggle={()=>handleToggle('email')}/>
         </Option>
         <Option>
             <Text>SMS Notification</Text>
-            <ToggleButton value='sms' isChecked={preferences.getNotified.sms} handleToggle={()=>handleToggle('sms')}/>
+            <ToggleButton value='sms' isChecked={preferences.getNotifiedBy.sms} handleToggle={()=>handleToggle('sms')}/>
         </Option>
         <SettingsSubHeading title={"Security & Safety"} />
         <UpdatePassword />

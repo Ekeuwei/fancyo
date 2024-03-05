@@ -6,7 +6,7 @@ import { faCopy } from "@fortawesome/free-regular-svg-icons"
 import { useDispatch, useSelector } from "react-redux"
 import { api } from "../../../common/api"
 import { clearLink, clearUserErrors, createUserError } from "../../../app/user/userSlice"
-import { formatAmount, formatNumber } from "../../../common/utils"
+import { formatAmount, formatNumber, formatNumberToFloat } from "../../../common/utils"
 import NavHeader from "../layout/NavHeader"
 
 const FundWallet = () => {
@@ -25,7 +25,7 @@ const FundWallet = () => {
   const handleCardPayment = (e)=> {
     e.preventDefault()
 
-    if(amount >= 100){
+    if(formatNumberToFloat(amount) >= 100){
       dispatch(api.fundWallet(amount))
     }else{
       dispatch(createUserError(`Minimum deposit is ${formatAmount(100)}`))
@@ -90,7 +90,7 @@ const FundWallet = () => {
 
 
         <Button disabled={loading} type="submit">
-            Proceed {loading&&<Loading />}
+            Proceed <Loading value={loading} />
         </Button>
 
         </form>}

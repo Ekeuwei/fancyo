@@ -10,7 +10,6 @@ export default defineConfig({
   build: {
     commonjsOptions: {
       transformMixedEsModules: true,
-      // include: [/linked-dep/, /node_modules/],
     },
   },
 

@@ -88,7 +88,7 @@ exports.getProjects = catchAsyncErrors(async (req, res, next) => {
     const resPerPage = 10;
     const projectsCount = await Project.countDocuments({ status: 'pending' });
 
-    const apiFeatures = new APIFeatures(Project.find({ status: 'pending' }).populate('punter', 'username', User), req.query)
+    const apiFeatures = new APIFeatures(Project.find({ status: 'pending' }).sort({endAt: -1}).populate('punter', 'username', User), req.query)
                         .search()
                         .filter()
     
@@ -113,13 +113,27 @@ exports.getMyProjects = catchAsyncErrors(async (req, res, next) => {
     const resPerPage = 10;
     const searchQuery = {
         $or: [ 
-            { 'contributors.userId': req.user._id }, 
+            { 'contributors.user': req.user._id }, 
             { punter: req.user._id } 
         ]
     }
+    const isRunningSearchQuery = {
+        $and: [
+            {
+                $or: [
+                    { 'contributors.user': req.user._id },
+                    { punter: req.user._id }
+                ]
+            },
+            {
+                status: { $in: ['in progress', 'pending'] }
+            }
+        ]
+    }
     const projectsCount = await Project.countDocuments(searchQuery);
+    const runningProjectsCount = await Project.countDocuments(isRunningSearchQuery);
 
-    const apiFeatures = new APIFeatures(Project.find(searchQuery).populate('punter', 'username', User), req.query)
+    const apiFeatures = new APIFeatures(Project.find(searchQuery).sort({endAt: -1}).populate('punter', 'username', User), req.query)
                         .search()
                         .filter()
     
@@ -134,6 +148,7 @@ exports.getMyProjects = catchAsyncErrors(async (req, res, next) => {
         projectsCount,
         resPerPage,
         filteredProjectsCount,
+        runningProjectsCount,
         projects
     });
 });

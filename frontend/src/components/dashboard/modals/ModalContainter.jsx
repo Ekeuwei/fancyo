@@ -45,6 +45,7 @@ ModalContainter.propTypes = {
 const ModalOverflow = styled.div`
     background-color: ${({theme})=>theme.colors.dark4};
     display: ${({value})=>value==="opened"?'block':'none'};
+    position: relative;
     padding: 20px;
     position: fixed;
     z-index: 1;
