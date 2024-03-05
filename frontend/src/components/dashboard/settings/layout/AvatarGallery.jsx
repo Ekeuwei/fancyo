@@ -14,8 +14,12 @@ const AvatarGallery = () => {
 
     const user = JSON.parse(localStorage.getItem('user'))
     
+    const getImageUrl = name => new URL(`/assets/avatars/${name}`, import.meta.url).href 
+    
     const [galleryVisible, setGalleryVisible] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState(
+        // user? getImageUrl(`${user.avatar.includes('.')?user.avatar: user.avatar+'.png'}`):
+        // getImageUrl('avatar1.png'))
         user? `/assets/avatars/${user.avatar.includes('.')?user.avatar: user.avatar+'.png'}`:
         '/assets/avatars/avatar1.png')
   
@@ -29,10 +33,10 @@ const AvatarGallery = () => {
     };
     const handleClose = ()=> setGalleryVisible(false)
 
+
     useEffect(()=>{
-        const avatar = avatarUrl.split('/').pop()
+        const avatar = `${avatarUrl.split('/').pop().split('.png')[0].split('-')[0]}.png`
         if(user.avatar !== avatar){
-            console.log(avatar);
             dispatch(api.updateProfile({avatar}))
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -58,7 +62,7 @@ const AvatarGallery = () => {
                       className={avatars[index] === avatarUrl ? 'selected' : ''}
                       onClick={() => handleAvatarClick(index)}
                       >
-                      <img src={`${avatar}`} alt={`Avatar ${index + 1}`} />
+                      <img src={avatar} alt={`Avatar ${index + 1}`} />
                       </AvatarItem>
                   ))
                   }
