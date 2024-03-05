@@ -19,7 +19,7 @@ const Header = () => {
     return (
         <Wrapper>
             <Avatar onClick={()=>history.push('/settings/profile')}>
-                <AvatarImage src={user?`/public/assets/avatars/${user.avatar.includes('.')?user.avatar:user.avatar+'.png'}`:'/public/assets/avatars/avatar1.png'} />
+                <AvatarImage src={user?`/assets/avatars/${user.avatar.includes('.')?user.avatar:user.avatar+'.png'}`:'/assets/avatars/avatar1.png'} />
             </Avatar>
             <Details>
                 <Title>Hi {user.username}</Title>

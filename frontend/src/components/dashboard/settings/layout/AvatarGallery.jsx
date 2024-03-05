@@ -16,8 +16,8 @@ const AvatarGallery = () => {
     
     const [galleryVisible, setGalleryVisible] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState(
-        user? `/public/assets/avatars/${user.avatar.includes('.')?user.avatar: user.avatar+'.png'}`:
-        '/public/assets/avatars/avatar1.png')
+        user? `/assets/avatars/${user.avatar.includes('.')?user.avatar: user.avatar+'.png'}`:
+        '/assets/avatars/avatar1.png')
   
     const handleAvatarClick = (index) => {
       setAvatarUrl(avatars[index]);
