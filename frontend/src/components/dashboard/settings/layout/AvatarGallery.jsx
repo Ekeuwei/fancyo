@@ -58,7 +58,7 @@ const AvatarGallery = () => {
                       className={avatars[index] === avatarUrl ? 'selected' : ''}
                       onClick={() => handleAvatarClick(index)}
                       >
-                      <img src={avatar} alt={`Avatar ${index + 1}`} />
+                      <img src={`${avatar}`} alt={`Avatar ${index + 1}`} />
                       </AvatarItem>
                   ))
                   }
