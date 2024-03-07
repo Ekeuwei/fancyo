@@ -39,6 +39,9 @@ import {
     walletStart,
     walletSuccess,
     walletFailure,
+    myTransactionsStart,
+    myTransactionsSuccess,
+    myTransactionsFailure,
     verifyAccountNumberStart,
     verifyAccountNumberSuccess,
     verifyAccountNumberFailure,
@@ -314,6 +317,21 @@ export const api = {
         } catch (error) {
 
             dispatch(walletFailure(error.response.data.message))
+        }
+    },
+    
+    // myTransactions 
+    myTransactions: () => async (dispatch) =>{
+        try {
+            dispatch(myTransactionsStart())
+
+            const { data } = await instance.get(`/api/v1/transactions`)
+            
+            dispatch(myTransactionsSuccess(data.transactions))
+
+        } catch (error) {
+
+            dispatch(myTransactionsFailure(error.response.data.message))
         }
     },
     

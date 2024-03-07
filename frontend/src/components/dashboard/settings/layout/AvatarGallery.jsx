@@ -14,7 +14,7 @@ const AvatarGallery = () => {
 
     const user = JSON.parse(localStorage.getItem('user'))
     
-    const getImageUrl = name => new URL(`/assets/avatars/${name}`, import.meta.url).href 
+    // const getImageUrl = name => new URL(`/assets/avatars/${name}`, import.meta.url).href 
     
     const [galleryVisible, setGalleryVisible] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState(

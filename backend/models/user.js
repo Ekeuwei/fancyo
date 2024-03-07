@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema({
         sparse: true,
         minlength: [10, 'Phone number not complete']
     },
-    gender: {
+    dob: {
         type: String,
     },
     contact: {

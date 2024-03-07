@@ -6,6 +6,7 @@ import UpdateUsername from './layout/UpdateUsername'
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
 import { BodyWrapper } from '../../../theme/ThemeStyle'
 import AvatarGallery from './layout/AvatarGallery'
+import UpdateDateOfBirth from './layout/UpdateDob'
 
 const ProfileSettings = () => {
     const user = JSON.parse(localStorage.getItem('user'))
@@ -24,10 +25,7 @@ const ProfileSettings = () => {
                         <Text>Last Name</Text>
                         <Text>{user.lastName}</Text>
                     </Option>
-                    <Option>
-                        <Text>Date of birth</Text>
-                        <Text>{user.dob||'Edit'} <FontAwesomeIcon style={{paddingLeft:"5px"}} icon={faAngleRight} /></Text>
-                    </Option>
+                    <UpdateDateOfBirth dateOfBirth={user.dob} />
                     <Option>
                         <Text>Location</Text>
                         <Text>{user.address||'Nigeria'} <FontAwesomeIcon style={{paddingLeft:"5px"}} icon={faAngleRight} /></Text>

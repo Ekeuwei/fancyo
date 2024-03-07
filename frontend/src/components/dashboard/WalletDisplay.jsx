@@ -1,11 +1,11 @@
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faMoneyBill1 } from "@fortawesome/free-regular-svg-icons"
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { api } from "../../common/api"
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
 import { formatAmountFraction } from "../../common/utils"
+import { faCreditCard, faLayerGroup, faSackDollar } from "@fortawesome/free-solid-svg-icons"
 
 const WalletDisplay = () => {
     const dispatch = useDispatch()
@@ -26,16 +26,16 @@ const WalletDisplay = () => {
             </MainView>
             <ButtonGroup>
                 <Button onClick={()=>history.push('/cashout')}>
-                    <ButtonIcon><FontAwesomeIcon icon={faMoneyBill1}/></ButtonIcon>
+                    <ButtonIcon><FontAwesomeIcon icon={faSackDollar}/></ButtonIcon>
                     <ButtonText>Cashout</ButtonText>
                 </Button>
                 <Button onClick={()=>history.push('/deposit')}>
-                    <ButtonIcon><FontAwesomeIcon icon={faMoneyBill1}/></ButtonIcon>
+                    <ButtonIcon><FontAwesomeIcon icon={faCreditCard}/></ButtonIcon>
                     <ButtonText>Fund</ButtonText>
                 </Button>
-                <Button>
-                    <ButtonIcon><FontAwesomeIcon icon={faMoneyBill1}/></ButtonIcon>
-                    <ButtonText>Transfer</ButtonText>
+                <Button onClick={()=>history.push('/transactions')}>
+                    <ButtonIcon><FontAwesomeIcon icon={faLayerGroup}/></ButtonIcon>
+                    <ButtonText>Transactions</ButtonText>
                 </Button>
             </ButtonGroup>
         </Wrapper>

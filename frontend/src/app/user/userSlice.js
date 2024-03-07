@@ -23,6 +23,19 @@ const userSlice = createSlice({
       state.error = action.payload;
     },
     
+    myTransactionsStart: state => {
+      state.loading = true;
+      state.error = null;
+    },
+    myTransactionsSuccess: (state, action) => {
+      state.transactions = action.payload;
+      state.loading = false;
+    },
+    myTransactionsFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    
     getBanksStart: state => {
       state.loading = true;
       state.error = null;
@@ -140,6 +153,9 @@ export const {
   walletStart,
   walletSuccess,
   walletFailure,
+  myTransactionsStart,
+  myTransactionsSuccess,
+  myTransactionsFailure,
   getBanksStart,
   getBanksSuccess,
   getBanksFailure,

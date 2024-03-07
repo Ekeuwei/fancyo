@@ -21,6 +21,7 @@ import TransacrionReceipt from "./components/dashboard/fundwallet/TransacrionRec
 import ProtectedRoute from "./app/route/ProtectedRoute";
 import Toast from "./components/user/layout/Toast";
 import Disclaimer from "./components/dashboard/modals/Disclaimer";
+import Transactions from "./components/dashboard/transactions";
     
 export const appName = import.meta.env.VITE_APP_NAME
 
@@ -40,6 +41,7 @@ function App() {
               <Route path="/register" component={Register} exact />
               <Route path="/password/forgot" component={ForgotPassword} exact />
               <Route path="/disclaimer" component={Disclaimer} exact />
+              <Route path="/transactions" component={Transactions} exact />
               <ProtectedRoute path="/dashboard" component={Dashboard} exact />
               <ProtectedRoute path="/deal" component={Deal} exact />
               <ProtectedRoute path="/cashout" component={Cashout} exact />

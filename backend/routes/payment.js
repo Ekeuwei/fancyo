@@ -23,7 +23,7 @@ router.route('/fund/cashout').post(isAuthenticatedUser, cashout);
 router.route('/stripeapi').get(isAuthenticatedUser, sendStripeApiKey)
 
 router.route('/wallet').get(isAuthenticatedUser, walletBalance);
-router.route('/wallet/transactions').get(isAuthenticatedUser, walletTransactions);
+router.route('/transactions').get(isAuthenticatedUser, walletTransactions);
 router.route('/flwpayment/process').post(isAuthenticatedUser, flwPayment);
 router.route('/flwpayment/callback').get(isAuthenticatedUser, flwPaymentCallback);
 router.route('/flwpayment/webhook').get(flwPaymentWebhook);

@@ -347,9 +347,13 @@ exports.cashout = catchAsyncErrors(async(req,res,next)=>{
     })
 })
 
-//Wallet transactions   =>   /api/v1/wallet/transactions
+//Wallet transactions   =>   /api/v1/transactions
 exports.walletTransactions = catchAsyncErrors(async (req, res, next)=>{
-    const transactions = await Transaction.find({userId: req.user.id}).sort({createdAt: -1})
+    const transactions = await Transaction.find({
+        $and:[
+            {userId: req.user.id}, 
+            {status: { $in:['successful', 'failed']}}
+        ]}).sort({createdAt: -1})
 
     res.status(200).json({
         success: true,

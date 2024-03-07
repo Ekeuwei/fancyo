@@ -115,12 +115,14 @@ const NewProject = ({isOpen, handleCloseModal}) => {
                         invalid={emptyFields.includes('startAt')?'error':''}
                         setDateTime={setStartAt} 
                         placeholder="Project start time"
+                        customDateFormat={"MMMM d, yyyy h:mm aa"}
                     />
                     <CustomDatePicker 
                         dateTime={endAt} 
                         invalid={emptyFields.includes('endAt')?'error':''}
                         setDateTime={setEndAt} 
                         placeholder="Project end time"
+                        customDateFormat={"MMMM d, yyyy h:mm aa"}
                     />
                     <NoticeMessage value={error?'error':''}>{error}</NoticeMessage>
                     <Button type="submit">Submit <Loading value={loading}/></Button>

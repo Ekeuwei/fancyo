@@ -7,7 +7,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import PropTypes from 'prop-types'
 
-const CustomDatePicker = ({dateTime, setDateTime, placeholder, invalid}) => {
+const CustomDatePicker = ({dateTime, setDateTime, placeholder, invalid, customDateFormat}) => {
     
 
     const datePickerRef = useRef(null);
@@ -30,7 +30,7 @@ const CustomDatePicker = ({dateTime, setDateTime, placeholder, invalid}) => {
                 showTimeSelect
                 invalid={invalid}
                 ref={datePickerRef}
-                dateFormat="MMMM d, yyyy h:mm aa"
+                dateFormat={customDateFormat}
             />
         </Shake>
         <CalendarIcon icon={faCalendar} onClick={openDatePicker} />
@@ -41,6 +41,7 @@ CustomDatePicker.propTypes = {
     dateTime: PropTypes.string,
     placeholder: PropTypes.string,
     invalid: PropTypes.string,
+    customDateFormat: PropTypes.string,
     setDateTime: PropTypes.func,
 }
 
