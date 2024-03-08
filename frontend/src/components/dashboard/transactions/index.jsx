@@ -7,13 +7,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useEffect } from 'react'
 import { api } from '../../../common/api'
 
-const index = () => {
+const Transactions = () => {
     const dispatch = useDispatch()
 
-    const { loading, error, transactions } = useSelector(state=> state.user)
+    const { loading, transactions } = useSelector(state=> state.user)
 
     useEffect(()=>{
         dispatch(api.myTransactions())
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
   return (
@@ -36,4 +37,4 @@ const Wrapper = styled.div`
     row-gap: 5px;
 `
 
-export default index
+export default Transactions

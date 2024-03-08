@@ -30,9 +30,9 @@ const ModalContainter = ({children, isOpen, handleModalClose}) => {
     <>
         <ModalOverflow value={isOpen} onClick={closeModal} />
           <ModalWrapper value={isOpen} display={display}>
-        <Shake value={shake}>
-              {children}
-        </Shake>
+            <Shake value={shake}>
+                  {children}
+            </Shake>
           </ModalWrapper>
     </>
   )
@@ -48,6 +48,7 @@ const ModalOverflow = styled.div`
     position: relative;
     padding: 20px;
     position: fixed;
+    cursor: auto;
     z-index: 1;
     left: 0;
     top: 0;
@@ -58,6 +59,7 @@ const ModalWrapper = styled.div`
     display: ${({display})=>display};
     top: 50%;
     left: 50%;
+    cursor: auto;
     border-radius: 5px;
     overflow: hidden;
     background-color: ${({theme})=>theme.colors.bg};

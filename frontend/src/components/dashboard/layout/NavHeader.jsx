@@ -13,7 +13,7 @@ const NavHeader = ({handleModalClose, title}) => {
     }
     return (
         <Header>
-            <Backdrop onClick={handleBackdrop} icon={faLongArrowLeft} />
+            {!handleModalClose&& <Backdrop onClick={handleBackdrop} icon={faLongArrowLeft} />}
             <Title>{title}</Title>
             {handleModalClose&& <Backdrop onClick={handleModalClose} icon={faTimes} />}
         </Header>
@@ -36,10 +36,12 @@ const Header = styled.div`
 `
 const Backdrop = styled(FontAwesomeIcon)`
     padding: 10px;
+    cursor: pointer;
 `
 const Title = styled.h2`
     font-size: 18px;
     font-weight: 500;
+    margin-left: 10px;
     flex: 1;
 `
 

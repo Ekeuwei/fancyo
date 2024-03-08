@@ -68,7 +68,7 @@ export const setAlpha = (color, alpha)=> {
   }
 
   // If the input is not recognized, return null or handle accordingly
-  return null;
+  return color;
 }
 
 const hexToRgb = (hex)=> {

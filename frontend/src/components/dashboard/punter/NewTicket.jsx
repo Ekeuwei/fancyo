@@ -10,7 +10,7 @@ import { api } from '../../../common/api'
 import { createToast } from '../../../app/user/userSlice'
 import { clearLoadedTicket } from '../../../app/project/projectSlice'
 import { clearTicketErrors } from '../../../app/ticket/ticketSlice'
-import { formatNumber } from '../../../common/utils'
+import { formatNumber, formatNumberToFloat } from '../../../common/utils'
 
 const NewTicket = ({isOpen, handleModalClose, projectId}) => {
     const [data, setData] = useState({
@@ -64,7 +64,11 @@ const NewTicket = ({isOpen, handleModalClose, projectId}) => {
         setEmptyFields(newEmptyFields)
 
         if(newEmptyFields.length === 0){
-            dispatch(api.createTicket({...data, projectId}, projectDetails))
+            dispatch(api.createTicket({
+                ...data, 
+                stakeAmount: formatNumberToFloat(data.stakeAmount), 
+                projectId
+            }, projectDetails))
             dispatch(clearLoadedTicket())
         }
     }

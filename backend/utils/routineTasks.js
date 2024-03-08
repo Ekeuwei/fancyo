@@ -148,8 +148,9 @@ exports.updateProjectProgress = async () => {
             const investmentQuota = contributor.amount / contributedAmount;
             const contributorProfit = contributorsCommission * investmentQuota;
             
-            if(projectCurrentBalance >= 1){
-              // At least 1 NGN remaining
+            const onePercentContributedAmount = contributedAmount * 0.01
+            if(projectCurrentBalance >= onePercentContributedAmount || onePercentContributedAmount >= 100){
+              // At least 1% or N100 of contributed amount is remaining
               await creditWallet((contributorProfit + contributor.amount), `Investment capital and returns. Project: ${project.uniqueId}`, contributor.user._id);
               contributor.status = 'settled';
 
@@ -171,7 +172,9 @@ exports.updateProjectProgress = async () => {
         }));
         
         // Settle punter
-        await creditWallet(punterCommission, `Project commission. Project: ${project.uniqueId}`, project.punter._id);
+        if(project.status === 'successful'){
+          await creditWallet(punterCommission, `Project commission. Project: ${project.uniqueId}`, project.punter._id);
+        }
         const wallet = await Wallet.findOne({userId: project.punter._id});
 
         // Send notification to punter
