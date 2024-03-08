@@ -1,11 +1,11 @@
 import styled from "styled-components"
 import PropTypes from 'prop-types'
 import MatchFixture from "../deal/MatchFixture"
-import { formatAmount } from "../../../common/utils"
+import { formatAmount, formatNumberToFloat } from "../../../common/utils"
 
 const Ticket = ({value, stakeAmount, picks}) => {
     const totalOdds = picks.reduce((acc, pick)=> acc*pick.odds, 1).toFixed(2)
-    const roi = formatAmount((stakeAmount===''?0:stakeAmount) * totalOdds)
+    const roi = formatAmount(formatNumberToFloat(stakeAmount===''?0:stakeAmount) * totalOdds)
     return (
         <Details value={value} >
             <Title>Details</Title>
