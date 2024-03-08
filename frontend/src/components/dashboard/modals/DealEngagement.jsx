@@ -123,7 +123,7 @@ const DealEngagement = ({isOpen, handleModalClose, project, title, idx}) => {
                     </ParentWrap>
                     <ButtonWrapper>
                         <ButtonClose onClick={prevView}>{currentIndex==0?'Close':'Back'}</ButtonClose>
-                        <Btn onClick={nextView}>{currentIndex===1?'Contribute':'Next'}</Btn>
+                        <Btn onClick={nextView}>{currentIndex===1?'Submit':'Contribute'}</Btn>
                     </ButtonWrapper>
 
                 </SliderWrapper>
