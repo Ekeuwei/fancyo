@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import StakeDetails from './StakeDetails'
 import { useState } from 'react'
 import PropTypes from 'prop-types'
-import { formatNumberFraction } from '../../../common/utils'
+import { formatAmount, formatNumberFraction, formatNumberToFloat } from '../../../common/utils'
 import { faAngleRight, faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
 
 const Stakes = ({tickets}) => {
@@ -51,7 +51,7 @@ const Stake = ({ticket, index, openIndex, handleToggle})=>{
                 <Title>{title}</Title>
                 <Label value={{winning, color}}>
                     <FontAwesomeIcon icon={winning<0? faMinus:faPlus} size='xs' style={{marginRight:'2px'}}/>
-                    {Math.abs(winning)}
+                    {formatAmount(Math.abs(formatNumberToFloat(winning)))}
                 </Label>
             </Header>
             <StakeDetails ticket={ticket} value={value} />
