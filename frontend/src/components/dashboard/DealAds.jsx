@@ -34,6 +34,7 @@ const DealAds = ({user, project, idx}) => {
     const projectStarted = project.status!=='pending';
     const totalContributedAmount = project.contributors.reduce((total, contributor) => total + contributor.amount, 0)
     const contributor = project.contributors.find(contributor => contributor.user === user._id)
+    const userIsPunter = user._id === project.punter._id
     const contributedAmount = contributor?.amount || totalContributedAmount
     const contributedQuota = isNaN(contributedAmount / totalContributedAmount)? 0 : (contributedAmount / totalContributedAmount)
     
@@ -75,9 +76,13 @@ const DealAds = ({user, project, idx}) => {
                 </StatusWrapper>:
                 <EarningsWrapper>
                     {profit!==0&&<>
-                        <Profit value={profit}><FontAwesomeIcon icon={profit>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{formatNumber(profit)}</Profit>
-                        <Balance>{balance}</Balance>
-                        <PercentIncrease>{percentIncrease}% {profit>0?'up':'down'}</PercentIncrease>
+                        {contributor||userIsPunter?<>
+                            <Profit value={profit}><FontAwesomeIcon icon={profit>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{formatNumber(profit)}</Profit>
+                            <Balance>{balance}</Balance>
+                            <PercentIncrease>{percentIncrease}% {profit>0?'up':'down'}</PercentIncrease>
+                        </>:
+                        <Balance value={profit} color={profit>0?'success':'error'}><FontAwesomeIcon icon={profit>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{percentIncrease}%</Balance>
+                        }
                     </>}
                 </EarningsWrapper>}
 
@@ -215,6 +220,7 @@ const Balance = styled.h3`
     margin: 1px 0;
     font-size: 18px;
     font-weight: 500;
+    color: ${({theme, color})=>color?theme.colors[color]:''}
 `
 const Profit = styled(Label)`
     font-size: 12px;
