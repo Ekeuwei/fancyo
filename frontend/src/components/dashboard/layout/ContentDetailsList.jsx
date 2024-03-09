@@ -1,10 +1,20 @@
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 import dateFormat from 'dateformat'
-import { formatAmountFraction, formatNumber } from '../../../common/utils'
+import { formatAmount, formatAmountFraction, formatNumber } from '../../../common/utils'
 
 const ContentDetailsList = ({project, title}) => {
-    const contributedAmount = project.contributors.reduce((acc, contributor)=>acc+contributor.amount, 0)
+    const user = JSON.parse(localStorage.getItem('user'))
+    const totalContributedAmount = project.contributors.reduce((acc, contributor)=>acc+contributor.amount, 0)
+    const contributor = project.contributors.find(contributor => contributor.user === user._id)
+    const contributedAmount = contributor?.amount || totalContributedAmount
+
+    const contributedQuota = isNaN(contributedAmount / totalContributedAmount)? 0 : (contributedAmount / totalContributedAmount)
+    
+    const profit = ((project.availableBalance||project.roi) - totalContributedAmount) * contributedQuota
+    const balance = isNaN((project.availableBalance||project.roi) * contributedQuota)? formatAmount(0) : formatAmount((project.availableBalance||project.roi) * contributedQuota)
+    const percentIncrease = isNaN(contributedAmount / totalContributedAmount)? 0: formatNumber(profit/contributedAmount * 100)
+
     return (
         <Content>
             {project.notes&&<Item>
@@ -32,17 +42,17 @@ const ContentDetailsList = ({project, title}) => {
                 <Details>{project.contributors.length}</Details>
             </Item>
             <Item>
-                <Label>{'Total value locked'}</Label>
-                <Details>{formatAmountFraction(contributedAmount)}</Details>
+                <Label>{contributor?'Amount contributed':'Total amount contributed'}</Label>
+                <Details>{formatAmount(contributedAmount)}</Details>
             </Item>
             {project.availableBalance > 0?
                 <Item>
                     <Label>{'Available Balance'}</Label>
-                    <Details>{formatAmountFraction(project.availableBalance)}</Details>
+                    <Details>{balance}</Details>
                 </Item>:
                 <Item>
                     <Label>{'Return on investment (ROI)'}</Label>
-                    <Details>{`${formatAmountFraction(project.roi)} (${formatNumber(project.roi/contributedAmount*100)}%)`} </Details>
+                    <Details>{`${balance} (${formatNumber(percentIncrease)}%)`} </Details>
                 </Item>
             }
             <Item>
