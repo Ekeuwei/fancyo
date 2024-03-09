@@ -53,7 +53,7 @@ exports.contribute = catchAsyncErrors(async (req, res, next)=>{
             return next(new ErrorHandler("Project unavailable for contribution"))
         }
     
-        debitResponse = await debitWallet(amount, `Project contribution ref:${project.id}`, req.user._id)
+        debitResponse = await debitWallet(amount, `Project contribution. Project:${project.uniqueId}`, req.user._id)
         
         if(contributorIndex === -1){
             project.contributors.push({

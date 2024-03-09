@@ -10,7 +10,8 @@ import TransactionDetails from "./TransactionDetails"
 const Transaction = ({transaction}) => {
     const [isDetailsOpen, setDetailsOpen] = useState('closed')
     const handleDetailsOpen = ()=> setDetailsOpen('opened')
-    const handleDetailsClose = ()=> setDetailsOpen('closed')
+    // const handleDetailsClose = ()=>setDetailsOpen('closed')
+    const handleDetailsClose = ()=> setTimeout(()=>setDetailsOpen('closed'),0)
 
     return (
         <TransactionWrapper color={transaction.type==='credit'?'success':'error'} onClick={handleDetailsOpen}>
@@ -33,6 +34,7 @@ const Transaction = ({transaction}) => {
         </TransactionWrapper>
     )
 }
+
 Transaction.propTypes = {
     transaction: PropTypes.object.isRequired
 }

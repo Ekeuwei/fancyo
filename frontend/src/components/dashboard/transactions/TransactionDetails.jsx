@@ -9,7 +9,7 @@ const TransactionDetails = ({transaction, isDetailsOpen, handleDetailsClose}) =>
   return (
     <ModalContainter isOpen={isDetailsOpen} handleModalClose={handleDetailsClose}>
         <Wrapper>
-            <NavHeader title={'Transaction Details '+ isDetailsOpen} handleModalClose={handleDetailsClose}/>
+            <NavHeader title={'Transaction Details'} handleModalClose={handleDetailsClose}/>
             <ValueWrapper>
                 <Type color={transaction.type==='credit'?'success':'error'}>{transaction.type}</Type>
                 <Value>{formatAmount(transaction.amount)}</Value>
