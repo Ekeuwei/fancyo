@@ -69,7 +69,7 @@ const DealAds = ({user, project, idx}) => {
                 </Details>
                 {!projectStarted?
                 <StatusWrapper value={project.contributors.length}>
-                    <AmountContributed>{formatAmount(contributedAmount)}</AmountContributed>
+                    {contributor&&<AmountContributed>{formatAmount(contributedAmount)}</AmountContributed>}
                     <Subscribers>{project.contributors.length}</Subscribers>
                     <SubscriberLabel>{project.contributors.length>1?'Contributors':'Contributor'}</SubscriberLabel>
                 </StatusWrapper>:

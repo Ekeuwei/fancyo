@@ -1,12 +1,13 @@
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 import dateFormat from 'dateformat'
-import { formatAmount, formatAmountFraction, formatNumber } from '../../../common/utils'
+import { formatAmount, formatNumber } from '../../../common/utils'
 
 const ContentDetailsList = ({project, title}) => {
     const user = JSON.parse(localStorage.getItem('user'))
     const totalContributedAmount = project.contributors.reduce((acc, contributor)=>acc+contributor.amount, 0)
     const contributor = project.contributors.find(contributor => contributor.user === user._id)
+    const userIsPunter = user._id === project.punter._id
     const contributedAmount = contributor?.amount || totalContributedAmount
 
     const contributedQuota = isNaN(contributedAmount / totalContributedAmount)? 0 : (contributedAmount / totalContributedAmount)
@@ -43,16 +44,16 @@ const ContentDetailsList = ({project, title}) => {
             </Item>
             <Item>
                 <Label>{contributor?'Amount contributed':'Total amount contributed'}</Label>
-                <Details>{formatAmount(contributedAmount)}</Details>
+                <Details>{contributor||userIsPunter?formatAmount(contributedAmount):'****'}</Details>
             </Item>
             {project.availableBalance > 0?
                 <Item>
                     <Label>{'Available Balance'}</Label>
-                    <Details>{balance}</Details>
+                    <Details>{contributor||userIsPunter?balance:'****'}</Details>
                 </Item>:
                 <Item>
                     <Label>{'Return on investment (ROI)'}</Label>
-                    <Details>{`${balance} (${formatNumber(percentIncrease)}%)`} </Details>
+                    <Details>{`${contributor||userIsPunter?balance:'****'} (${formatNumber(percentIncrease)}%)`} </Details> :
                 </Item>
             }
             <Item>
