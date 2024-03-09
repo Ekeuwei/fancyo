@@ -8,7 +8,7 @@ import { formatAmount, formatNumber, setAlpha } from "../../common/utils"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCheckCircle, faMinus, faPlus, faTimesCircle } from "@fortawesome/free-solid-svg-icons"
 
-const DealAds = ({project, idx}) => {
+const DealAds = ({user, project, idx}) => {
     const history = useHistory()
     const [isOpen, setOpen] = useState("closed")
     const [wantsToSubscribe, setWantsToSubscribe] = useState(false)
@@ -32,12 +32,15 @@ const DealAds = ({project, idx}) => {
     const toStartIn = calculateCountdown(project.startAt)
     const toEndIn = calculateCountdown(project.endAt)
     const projectStarted = project.status!=='pending';
-    const contributedAmount = project.contributors.reduce((total, contributor) => total + contributor.amount, 0)
+    const totalContributedAmount = project.contributors.reduce((total, contributor) => total + contributor.amount, 0)
+    const contributor = project.contributors.find(contributor => contributor.user === user._id)
+    const contributedAmount = contributor?.amount || totalContributedAmount
+    const contributedQuota = isNaN(contributedAmount / totalContributedAmount)? 0 : (contributedAmount / totalContributedAmount)
+    
+    const profit = (project.availableBalance - totalContributedAmount) * contributedQuota
+    const balance = formatAmount(project.availableBalance * contributedQuota)
+    const percentIncrease = isNaN(contributedAmount / totalContributedAmount)? 0: formatNumber(profit/contributedAmount * 100)
 
-    const profit = project.availableBalance - contributedAmount
-    const balance = formatAmount(project.availableBalance)
-    const percentIncrease = formatNumber(profit/contributedAmount * 100)
-  
     return (
         <>
             <Wrapper onClick={handleOpenProject}>
@@ -68,7 +71,7 @@ const DealAds = ({project, idx}) => {
                 <StatusWrapper value={project.contributors.length}>
                     <AmountContributed>{formatAmount(contributedAmount)}</AmountContributed>
                     <Subscribers>{project.contributors.length}</Subscribers>
-                    <SubscriberLabel>Contributors</SubscriberLabel>
+                    <SubscriberLabel>{project.contributors.length>1?'Contributors':'Contributor'}</SubscriberLabel>
                 </StatusWrapper>:
                 <EarningsWrapper>
                     {profit!==0&&<>
@@ -93,6 +96,7 @@ const DealAds = ({project, idx}) => {
     )
 }
 DealAds.propTypes = {
+    user: PropTypes.object.isRequired,
     project: PropTypes.object.isRequired,
     idx: PropTypes.number.isRequired,
 }

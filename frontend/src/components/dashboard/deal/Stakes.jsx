@@ -124,6 +124,7 @@ const Label = styled.p`
     margin-right: 5px;
     background-color: ${({theme, value})=>theme.colors[value.color]};
     border-radius: 8px;
+    letter-spacing: 0.5px;
     color: ${({theme})=>theme.colors.white};
     /* color: ${({theme, value})=>theme.colors[value.color]}; */
 

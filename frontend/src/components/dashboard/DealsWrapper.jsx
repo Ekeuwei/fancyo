@@ -47,19 +47,6 @@ const DealsWrapper = () => {
         setTabDirection('personal')
     }
 
-    /*const generalProjects = []
-
-    const myProjects = projects?.projects.filter(project => {
-        let isContributor = project.contributors.find(contributor => contributor.userId === user._id)
-        let isManager = user._id===project.punter._id
-
-        if(isContributor || isManager){
-            return project
-        }else{
-            generalProjects.push(project)
-        }
-    })*/
-
     return (
         <Wrapper>
 
@@ -72,8 +59,8 @@ const DealsWrapper = () => {
                 <SearchDeals />
                 {loading?<Loading value={loading?'loading':''} />:<>
                     {tabDirection==='general'?
-                        projects?.projects.map((project, index) => <DealAds key={index} idx={index} project={project} />):
-                        myProjects?.projects.map((project, index) => <DealAds key={index} idx={index} project={project} />)
+                        projects?.projects.map((project, index) => <DealAds key={index} idx={index} project={project} user={user} />):
+                        myProjects?.projects.map((project, index) => <DealAds key={index} idx={index} project={project} user={user} />)
                     }
                 </>}
             </List>
