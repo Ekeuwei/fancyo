@@ -1,13 +1,13 @@
 import styled from 'styled-components'
 import { Input } from '../../theme/ThemeStyle'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowAltCircleRight, faLaugh } from '@fortawesome/free-regular-svg-icons'
+import { faSearch, faArrowAltCircleRight } from '@fortawesome/free-solid-svg-icons'
 
 const SearchDeals = () => {
   return (
     <Wrapper>
-        <Label> <FontAwesomeIcon icon={faLaugh}/> </Label>
-        <SearchInput placeholder='Search by ROI, ID or Author' />
+        <Label> <FontAwesomeIcon icon={faSearch}/> </Label>
+        <SearchInput placeholder='Search by ROI, ID or Punter' />
         <Label type='submit'> <FontAwesomeIcon icon={faArrowAltCircleRight} size='xl'/> </Label>
     </Wrapper>
   )

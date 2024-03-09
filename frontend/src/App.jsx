@@ -22,6 +22,7 @@ import ProtectedRoute from "./app/route/ProtectedRoute";
 import Toast from "./components/user/layout/Toast";
 import Disclaimer from "./components/dashboard/modals/Disclaimer";
 import Transactions from "./components/dashboard/transactions";
+import ValidateBvn from "./components/user/ValidateBvn";
     
 export const appName = import.meta.env.VITE_APP_NAME
 
@@ -54,6 +55,8 @@ function App() {
               <ProtectedRoute path="/project/punter/:id" component={Manager} exact />
               <ProtectedRoute path="/dashboard/punter" component={PunterDashboard} exact />
               <ProtectedRoute path="/dashboard/punter/project/details" component={ProjectDetails} exact />
+              
+              <Route path="/bvn" component={ValidateBvn} exact />
           </Router>
       </StyleWrapper>
     </ThemeProvider>

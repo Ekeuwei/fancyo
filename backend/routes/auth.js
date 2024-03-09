@@ -21,7 +21,8 @@ const {
     validateUser,
     requestToken,
     validateToken,
-    addBankAccount
+    addBankAccount,
+    getBvnDetails
 } = require ('../controllers/authController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../midllewares/auth')
@@ -46,6 +47,8 @@ router.route('/admin/user/:id')
             .get(isAuthenticatedUser, authorizeRoles('admin'), getUserDetails)
             .put(isAuthenticatedUser, authorizeRoles('admin'), updateUser)
             .delete(isAuthenticatedUser, authorizeRoles('admin'), deleteUser);
+
+router.route('/bvn/validate').get(getBvnDetails);
 /*
 router.route('/live').get(keepAlive);
 router.route('/activate').get(resendActivationToken);

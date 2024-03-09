@@ -11,7 +11,7 @@ const WalletDisplay = () => {
     const dispatch = useDispatch()
     const history = useHistory()
 
-    const { walletBalance } = useSelector(state => state.user)
+    const { walletBalance, loading } = useSelector(state => state.user)
 
     useEffect(()=>{
         dispatch(api.wallet())
@@ -22,7 +22,7 @@ const WalletDisplay = () => {
         <Wrapper>
             <MainView>
                 <Title>My portfolio</Title>
-                <Balance>{formatAmountFraction(walletBalance)}</Balance>
+                <Balance>{loading?'** * **':formatAmountFraction(walletBalance)}</Balance>
             </MainView>
             <ButtonGroup>
                 <Button onClick={()=>history.push('/cashout')}>

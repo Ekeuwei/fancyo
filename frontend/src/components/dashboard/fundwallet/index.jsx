@@ -55,18 +55,22 @@ const FundWallet = () => {
     <>
       <NavHeader title={'Fund Wallet'} />
       <BodyWrapper>
-        <p>Select Payment method</p>
-        <PaymentMethods>
-          <PaymentButton onClick={()=>setPaymentOption("transfer")} value={paymentOption==="transfer"?"active":""}>Bank transer</PaymentButton>
-          <PaymentButton onClick={()=>setPaymentOption("card")} value={paymentOption==="card"?"active":""}>Pay with card</PaymentButton>
-        </PaymentMethods>
-        <AccountDisplay>
-          <Text>Deposit into account number below for instant crediting</Text>
-          <AccountDetails>
-            <Text>Guaranty Trust Bank</Text>
-            <HeadingText onClick={handleTextCopied} value={textCopied}>0236334534 <FontAwesomeIcon icon={faCopy} /></HeadingText>
-          </AccountDetails>
-        </AccountDisplay>
+        {false&&
+        <>
+          <p>Select Payment method</p>
+          <PaymentMethods>
+            <PaymentButton onClick={()=>setPaymentOption("transfer")} value={paymentOption==="transfer"?"active":""}>Bank transer</PaymentButton>
+            <PaymentButton onClick={()=>setPaymentOption("card")} value={paymentOption==="card"?"active":""}>Pay with card</PaymentButton>
+          </PaymentMethods>
+          <AccountDisplay>
+            <Text>Deposit into account number below for instant crediting</Text>
+            <AccountDetails>
+              <Text>Guaranty Trust Bank</Text>
+              <HeadingText onClick={handleTextCopied} value={textCopied}>0236334534 <FontAwesomeIcon icon={faCopy} /></HeadingText>
+            </AccountDetails>
+          </AccountDisplay>
+        </>
+        }
         <List>
           <ListItem>Minimum per transaction NGN 1,000</ListItem>
           <ListItem>Maximum per transaction NGN 10,000,000</ListItem>

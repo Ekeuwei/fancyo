@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const got = require('got');
 
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../midllewares/catchAsyncErrors');
@@ -521,6 +522,34 @@ exports.logout = catchAsyncErrors( async (req, res, next)=>{
     res.status(200).json({
         success: true,
         message: 'Logged out'
+    })
+});
+
+// BVN Details user => /app/v1/bvn/validate
+exports.getBvnDetails = catchAsyncErrors( async (req, res, next)=>{
+    
+    const url = `https://nibloansapi.azurewebsites.net/api/v1/bvnvalidationsimple/`;
+    
+    let bvnDetails;
+    try {
+        bvnDetails = await got.post(url, {
+                
+                json: {
+                    bvn: req.query.bvn,
+                },
+            }).json();
+        
+    } catch (error) {
+        return next(new ErrorHandler('Error fetching BVN details'))
+    } 
+    
+    if(!bvnDetails.gender){
+        return next(new ErrorHandler('BVN not valid'))
+    }
+
+    res.status(200).json({
+        success: true,
+        bvnDetails
     })
 });
 

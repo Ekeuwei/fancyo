@@ -60,6 +60,9 @@ import {
     verifyTopupStart,
     verifyTopupSuccess,
     verifyTopupFailure,
+    fetchBvnDetailsStart,
+    fetchBvnDetailsSuccess,
+    fetchBvnDetailsFailure,
     createToast,
 } from "../app/user/userSlice"
 
@@ -407,6 +410,21 @@ export const api = {
         } catch (error) {
 
             dispatch(verifyTopupFailure(error.response.data.message))
+        }
+    },
+    
+    // Fetch BVN Details
+    fetchBvnDetails: (bvn) => async (dispatch) =>{
+        try {
+            dispatch(fetchBvnDetailsStart())
+
+            const { data } = await instance.get(`/api/v1/bvn/validate?bvn=${bvn}`)
+            
+            dispatch(fetchBvnDetailsSuccess(data.bvnDetails))
+
+        } catch (error) {
+
+            dispatch(fetchBvnDetailsFailure(error.response.data.message))
         }
     },
 

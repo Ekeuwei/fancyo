@@ -117,6 +117,19 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    fetchBvnDetailsStart: state => {
+      state.loading = true;
+      state.error = null;
+    },
+    fetchBvnDetailsSuccess: (state, action) => {
+      state.bvnDetails = action.payload;
+      state.loading = false;
+    },
+    fetchBvnDetailsFailure: (state, action) => {
+      state.loading = false;
+      state.bvnDetails = null;
+      state.error = action.payload;
+    },
     
     
     clearUserErrors: (state) => {
@@ -174,6 +187,9 @@ export const {
   verifyTopupStart,
   verifyTopupSuccess,
   verifyTopupFailure,
+  fetchBvnDetailsStart,
+  fetchBvnDetailsSuccess,
+  fetchBvnDetailsFailure,
 
   clearLink,
   clearUserErrors,
