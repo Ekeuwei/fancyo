@@ -27,7 +27,9 @@ const ValidateBvn = () => {
         dispatch(clearUserErrors())
     }
 
-    setBvn(e.target.value)
+    if(e.target.value.length <= 11){
+        setBvn(e.target.value)
+    }
   }
   return (
     <>
