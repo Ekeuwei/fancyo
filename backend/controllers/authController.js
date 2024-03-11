@@ -13,6 +13,7 @@ const cloudinary = require('cloudinary');
 const Wallet = require('../models/wallet');
 const sendSMS = require('../utils/sendSMS');
 const sendUserToken = require('../utils/sendUserToken');
+const Badge = require('../models/badge');
  
 // Register a user => /api/v1/auth/validate
 exports.validateUser = catchAsyncErrors( async (req, res, next)=>{
@@ -457,10 +458,16 @@ exports.addBankAccount = catchAsyncErrors( async (req, res, next) => {
 // Get currently logged in user details => /api/v1/me
 exports.getUserProfile = catchAsyncErrors( async (req, res, next) => {
     const user = req.user;
+    let badge;
+
+    if(req.user.role==='punter'){
+        badge = await Badge.findOne({number: req.user.badge}).select('-_id -__v')
+    }
 
     res.status(200).json({
         success: true,
-        user
+        user,
+        badge
     });
 });
 

@@ -1,9 +1,11 @@
 const Bank = require("../models/bank");
+const Badge = require("../models/badge");
 
 const dotenv = require("dotenv");
 const connectDatabase = require("../config/database");
 
 const banks = require("../data/banks.json");
+const badges = require("../data/badges.json");
 const { connect } = require("mongoose");
 const sendSMS = require("./sendSMS");
 const Ticket = require("../models/ticket");
@@ -23,6 +25,21 @@ const seedBanks = async () => {
 
     await Bank.insertMany(banks);
     console.log("All banks are added");
+
+    process.exit();
+  } catch (error) {
+    console.error(error.message);
+    process.exit();
+  }
+};
+
+const seedBadges = async () => {
+  try {
+    await Badge.deleteMany();
+    console.log("Batches deleted");
+
+    await Badge.insertMany(badges);
+    console.log("All badges are added");
 
     process.exit();
   } catch (error) {
@@ -69,6 +86,7 @@ const updateProject = async ()=>{
   process.exit(1)
 }
 
-updateProject();
+// updateProject();
+seedBadges();
 // updateTickets();
 // seedBanks();

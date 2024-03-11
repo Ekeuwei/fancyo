@@ -91,6 +91,10 @@ const userSchema = new mongoose.Schema({
         enum: ["user", "punter", "admin"],
         default: 'user'
     },
+    badge:{
+        type: Number,
+        default: 0,
+    },
     userMode: {
         type: Boolean,
         default: true
@@ -117,6 +121,12 @@ const userSchema = new mongoose.Schema({
 // Encrypting password before saving
 userSchema.pre('save', async function (next){
 
+    if(this.isModified('role')){
+        if(this.role === 'punter'){
+            this.badge += 1
+        }
+    }
+    
     if(this.isNew){
         this.token = await this.getToken();
     }

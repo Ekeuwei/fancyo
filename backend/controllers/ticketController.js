@@ -51,7 +51,16 @@ exports.newTicket = catchAsyncErrors( async (req, res, next) => {
         // return next(new ErrorHandler("Tickets must be submitted 3 hours before kickoff of all matches.", 403))   
     }
 
+    const totalOdds  = games.reduce((prev, game)=> prev * game.odds, 1)
+    const allowedOddsRange = project.maxOdds >= totalOdds && totalOdds <= project.minOdds
+
+    if(!allowedOddsRange){
+        return next(new ErrorHandler(`total ticket odds must not exceed project's maximum odds (${project.maxOdds}) and must not be lower than project minimum odds (${project.minOdds})`))
+    }
+    
+
     project.availableBalance -= parseFloat(req.body.stakeAmount)
+
     await project.save()
 
     req.body.games = games

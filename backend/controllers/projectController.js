@@ -6,11 +6,12 @@ const cloudinary = require('cloudinary');
 const User = require('../models/user');
 const { debitWallet } = require('./paymentController');
 const Ticket = require('../models/ticket');
+const Badge = require('../models/badge');
 
 // Create new project => /api/v1/punter/project/new
 exports.newProject = catchAsyncErrors( async (req, res, next) => {
 
-    const { startAt, endAt } = req.body;
+    const { startAt, endAt, minOdds, maxOdds } = req.body;
 
     req.body.punter = req.user._id;
 
@@ -22,6 +23,15 @@ exports.newProject = catchAsyncErrors( async (req, res, next) => {
     if(!allowedProjectTimeFrame){
         return next(new ErrorHandler("Project must start at least six hours from now and must end later than start date", 403))   
     }
+
+    // check if punter's batch aligns with projects min odds
+    const badge = await Badge.findOne({number: req.user.badge})
+    const isBadgeLevelProject = badge.maxOdds >= maxOdds
+
+    if(!isBadgeLevelProject){
+        return next(new ErrorHandler(`Your badge clearance (${badge.name}) level not high enough to run this project.`))
+    }
+
     const project = await Project.create(req.body);
 
     res.status(201).json({

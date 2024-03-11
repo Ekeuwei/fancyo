@@ -13,9 +13,12 @@ const projectSchema = new mongoose.Schema({
     notes: {
         type: String,
     },
-    budget: { 
+    minOdds: { 
         type: Number, 
-        required: true 
+        min: [1.3, 'Minimum odd must be at least 1.30']
+    },
+    maxOdds: { 
+        type: Number, 
     },
     eRoi: { 
         type: Number, 

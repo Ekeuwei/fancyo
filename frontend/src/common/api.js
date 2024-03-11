@@ -60,6 +60,9 @@ import {
     verifyTopupStart,
     verifyTopupSuccess,
     verifyTopupFailure,
+    getBadgeStart,
+    getBadgeSuccess,
+    getBadgeFailure,
     fetchBvnDetailsStart,
     fetchBvnDetailsSuccess,
     fetchBvnDetailsFailure,
@@ -117,6 +120,10 @@ export const api = {
 
             localStorage.setItem('user', JSON.stringify(data.user))
 
+            if(data.badge){
+                dispatch(getBadgeSuccess(data.badge))
+            }
+
             dispatch(loginSuccess(data.user))
 
         } catch (error) {
@@ -133,6 +140,10 @@ export const api = {
             
             localStorage.setItem('user', JSON.stringify(data.user))
 
+            if(data.badge){
+                dispatch(getBadgeSuccess(data.badge))
+            }
+            
             dispatch(loadUserSuccess(data.user))
 
         } catch (error) {

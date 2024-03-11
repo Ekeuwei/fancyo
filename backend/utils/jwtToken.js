@@ -1,5 +1,6 @@
+const Badge = require('../models/badge')
 // Create and send token and save in the cookie.
-const sendToken = (user, statusCode, res) => {
+const sendToken = async (user, statusCode, res) => {
 
     // Create JWT cookie
     const token = user.getJwtToken();
@@ -12,10 +13,17 @@ const sendToken = (user, statusCode, res) => {
         httpOnly: true
     }
 
+    let badge;
+
+    if(user.role==='punter'){
+        badge = await Badge.findOne({number: user.badge}).select('-_id -__v')
+    }
+
     res.status(statusCode).cookie('token', token, options).json({
         success: true,
         token,
-        user
+        user,
+        badge
     })
 }
 

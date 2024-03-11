@@ -103,6 +103,18 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    getBadgeStart: state => {
+      state.loading = true;
+      state.error = null;
+    },
+    getBadgeSuccess: (state, action) => {
+      state.badge = action.payload;
+      state.loading = false;
+    },
+    getBadgeFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
 
     verifyTopupStart: state => {
       state.loading = true;
@@ -190,6 +202,9 @@ export const {
   fetchBvnDetailsStart,
   fetchBvnDetailsSuccess,
   fetchBvnDetailsFailure,
+  getBadgeStart,
+  getBadgeSuccess,
+  getBadgeFailure,
 
   clearLink,
   clearUserErrors,

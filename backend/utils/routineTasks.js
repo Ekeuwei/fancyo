@@ -190,10 +190,11 @@ exports.updateProjectProgress = async () => {
 
         // Settle platform
         // await creditWallet(platformCommission, `Platform commission settlement. Project: ${project.uniqueId}`, 'platform purse');
+        
+        project.availableBalance = 0
+        project.roi = profit
       }
 
-      project.availableBalance = 0
-      project.roi = profit
 
       return project.save();
     }));

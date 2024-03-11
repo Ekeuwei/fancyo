@@ -81,7 +81,7 @@ const FundWallet = () => {
             { error }
         </NoticeMessage>}
 
-        {paymentOption==="card"&&<form onSubmit={handleCardPayment}>
+        <form onSubmit={handleCardPayment}>
           <InputWrapper>
             <InputLabel value={amount} >Amount</InputLabel>
             <Input 
@@ -97,7 +97,7 @@ const FundWallet = () => {
             Proceed <Loading value={loading} />
         </Button>
 
-        </form>}
+        </form>
       </BodyWrapper>
     </>
   )
