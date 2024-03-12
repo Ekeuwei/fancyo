@@ -26,11 +26,20 @@ exports.newProject = catchAsyncErrors( async (req, res, next) => {
 
     // check if punter's batch aligns with projects min odds
     const badge = await Badge.findOne({number: req.user.badge})
-    const isBadgeLevelProject = badge.maxOdds >= maxOdds
+    const isBadgeLevelProject = badge.maxOdds >= maxOdds && badge.maxOdds >= minOdds
 
     if(!isBadgeLevelProject){
-        return next(new ErrorHandler(`Your badge clearance (${badge.name}) level not high enough to run this project.`))
+        return next(new ErrorHandler(`Insufficient badge level. "${badge.title}" cannot run this project. Set your minimum and maximum below ${badge.maxOdds}`))
     }
+    
+    if(maxOdds < minOdds){
+        return next(new ErrorHandler(`Minimum odds value must be lower than maximum odds value.`))
+    }
+    
+    if((parseFloat(minOdds) + 0.2) >= parseFloat(maxOdds) ){
+        return next(new ErrorHandler(`Allow a odd difference of 0.2 between maximum and minimum odds.`))
+    }
+    
 
     const project = await Project.create(req.body);
 
@@ -75,6 +84,8 @@ exports.contribute = catchAsyncErrors(async (req, res, next)=>{
         }
         
         project.availableBalance += parseInt(amount)
+
+        project.stats.highestBalance = Math.max(project.stats.highestBalance, project.availableBalance)
     
         await project.save();
 

@@ -7,8 +7,11 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
 import { formatAmount, formatNumber, setAlpha } from "../../common/utils"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCheckCircle, faMinus, faPlus, faTimesCircle } from "@fortawesome/free-solid-svg-icons"
+import { clearProjectErrors } from "../../app/project/projectSlice"
+import { useDispatch } from "react-redux"
 
 const DealAds = ({user, project, idx}) => {
+    const dispatch = useDispatch()
     const history = useHistory()
     const [isOpen, setOpen] = useState("closed")
     const [wantsToSubscribe, setWantsToSubscribe] = useState(false)
@@ -16,6 +19,7 @@ const DealAds = ({user, project, idx}) => {
     const handleModalOpen = ()=> setOpen("opened")
     const handleModalClose = ()=> {
         setOpen("closed")
+        dispatch(clearProjectErrors())
         setWantsToSubscribe(false)
     }
     const handleSubscribe = ()=>setWantsToSubscribe(true)

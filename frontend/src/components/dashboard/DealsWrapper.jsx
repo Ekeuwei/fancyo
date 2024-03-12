@@ -5,9 +5,9 @@ import SearchDeals from "./SearchDeals"
 import { useDispatch, useSelector } from "react-redux"
 import { api } from "../../common/api"
 import { Loading } from "../../theme/ThemeStyle"
-import { createToast } from "../../app/user/userSlice"
 import FloatingButton from "./layout/FloatingButton"
 import NewProject from "./punter/NewProject"
+import { clearProjectErrors } from "../../app/project/projectSlice"
 
 const DealsWrapper = () => {
     const dispatch = useDispatch()
@@ -16,7 +16,7 @@ const DealsWrapper = () => {
     const [myDealActive, setMyDealsActive] = useState('')
     const [tabDirection, setTabDirection] = useState('general')
 
-    const { projects, myProjects, loading, error } = useSelector(state => state.project)
+    const { projects, myProjects, loading } = useSelector(state => state.project)
 
     const user = JSON.parse(localStorage.getItem('user'))
     
@@ -26,14 +26,17 @@ const DealsWrapper = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
 
-    useEffect(()=>{
-      if(error){
-        dispatch(createToast({message:error, type:'error'}))
-      }
-    },[error, dispatch])
+    // useEffect(()=>{
+    //   if(error){
+    //     dispatch(createToast({message:error, type:'error'}))
+    //   }
+    // },[error, dispatch])
 
     const [isOpen, setOpen] = useState("closed")
-    const handleModalClose = ()=> setOpen("closed")
+    const handleModalClose = ()=> {
+        dispatch(clearProjectErrors())
+        setOpen("closed")
+    }
     const handleModalOpen = ()=> setOpen("opened")
 
     const dealHandler = ()=>{
@@ -57,12 +60,13 @@ const DealsWrapper = () => {
 
             <List>
                 <SearchDeals />
-                {loading?<Loading value={loading?'loading':''} />:<>
+                <Loading value={loading?'loading':''} />
+                <>
                     {tabDirection==='general'?
                         projects?.projects.map((project, index) => <DealAds key={index} idx={index} project={project} user={user} />):
                         myProjects?.projects.map((project, index) => <DealAds key={index} idx={index} project={project} user={user} />)
                     }
-                </>}
+                </>
             </List>
 
             {user.role==='punter'&&<>

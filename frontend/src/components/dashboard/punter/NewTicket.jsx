@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import ModalContainter from '../modals/ModalContainter'
 import PropTypes from 'prop-types'
-import { Button, Input, InputLabel, InputWrapper, Loading, NoticeMessage, Select, Shake } from '../../../theme/ThemeStyle'
+import { BannerNotice, Button, Input, InputLabel, InputWrapper, Loading, NoticeMessage, Select, Shake } from '../../../theme/ThemeStyle'
 import { useEffect, useState } from 'react'
 import NavHeader from '../layout/NavHeader'
 import Ticket from './Ticket'
@@ -10,7 +10,7 @@ import { api } from '../../../common/api'
 import { createToast } from '../../../app/user/userSlice'
 import { clearLoadedTicket } from '../../../app/project/projectSlice'
 import { clearTicketErrors } from '../../../app/ticket/ticketSlice'
-import { formatNumber, formatNumberToFloat } from '../../../common/utils'
+import { formatNumber, formatNumberToFloat, getNextStakeAmount } from '../../../common/utils'
 
 const NewTicket = ({isOpen, handleModalClose, projectId}) => {
     const [data, setData] = useState({
@@ -62,8 +62,13 @@ const NewTicket = ({isOpen, handleModalClose, projectId}) => {
         e.preventDefault()
         const newEmptyFields = Object.keys(data).filter(key=>data[key]==='')
         setEmptyFields(newEmptyFields)
-
-        if(newEmptyFields.length === 0){
+        const isTicketInprogress = projectDetails?.tickets.some(ticket => ticket.status === 'in progress');
+        
+        if(projectDetails.project.progressiveStaking && !isTicketInprogress){
+            
+            // Dispatch an error that the last ticket need to conclude before creating a new ticket
+        
+        }else if(newEmptyFields.length === 0){
             dispatch(api.createTicket({
                 ...data, 
                 stakeAmount: formatNumberToFloat(data.stakeAmount), 
@@ -101,11 +106,27 @@ const NewTicket = ({isOpen, handleModalClose, projectId}) => {
     },[data.bookie, dispatch, message])
 
     
+    const nextStakeAmount = getNextStakeAmount(
+                                projectDetails?.project.minOdds, 
+                                projectDetails?.project.progressiveSteps, 
+                                projectDetails?.project.stats?.highestBalance, 
+                                projectDetails?.project.stats?.lossStreakCount)
+    useEffect(()=>{
+        if(projectDetails?.project.progressiveStaking){
+            setData(prevData => ({...prevData, stakeAmount: nextStakeAmount}))
+        }
+    },[data.stakeAmount, nextStakeAmount, projectDetails?.project.progressiveStaking])
     return (
         <ModalContainter isOpen={isOpen} handleModalClose={handleModalClose} >
             <>
                 <NavHeader title={"Create Ticket"} handleModalClose={handleModalClose}/>
                 <FormControl onSubmit={handleSubmit}>
+                    
+                    {projectDetails?.project.progressiveStaking && projectDetails?.project.stats.lossStreakCount>1 &&
+                        <BannerNotice color='error'><strong>Note: </strong>You lost your last {projectDetails?.project.stats.lossStreakCount==1?'ticket':projectDetails?.project.stats.lossStreakCount+' tickets'}, 
+                            you have 3 chances left to recover your loss
+                        </BannerNotice>}
+
                     <Shake value={emptyFields.includes('ticketId')?'animate':''}>
                         <InputWrapper>
                             <InputLabel value={data.ticketId}>Ticket Id</InputLabel>
@@ -139,7 +160,10 @@ const NewTicket = ({isOpen, handleModalClose, projectId}) => {
                             </Select>
                         </InputWrapper>
                     </Shake>
-
+                    {projectDetails?.project.progressiveStaking &&
+                    <BannerNotice color='accent'><strong>Note: </strong>Progressive staking strategy is applied to this project. 
+                        Hence, stake amount is auto calculated. 
+                    </BannerNotice>}
                     <Shake value={emptyFields.includes('stakeAmount')?'animate':''}>
                         <InputWrapper>
                             <InputLabel value={data.stakeAmount}>Stake Amount</InputLabel>
@@ -148,6 +172,7 @@ const NewTicket = ({isOpen, handleModalClose, projectId}) => {
                                 label={data.stakeAmount}
                                 name='stakeAmount'
                                 autoComplete='off'
+                                disabled={projectDetails?.project.progressiveStaking}
                                 placeholder='Stake Amount'
                                 onChange={onChange} />
                         </InputWrapper>
@@ -173,7 +198,6 @@ NewTicket.propTypes = {
 const FormControl = styled.form`
     padding: 0 10px 10px;
 `
-
 const SendButton = styled(Button)`
     position: absolute;
     right: 2px;

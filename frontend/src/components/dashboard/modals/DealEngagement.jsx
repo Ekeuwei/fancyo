@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
-import { Button, Input, Loading, Shake, slideIn, slideOut } from '../../../theme/ThemeStyle'
+import { Button, Input, Loading, NoticeMessage, Shake, slideIn, slideOut } from '../../../theme/ThemeStyle'
 import { useEffect, useRef, useState } from 'react'
 import NavHeader from '../layout/NavHeader'
 import ContentDetailsList from '../layout/ContentDetailsList'
@@ -10,6 +10,7 @@ import { api } from '../../../common/api'
 import { clearProjectErrors } from '../../../app/project/projectSlice'
 import { formatAmount, formatAmountFraction, formatNumber, formatNumberToFloat } from '../../../common/utils'
 import Disclaimer from './Disclaimer'
+import { createToast } from '../../../app/user/userSlice'
 
 const DealEngagement = ({isOpen, handleModalClose, project, title, idx}) => {
     const dispatch = useDispatch()
@@ -44,12 +45,12 @@ const DealEngagement = ({isOpen, handleModalClose, project, title, idx}) => {
     }
 
     useEffect(()=>{
-        if(error||message){
+        if(message){
+            dispatch(createToast({type:'success', message}))
             dispatch(clearProjectErrors())
             closeConfirmDialog()
-
         }
-    },[error, message, dispatch])
+    },[message, dispatch])
 
     const [currentIndex, setCurrentIndex] = useState(0);
     
@@ -121,9 +122,10 @@ const DealEngagement = ({isOpen, handleModalClose, project, title, idx}) => {
                             </View>
                         ))}
                     </ParentWrap>
+                    <NoticeMessage value={error?'error':''}>{error}</NoticeMessage>
                     <ButtonWrapper>
                         <ButtonClose onClick={prevView}>{currentIndex==0?'Close':'Back'}</ButtonClose>
-                        <Btn onClick={nextView}>{currentIndex===1?'Submit':'Contribute'}</Btn>
+                        <Btn disabled={loading} onClick={nextView}>{currentIndex===1?'Submit':'Contribute'} <Loading value={loading}/></Btn>
                     </ButtonWrapper>
 
                 </SliderWrapper>
@@ -132,9 +134,10 @@ const DealEngagement = ({isOpen, handleModalClose, project, title, idx}) => {
             <ModalContainter isOpen={confirmDialog} handleModalClose={null}>
                 <>
                     <Text>Please confirm the contribution of {formatAmount(amount)} to project ID: {project.uniqueId}</Text>
+                    <NoticeMessage value={error?'error':''}>{error}</NoticeMessage>
                     <ButtonWrapper>
                         <ButtonClose onClick={closeConfirmDialog}>Cancel</ButtonClose>
-                        <Btn onClick={confirmContribution}> {loading&&<Loading />} I Confirm</Btn>
+                        <Btn disabled={loading} onClick={confirmContribution}> {<Loading value={loading} />} I Confirm</Btn>
                     </ButtonWrapper>
                 </>
             </ModalContainter>

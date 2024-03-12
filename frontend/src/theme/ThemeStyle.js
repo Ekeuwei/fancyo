@@ -1,4 +1,5 @@
 import styled, { keyframes } from 'styled-components';
+import { setAlpha } from '../common/utils';
 
 /* Key Frames */
 const spin = keyframes`
@@ -115,7 +116,7 @@ export const HomeStyle = styled.div`
 export const BodyWrapper = styled.div`
     display: flex;
     flex-direction: column;
-    margin: 0 5px;
+    margin: 0 5px 10px;
 `
 
 export const Fade = styled.div`
@@ -276,6 +277,17 @@ export const NoticeMessage = styled.div`
     border-radius: 10px;
     border: solid 1px;
     margin: 10px;
+`
+
+export const BannerNotice = styled.p`
+    padding: 5px;
+    color: ${({theme})=>theme.colors.text};
+    background: ${({theme, color})=>setAlpha(theme.colors[color], 0.15)};
+    border-left: 4px solid ${({theme, color})=>theme.colors[color]};
+    border-right: 4px solid ${({theme, color})=>theme.colors[color]};
+    border-radius: 5px;
+    margin: 10px 0;
+    line-height: 1.35;
 `
 
 /* Spinner */

@@ -84,13 +84,26 @@ exports.updateTicketProgress = async () => {
       const wonAllMatches = ticket.games.every(game => game.outcome === 1);
       ticket.status = matchesConcluded && wonAllMatches ? 'successful' :
         matchesConcluded && !wonAllMatches ? 'failed' : ticket.status;
-
-      // Settlement for successful tickets
-      if (ticket.status === 'successful') {
-        const settlement = ticket.games.reduce((prev, current) => prev * (current.outcome === 1 ? current.odds : 1), ticket.stakeAmount);
+        
+      if(ticket.status !== 'in progress'){
+        
+        // Settlement for successful tickets
         const project = await Project.findById(ticket.projectId);
-        project.availableBalance += settlement;
+        if (ticket.status === 'successful') {
+          const settlement = ticket.games.reduce((prev, current) => prev * (current.outcome === 1 ? current.odds : 1), ticket.stakeAmount);
+          project.availableBalance += settlement;
+  
+          project.stats.lossStreakCount = 0
+          project.stats.highestBalance = Math.max(project.stats.highestBalance, project.availableBalance)
+  
+        }
+        
+        if(ticket.status === 'failed'){
+          project.stats.lossStreakCount += 1
+        }
+        
         await project.save();
+
       }
 
       console.log(`Ticket ${idx + 1} updated`);

@@ -81,3 +81,56 @@ const hexToRgb = (hex)=> {
 }
 
 export const avatars = Object.values(import.meta.glob('../../public/assets/avatars/*.{png,jpg,jpeg,PNG,JPEG}', { eager: true, as: 'url' }))
+
+
+const betproCalc = (odds, steps, bankroll, profit)=>{
+   const stakes = [ ]
+   const p = profit || 1; // profit is the expected profit that must be ensured per stake
+   
+   for(let i=1; i<=steps; i++){
+      const sum = stakes.reduce((accumulator, currentValue)=>accumulator + currentValue, 0)
+      const nextStake = (i*p+sum)/(odds-1)
+      stakes.push(nextStake)
+   }
+
+   let newStakes = [ ]
+   if(!profit){
+      const sum = stakes.reduce((accumulator, currentValue)=> accumulator + currentValue, 0)
+      newStakes= stakes.map(stake => stake/sum * bankroll)
+   }else{
+      newStakes = stakes
+   }
+   
+   return newStakes;
+}
+
+export const estimateRoi = (odds, steps, numberOfStakes)=>{
+
+  // eslint-disable-next-line no-unused-vars
+  let bankroll = 100//parseFloat(bankroll.toString().replace(/,/g, ''));
+
+  let newBankroll = bankroll;
+   
+   for(let i=0; i<numberOfStakes; i++){
+       const timeToAdd = Math.floor(Math.random() * parseInt(steps/2)) + 1;
+       const stakes = betproCalc(odds, steps, newBankroll);
+       const minProfit = stakes[0]*odds-stakes[0];
+      
+      newBankroll += minProfit*timeToAdd;
+      
+   }
+   
+   const formatNumber = value => new Intl.NumberFormat('en-US').format(value.toFixed(2))//Number(value).toLocaleString("en-US");
+   
+   const percentIncrease = formatNumber((newBankroll-bankroll)/bankroll * 100)
+
+  return isNaN(percentIncrease)? 0 : `${Math.round(percentIncrease)}`
+}
+
+export const getNextStakeAmount = (odds, steps, bankroll, failCount)=>{
+
+  const stakes = betproCalc(odds, steps, bankroll)
+
+  return stakes[failCount]? formatNumber(stakes[failCount]):''
+
+}

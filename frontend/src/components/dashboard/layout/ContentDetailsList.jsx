@@ -31,6 +31,10 @@ const ContentDetailsList = ({project, title}) => {
                 <Details>{title.split(' in ')[1]}</Details>
             </Item>
             <Item>
+                <Label>ROI</Label>
+                <Details>Estimated at {project.eRoi}%</Details>
+            </Item>
+            <Item>
                 <Label>{'Starts'}</Label>
                 <Details>{dateFormat(project.startAt, 'ddd mmm dS')}</Details>
             </Item>
@@ -53,7 +57,7 @@ const ContentDetailsList = ({project, title}) => {
                 </Item>:
                 <Item>
                     <Label>{'Return on investment (ROI)'}</Label>
-                    <Details>{`${contributor||userIsPunter?balance:'****'} (${formatNumber(percentIncrease)}%)`} </Details> :
+                    <Details>{`${contributor||userIsPunter?balance:'****'} (${formatNumber(percentIncrease)}%)`} </Details>
                 </Item>
             }
             <Item>

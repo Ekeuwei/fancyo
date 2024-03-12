@@ -55,9 +55,8 @@ exports.newTicket = catchAsyncErrors( async (req, res, next) => {
     const allowedOddsRange = project.maxOdds >= totalOdds && totalOdds <= project.minOdds
 
     if(!allowedOddsRange){
-        return next(new ErrorHandler(`total ticket odds must not exceed project's maximum odds (${project.maxOdds}) and must not be lower than project minimum odds (${project.minOdds})`))
+        return next(new ErrorHandler(`Minimum and Maximum odds allowed per ticket is [min: ${project.minOdds}] and [max:${project.maxOdds}]`))
     }
-    
 
     project.availableBalance -= parseFloat(req.body.stakeAmount)
 

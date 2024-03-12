@@ -24,9 +24,26 @@ const projectSchema = new mongoose.Schema({
         type: Number, 
         required: true 
     },
+    progressiveStaking: { 
+        type: Boolean, 
+        default: false 
+    },
+    progressiveSteps: { 
+        type: Number
+    },
     availableBalance: { 
         type: Number, 
         default: 0
+    },
+    stats:{
+        lossStreakCount:{
+            type: Number,
+            default: 0
+        },
+        highestBalance:{
+            type: Number,
+            default: 0
+        }
     },
     roi: {
         type: Number,
