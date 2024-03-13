@@ -104,6 +104,8 @@ import {
 const instance = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true,
+    timeout: 20*1000,
+    timeoutErrorMessage: 'Request timeout, check network connectivity.'
 })
 // Login
 export const api = {
@@ -143,7 +145,7 @@ export const api = {
             if(data.badge){
                 dispatch(getBadgeSuccess(data.badge))
             }
-            
+
             dispatch(loadUserSuccess(data.user))
 
         } catch (error) {
