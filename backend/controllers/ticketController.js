@@ -52,10 +52,10 @@ exports.newTicket = catchAsyncErrors( async (req, res, next) => {
     }
 
     const totalOdds  = games.reduce((prev, game)=> prev * game.odds, 1)
-    const allowedOddsRange = project.maxOdds >= totalOdds && totalOdds <= project.minOdds
+    const allowedOddsRange = project.minOdds && project.maxOdds >= totalOdds && totalOdds <= project.minOdds
 
     if(!allowedOddsRange){
-        return next(new ErrorHandler(`Minimum and Maximum odds allowed per ticket is [min: ${project.minOdds}] and [max:${project.maxOdds}]`))
+        return next(new ErrorHandler(`Minimum and maximum odds allowed per ticket is [min: ${project.minOdds}] and [max:${project.maxOdds}]`))
     }
 
     project.availableBalance -= parseFloat(req.body.stakeAmount)
