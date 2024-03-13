@@ -82,8 +82,9 @@ exports.updateTicketProgress = async () => {
       // Update ticket status based on game outcomes
       const matchesConcluded = ticket.games.every(game => game.scores.ft !== '');
       const wonAllMatches = ticket.games.every(game => game.outcome === 1);
+      const lostAGame = ticket.games.some(game => game.outcome === 0);
       ticket.status = matchesConcluded && wonAllMatches ? 'successful' :
-        matchesConcluded && !wonAllMatches ? 'failed' : ticket.status;
+        (matchesConcluded && !wonAllMatches) || lostAGame ? 'failed' : ticket.status;
         
       if(ticket.status !== 'in progress'){
         
