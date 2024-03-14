@@ -102,7 +102,7 @@ const Login = () => {
                             <PassworVisibilityIcon showPassword={showPassword} setShowPassword={setShowPassword}/>
                         </InputWrapper>
                         <Label onClick={()=>history.push('/password/forgot')}>Forgot password</Label>
-                        <Button type="submit" disabled={loading}> <Loading value={loading} /> Login</Button>
+                        <Button type="submit" disabled={loading}> <Loading value={+loading} /> Login</Button>
                         <RedirectAccess onClick={()=>history.push('/register')}>Doesn’t have an account?
                             <div className="" style={{marginLeft: "5px", color:"green"}}>Register Now</div>
                         </RedirectAccess>

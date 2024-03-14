@@ -10,13 +10,13 @@ import { api } from '../../../common/api'
 import { createToast } from '../../../app/user/userSlice'
 import { clearLoadedTicket } from '../../../app/project/projectSlice'
 import { clearTicketErrors } from '../../../app/ticket/ticketSlice'
-import { formatNumber, formatNumberToFloat, getNextStakeAmount } from '../../../common/utils'
+import { formatNumberInput, formatNumberToFloat, getNextStakeAmount } from '../../../common/utils'
 
 const NewTicket = ({isOpen, handleModalClose, projectId}) => {
     const [data, setData] = useState({
         ticketId: '',
         bookie: '',
-        stakeAmount: ''
+        stakeAmount: '0.00'
     })
 
     const [emptyFields, setEmptyFields] = useState([])
@@ -28,10 +28,13 @@ const NewTicket = ({isOpen, handleModalClose, projectId}) => {
 
     const onChange = (e)=> setData(prevData => {
         if(e.target.name==='stakeAmount'){
-            e.target.value = e.target.value==0?'':formatNumber(e.target.value)
+
+            e.target.value = formatNumberInput(e.target.value)
+
         }
         return ({...prevData, [e.target.name]:e.target.value})
     })
+
     
     const options = [
         {
@@ -116,6 +119,7 @@ const NewTicket = ({isOpen, handleModalClose, projectId}) => {
             setData(prevData => ({...prevData, stakeAmount: nextStakeAmount}))
         }
     },[data.stakeAmount, nextStakeAmount, projectDetails?.project.progressiveStaking])
+    
     return (
         <ModalContainter isOpen={isOpen} handleModalClose={handleModalClose} >
             <>

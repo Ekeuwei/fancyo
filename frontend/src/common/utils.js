@@ -18,6 +18,26 @@ export const formatNumber_ = (value) => {
   return new Intl.NumberFormat('en-US').format(numericValue);
 };
 
+export const formatNumberInput = (value) => {
+  
+  value = '00'+value.replace(/[^\d]/g, '')
+
+  const index = value.length - 1; 
+
+  let integerPart = value.slice(0, index);
+  let decimalPart = value.slice(index);
+
+  if(decimalPart.length < 2){
+    decimalPart = integerPart.slice(-1) + decimalPart
+    integerPart = integerPart.slice(0, -1)
+  }else{
+    integerPart += decimalPart.slice(0, -2);
+    decimalPart = decimalPart.slice(1)
+  }
+
+  return `${formatNumber(integerPart)}.${decimalPart}`;  
+};
+    
 export const calculateTimeLeft = (targetDate) => {
   const now = new Date().getTime();
   const difference = new Date(targetDate) - now;
