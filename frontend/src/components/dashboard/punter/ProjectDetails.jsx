@@ -32,7 +32,7 @@ const ProjectDetails = ({match}) => {
     },[error, dispatch])
 
     const projectDuration = Math.ceil(Math.abs(new Date(projectDetails?.project.endAt).getTime() - new Date(projectDetails?.project.startAt).getTime())/(1000 * 60 * 60 * 24))
-    const title = projectDetails?`Project ${projectDetails.project.uniqueId} | ${projectDetails.project.eRoi}% in ${projectDuration} days`:'Project'
+    const title = projectDetails?`Project ${projectDetails.project.uniqueId} - ${projectDetails.project.eRoi}% in ${projectDuration} days`:'Project'
     const canCreateTicket = projectDetails?.project.punter._id===user._id && projectDetails?.project.status==='in progress'
 
     return (

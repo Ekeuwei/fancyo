@@ -39,8 +39,9 @@ const Stake = ({ticket, index, openIndex, handleToggle})=>{
 
     const allMatchesConcluded = ticket.games.every(game => game.matchStatus==='Ended' || game.matchStatus==='AP')
     const wonTicket = allMatchesConcluded && ticket.games.every(game => game.outcome == 1)
+    const lostAGame = ticket.games.some(game => game.outcome === 0);
     const color = !allMatchesConcluded?'warning':wonTicket?'success':'error'
-    const winning = !allMatchesConcluded? '': wonTicket? expectedRoi: -ticket.stakeAmount
+    const winning = wonTicket? expectedRoi: lostAGame? -ticket.stakeAmount:''
 
     return(
         <StakeWrapper>

@@ -67,8 +67,8 @@ const DealAds = ({user, project, idx}) => {
                 </Timer>
                 <Details>
                     <Title>{title}</Title>
-                    <InvestmentType>Sports Betting</InvestmentType>
-                    <Author>Author: {project.punter.username}</Author>
+                    <InvestmentType>Project ID: {project.uniqueId}</InvestmentType>
+                    <Author>Punter: {project.punter.username}</Author>
                     <Status>{project.status}</Status>
                     {/* <ProgressBar width={10} content={''}/> */}
                 </Details>
