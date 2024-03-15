@@ -25,6 +25,10 @@ const ticketSlice = createSlice({
             state.error = action.payload;
         },
         
+        createTicketError: (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        },
         clearTicketErrors: (state) => {
             state.loading = false;
             state.error = null;
@@ -39,7 +43,8 @@ export const {
     createTicketSuccess,
     createTicketFailure,
 
-    clearTicketErrors
+    createTicketError,
+    clearTicketErrors,
 } = ticketSlice.actions;
 
 export default ticketSlice.reducer;

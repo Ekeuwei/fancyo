@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { api } from '../../../common/api'
 import { createToast } from '../../../app/user/userSlice'
 import { clearLoadedTicket } from '../../../app/project/projectSlice'
-import { clearTicketErrors } from '../../../app/ticket/ticketSlice'
+import { clearTicketErrors, createTicketError } from '../../../app/ticket/ticketSlice'
 import { formatNumberInput, formatNumberToFloat, getNextStakeAmount } from '../../../common/utils'
 
 const NewTicket = ({isOpen, handleModalClose, projectId}) => {
@@ -67,9 +67,9 @@ const NewTicket = ({isOpen, handleModalClose, projectId}) => {
         setEmptyFields(newEmptyFields)
         const isTicketInprogress = projectDetails?.tickets.some(ticket => ticket.status === 'in progress');
         
-        if(projectDetails.project.progressiveStaking && !isTicketInprogress){
+        if(projectDetails.project.progressiveStaking && isTicketInprogress){
             
-            // Dispatch an error that the last ticket need to conclude before creating a new ticket
+            createTicketError('Allow the last bet ticket to conclude before submitting a new ticket.')
         
         }else if(newEmptyFields.length === 0){
             dispatch(api.createTicket({
@@ -165,7 +165,7 @@ const NewTicket = ({isOpen, handleModalClose, projectId}) => {
                         </InputWrapper>
                     </Shake>
                     {projectDetails?.project.progressiveStaking &&
-                    <BannerNotice color='accent'><strong>Note: </strong>Progressive staking strategy is applied to this project. 
+                    <BannerNotice color='accent'><strong>Note: </strong>Progressive staking strategy ({projectDetails?.project.progressiveSteps} steps) is applied to this project. 
                         Hence, stake amount is auto calculated. 
                     </BannerNotice>}
                     <Shake value={emptyFields.includes('stakeAmount')?'animate':''}>
