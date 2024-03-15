@@ -72,7 +72,8 @@ exports.updateTicketProgress_ = async ()=>{
 
 exports.updateTicketProgress = async () => {
   try {
-    const tickets = await Ticket.find({ status: 'in progress' });
+    // const tickets = await Ticket.find({ status: 'in progress' });
+    const tickets = await Ticket.find({ "games.scores.ft": '' });
 
     const updatedTickets = await Promise.all(tickets.map(async (ticket, idx) => {
       // Get updated ticket status

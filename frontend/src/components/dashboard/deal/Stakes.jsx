@@ -36,11 +36,10 @@ const Stake = ({ticket, index, openIndex, handleToggle})=>{
     const gameType = ticket.games.length > 1? 'Accumulator':'Single'
     const title = `Ticket ${index+1} - ${gameType} @${formatNumberFraction(combinedOdds)} Odds`
 
-
     const allMatchesConcluded = ticket.games.every(game => game.matchStatus==='Ended' || game.matchStatus==='AP')
     const wonTicket = allMatchesConcluded && ticket.games.every(game => game.outcome == 1)
     const lostAGame = ticket.games.some(game => game.outcome === 0);
-    const color = !allMatchesConcluded?'warning':wonTicket?'success':'error'
+    const color = wonTicket?'success':lostAGame?'error':'warning'
     const winning = wonTicket? expectedRoi: lostAGame? -ticket.stakeAmount:''
 
     return(
