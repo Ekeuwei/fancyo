@@ -69,7 +69,7 @@ const NewTicket = ({isOpen, handleModalClose, projectId}) => {
         
         if(projectDetails.project.progressiveStaking && isTicketInprogress){
             
-            createTicketError('Allow the last bet ticket to conclude before submitting a new ticket.')
+            dispatch(createTicketError('Allow the last bet ticket to conclude before submitting a new ticket.'))
         
         }else if(newEmptyFields.length === 0){
             dispatch(api.createTicket({
