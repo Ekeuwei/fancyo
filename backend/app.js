@@ -66,14 +66,14 @@ app.use('/api/v1', webhooks)
 
 cron.schedule('*/30 * * * *', async () => {
   // runs every 30 minues
-  console.log('Running 30minutes routine update...');
+  console.log('Updating bet tickets...');
   const response = await updateTicketProgress();
   console.log(response);
 })
 
 cron.schedule('0 * * * *', async () => {
   // runs every hour
-  console.log('Running hourly routine update...');
+  console.log('Updating projects...');
   const response = await updateProjectProgress();
   console.log(response);
 })

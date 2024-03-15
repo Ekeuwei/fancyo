@@ -42,9 +42,11 @@ const DealAds = ({user, project, idx}) => {
     const contributedAmount = contributor?.amount || totalContributedAmount
     const contributedQuota = isNaN(contributedAmount / totalContributedAmount)? 0 : (contributedAmount / totalContributedAmount)
     
-    const profit = (project.availableBalance - totalContributedAmount) * contributedQuota
-    const balance = formatAmount(project.availableBalance * contributedQuota)
-    const percentIncrease = isNaN(contributedAmount / totalContributedAmount)? 0: formatNumber(profit/contributedAmount * 100)
+    // const profit = (project.availableBalance - totalContributedAmount) * contributedQuota
+    const profit = ((project.availableBalance>0? project.availableBalance : (project.roi + contributedAmount)) - contributedAmount) * contributedQuota
+    // const balance = formatAmount(project.availableBalance * contributedQuota)
+    const balance = isNaN((project.availableBalance||project.roi) * contributedQuota)? formatAmount(0) : formatAmount((project.availableBalance||project.roi) * contributedQuota)
+    const percentIncrease = isNaN(profit/contributedAmount)? 0: formatNumber(profit/contributedAmount * 100)
 
     return (
         <>
