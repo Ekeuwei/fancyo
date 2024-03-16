@@ -126,9 +126,9 @@ const NewTicket = ({isOpen, handleModalClose, projectId}) => {
                 <NavHeader title={"Create Ticket"} handleModalClose={handleModalClose}/>
                 <FormControl onSubmit={handleSubmit}>
                     
-                    {projectDetails?.project.progressiveStaking && projectDetails?.project.stats.lossStreakCount>1 &&
+                    {projectDetails?.project.progressiveStaking && projectDetails?.project.stats.lossStreakCount>0 &&
                         <BannerNotice color='error'><strong>Note: </strong>You lost your last {projectDetails?.project.stats.lossStreakCount==1?'ticket':projectDetails?.project.stats.lossStreakCount+' tickets'}, 
-                            you have 3 chances left to recover your loss
+                            you have {projectDetails?.project.progressiveSteps - projectDetails?.project.stats.lossStreakCount} chances left to recover your loss
                         </BannerNotice>}
 
                     <Shake value={emptyFields.includes('ticketId')?'animate':''}>
