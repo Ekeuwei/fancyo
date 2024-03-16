@@ -80,33 +80,38 @@ exports.updateTicketProgress = async () => {
       const newTicket = await this.getTicketStatus(ticket);
       ticket.games = newTicket.games;
 
-      // Update ticket status based on game outcomes
-      const matchesConcluded = ticket.games.every(game => game.scores.ft !== '');
-      const wonAllMatches = ticket.games.every(game => game.outcome === 1);
-      const lostAGame = ticket.games.some(game => game.outcome === 0);
-      ticket.status = matchesConcluded && wonAllMatches ? 'successful' :
-        (matchesConcluded && !wonAllMatches) || lostAGame ? 'failed' : ticket.status;
-        
-      if(ticket.status !== 'in progress'){
-        
-        // Settlement for successful tickets
-        const project = await Project.findById(ticket.projectId);
-        if (ticket.status === 'successful') {
-          const settlement = ticket.games.reduce((prev, current) => prev * (current.outcome === 1 ? current.odds : 1), ticket.stakeAmount);
-          project.availableBalance += settlement;
-  
-          project.stats.lossStreakCount = 0
-          project.stats.highestBalance = Math.max(project.stats.highestBalance, project.availableBalance)
-  
-        }
-        
-        if(ticket.status === 'failed'){
-          project.stats.lossStreakCount += 1
-        }
-        
-        await project.save();
+      if(ticket.status === 'in progress'){
 
+        // Update ticket status based on game outcomes
+        const matchesConcluded = ticket.games.every(game => game.scores.ft !== '');
+        const wonAllMatches = ticket.games.every(game => game.outcome === 1);
+        const lostAGame = ticket.games.some(game => game.outcome === 0);
+        ticket.status = matchesConcluded && wonAllMatches ? 'successful' :
+          (matchesConcluded && !wonAllMatches) || lostAGame ? 'failed' : ticket.status;
+          
+        if(ticket.status !== 'in progress'){
+          
+          // Settlement for successful tickets
+          const project = await Project.findById(ticket.projectId);
+          if (ticket.status === 'successful') {
+            const settlement = ticket.games.reduce((prev, current) => prev * (current.outcome === 1 ? current.odds : 1), ticket.stakeAmount);
+            project.availableBalance += settlement;
+    
+            project.stats.lossStreakCount = 0
+            project.stats.highestBalance = Math.max(project.stats.highestBalance, project.availableBalance)
+    
+          }
+          
+          if(ticket.status === 'failed'){
+            project.stats.lossStreakCount += 1
+          }
+          
+          await project.save();
+  
+        }
+        
       }
+
 
       console.log(`Ticket ${idx + 1} updated`);
 
