@@ -24,6 +24,8 @@ import Disclaimer from "./components/dashboard/modals/Disclaimer";
 import Transactions from "./components/dashboard/transactions";
 import ValidateBvn from "./components/user/ValidateBvn";
 import RegisterPunter from "./components/user/RegisterPunter";
+import AdminDashboard from "./components/admin";
+import AllUsers from "./components/admin/users";
     
 export const appName = import.meta.env.VITE_APP_NAME
 
@@ -57,6 +59,9 @@ function App() {
               <ProtectedRoute path="/punter/:id" component={Manager} exact />
               <ProtectedRoute path="/dashboard/punter" component={PunterDashboard} exact />
               <ProtectedRoute path="/dashboard/punter/project/details" component={ProjectDetails} exact />
+              
+              <Route path="/admin/dashboard" component={AdminDashboard} exact />
+              <Route path="/admin/users" component={AllUsers} exact />
               
               <Route path="/bvn" component={ValidateBvn} exact />
           </Router>

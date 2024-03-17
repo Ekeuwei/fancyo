@@ -42,9 +42,7 @@ const DealAds = ({user, project, idx}) => {
     const contributedAmount = contributor?.amount || totalContributedAmount
     const contributedQuota = isNaN(contributedAmount / totalContributedAmount)? 0 : (contributedAmount / totalContributedAmount)
     
-    // const profit = (project.availableBalance - totalContributedAmount) * contributedQuota
-    const profit = ((project.availableBalance>0? project.availableBalance : (project.roi + contributedAmount)) - contributedAmount) * contributedQuota
-    // const balance = formatAmount(project.availableBalance * contributedQuota)
+    const profit = ((project.status==='in progress'? project.availableBalance : (project.roi + contributedAmount)) - contributedAmount) * contributedQuota
     const balance = isNaN((project.availableBalance||project.roi) * contributedQuota)? formatAmount(0) : formatAmount((project.availableBalance||project.roi) * contributedQuota)
     const percentIncrease = isNaN(profit/contributedAmount)? 0: formatNumber(profit/contributedAmount * 100)
 
@@ -89,9 +87,13 @@ const DealAds = ({user, project, idx}) => {
                                         <PercentIncrease>No Contributor</PercentIncrease>}
                             </>:<>
                                 {contributor||userIsPunter?<>
-                                    <Profit value={profit}><FontAwesomeIcon icon={profit>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{formatNumber(profit)}</Profit>
-                                    <Balance>{balance}</Balance>
-                                    <PercentIncrease>{percentIncrease}% {profit>0?'up':'down'}</PercentIncrease>
+                                    {project.status==='in progress'?<>
+                                        <Profit value={profit}><FontAwesomeIcon icon={profit>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{formatNumber(profit)}</Profit>
+                                        <Balance>{balance}</Balance>
+                                        <PercentIncrease>{percentIncrease}% {profit>0?'up':'down'}</PercentIncrease>
+                                    </>:
+                                    <Balance value={profit} color={profit>0?'success':'error'}><FontAwesomeIcon icon={profit>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{formatAmount(profit)}</Balance>
+                                    }
                                 </>:
                                 <Balance value={percentIncrease} color={percentIncrease>0?'success':'error'}><FontAwesomeIcon icon={percentIncrease>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{percentIncrease}%</Balance>
                                 }
@@ -245,6 +247,7 @@ const Balance = styled.h3`
     margin: 1px 0;
     font-size: 18px;
     font-weight: 500;
+    letter-spacing: 1px;
     color: ${({theme, color})=>color?theme.colors[color]:''}
 `
 const Profit = styled(Label)`
