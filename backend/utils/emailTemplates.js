@@ -1,10 +1,5 @@
 const formatAmount = value => `₦${new Intl.NumberFormat('en-US').format(parseFloat((value?value:0).toString().replace(/[^\d.]/g, '')).toFixed(2))}`;
-
-exports.activationEmailTemplate = (token, type)=>`
-<!DOCTYPE html>
-<html>
-<head>
-  <title>${process.env.APP_NAME} Security Notification - ${type}</title>
+const styling = `
   <style>
     /* Basic styling for the email */
     body {
@@ -29,6 +24,13 @@ exports.activationEmailTemplate = (token, type)=>`
       border-radius: 5px;
     }
   </style>
+`
+exports.activationEmailTemplate = (token, type)=>`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>${process.env.APP_NAME} Security Notification - ${type}</title>
+  ${styling}
 </head>
 <body>
   <div class="container">
@@ -46,30 +48,7 @@ exports.projectSuccessNotificationEmailTemplateUser = (details)=>`
 <html>
 <head>
   <title>Project Completion and Returns Notification</title>
-  <style>
-    /* Basic styling for the email */
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.5;
-      margin: 0;
-      padding: 0;
-    }
-    
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .button {
-      display: inline-block;
-      background-color: #007bff;
-      color: #fff;
-      padding: 10px 20px;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-  </style>
+  ${styling}
 </head>
 <body>
   <div class="container">
@@ -93,30 +72,7 @@ exports.projectSuccessNotificationEmailTemplatePunter = (details)=>`
 <html>
 <head>
   <title>Project Completion and Punter Commission Notification</title>
-  <style>
-    /* Basic styling for the email */
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.5;
-      margin: 0;
-      padding: 0;
-    }
-    
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .button {
-      display: inline-block;
-      background-color: #007bff;
-      color: #fff;
-      padding: 10px 20px;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-  </style>
+  ${styling}
 </head>
 <body>
   <div class="container">
@@ -149,41 +105,63 @@ exports.projectFailureNotificationEmailTemplateUser = (details)=>`
 <html>
 <head>
   <title>Project Completion and Returns Notification</title>
-  <style>
-    /* Basic styling for the email */
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.5;
-      margin: 0;
-      padding: 0;
-    }
-    
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .button {
-      display: inline-block;
-      background-color: #007bff;
-      color: #fff;
-      padding: 10px 20px;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-  </style>
+  ${styling}
 </head>
 <body>
   <div class="container">
     <p>Dear ${details.username},</p>
     <p>We regret to inform you that Project ${details.projectId} did not yield any profit, and there was ${details.profit < 0?'a':'no'} loss in the project. Here are the details:</p>
     <ul>
-      <li>Contribution Amount: ${details.contributedAmount}</li>
-      <li>Loss Incurred: ${Math.abs(details.profit)}</li>
-      <li>Total Amount Returned: ${(details.profit + details.contributedAmount) <= 1? 0: (details.contributedAmount + details.profit)}</li>
+      <li>Contribution Amount: ${formatAmount(details.contributedAmount)}</li>
+      <li>Loss Incurred: ${formatAmount(Math.abs(details.profit))}</li>
+      <li>Total Amount Returned: ${formatAmount(details.profit + details.contributedAmount) <= 1? 0: (details.contributedAmount + details.profit)}</li>
     </ul>
     <p>We understand that this outcome may be disappointing. If you have any questions or concerns, please don't hesitate to reach out. We appreciate your participation in this project.</p>
+    <p>Best regards,</p>
+    <p>The ${process.env.APP_NAME} Team</p>
+  </div>
+</body>
+</html>
+`
+exports.projectNoEngagementNotificationEmailTemplateUser = (details)=>`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Project Completion Notification</title>
+  ${styling}
+</head>
+<body>
+  <div class="container">
+    <p>Dear ${details.username},</p>
+    <p>Project ${details.projectId} has completed and did not yield any profit, and there was no loss of capital in the project. Here are the details:</p>
+    <ul>
+      <li>Contribution Amount: ${formatAmount(details.contributedAmount)}</li>
+      <li>Loss Incurred: ${formatAmount(Math.abs(0))}</li>
+      <li>Total Amount Returned: ${formatAmount(details.details.contributedAmount.toString())}</li>
+    </ul>
+    <p>We understand that this outcome may be disappointing. If you have any questions or concerns, please don't hesitate to reach out. We appreciate your participation in this project.</p>
+    <p>Best regards,</p>
+    <p>The ${process.env.APP_NAME} Team</p>
+  </div>
+</body>
+</html>
+`
+
+exports.projectNoEngagementNotificationEmailTemplatePunter = (details)=>`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Project Completion Notification</title>
+  ${styling}
+</head>
+<body>
+  <div class="container">
+    <p>Dear ${details.username},</p>
+
+    <p>We want to inform you that Project ${details.projectId} has concluded without any engagement, there was no profit generated. As a result, no punter commission is applicable for this project.</p>
+   
+    <p>If you have any questions or need further clarification, please feel free to contact us. We appreciate your involvement in this project.</p>
+    
     <p>Best regards,</p>
     <p>The ${process.env.APP_NAME} Team</p>
   </div>
@@ -196,30 +174,7 @@ exports.projectFailureNotificationEmailTemplatePunter = (details)=>`
 <html>
 <head>
   <title>Project Completion and Returns Notification</title>
-  <style>
-    /* Basic styling for the email */
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.5;
-      margin: 0;
-      padding: 0;
-    }
-    
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .button {
-      display: inline-block;
-      background-color: #007bff;
-      color: #fff;
-      padding: 10px 20px;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-  </style>
+  ${styling}
 </head>
 <body>
   <div class="container">
@@ -241,30 +196,7 @@ exports.activationEmailTemplate2 = (url, firstName)=>`
 <html>
 <head>
   <title>Activate Your ${process.env.APP_NAME} Account - Let's Get Started!</title>
-  <style>
-    /* Basic styling for the email */
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.5;
-      margin: 0;
-      padding: 0;
-    }
-    
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .button {
-      display: inline-block;
-      background-color: #007bff;
-      color: #fff;
-      padding: 10px 20px;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-  </style>
+  ${styling}
 </head>
 <body>
   <div class="container">
@@ -289,30 +221,7 @@ exports.passwordResetTemplate = (url, email, firstName) =>`
 <html>
 <head>
   <title>${process.env.APP_NAME} Password Reset!</title>
-  <style>
-    /* Basic styling for the email */
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.5;
-      margin: 0;
-      padding: 0;
-    }
-    
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .button {
-      display: inline-block;
-      background-color: #007bff;
-      color: #fff;
-      padding: 10px 20px;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-  </style>
+  ${styling}
 </head>
 <body>
   <div class="container">

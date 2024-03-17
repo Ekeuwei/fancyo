@@ -4,7 +4,7 @@ const Project = require('../models/project');
 const User = require('../models/user');
 const { creditWallet } = require('../controllers/paymentController');
 const logger = require('../config/logger');
-const { ProjectCompletionNotification } = require('./notifications');
+const { ProjectCompletionNotification, ProjectNoEngagementNotification } = require('./notifications');
 const Wallet = require('../models/wallet');
 
 exports.getTicketStatus = async (ticket)=> {
@@ -143,9 +143,40 @@ exports.updateProjectProgress = async () => {
 
         const contributedAmount = project.contributors.reduce((amount, contributor) => amount + contributor.amount, 0);
         
-        if(contributedAmount == 0){
-          // no one contributed to this project
+        if(tickets.length === 0){
+          // Either no value was contributed or punter did not submit ticket
           project.status = 'no engagement'
+          project.availableBalance = 0
+
+          if(project.contributors.length > 0){
+            // Refund contributed amount
+            await Promise.all(project.contributors.map(async (contributor) => {
+              if (contributor.status === 'pending') {
+
+                await creditWallet(contributor.amount, `Investment capital and returns. Project: ${project.uniqueId}`, contributor.user._id);
+                contributor.status = 'settled';
+
+                // Send notification contributor about refund
+                await ProjectNoEngagementNotification({
+                  username: contributor.user.username,
+                  userId: contributor.user._id,
+                  projectId: project.uniqueId,
+                  contributedAmount: contributor.amount,
+                })
+
+                await project.save();
+              }
+            }));
+          }
+
+          // Send notification contributor about refund
+          await ProjectNoEngagementNotification({
+            username: contributor.user.username,
+            userId: project.punter._id,
+            projectId: project.uniqueId,
+            contributedAmount,
+          })
+
           return project.save()
         }
 
@@ -175,7 +206,7 @@ exports.updateProjectProgress = async () => {
               contributor.status = 'settled';
 
             }else{
-              contributor.status = 'lost';
+              contributor.status = 'settled';
             }
 
             // Send notification contributor

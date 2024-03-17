@@ -91,6 +91,7 @@ const userSchema = new mongoose.Schema({
         enum: ["user", "punter", "admin"],
         default: 'user'
     },
+    bio: String,
     badge:{
         type: Number,
         default: 0,

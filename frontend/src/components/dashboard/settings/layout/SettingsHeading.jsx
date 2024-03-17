@@ -32,6 +32,7 @@ const Backdrop = styled(FontAwesomeIcon)`
 
 const Header = styled.div`
     flex: 1;
+    text-transform: capitalize;
     color: ${({theme})=>theme.colors.white};
 `
 const CloseButton = styled.div`

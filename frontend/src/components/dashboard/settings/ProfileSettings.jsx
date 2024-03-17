@@ -7,6 +7,7 @@ import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
 import { BodyWrapper } from '../../../theme/ThemeStyle'
 import AvatarGallery from './layout/AvatarGallery'
 import UpdateDateOfBirth from './layout/UpdateDob'
+import UpdateBio from './layout/UpdateBio'
 
 const ProfileSettings = () => {
     const user = JSON.parse(localStorage.getItem('user'))
@@ -31,6 +32,7 @@ const ProfileSettings = () => {
                         <Text>{user.address||'Nigeria'} <FontAwesomeIcon style={{paddingLeft:"5px"}} icon={faAngleRight} /></Text>
                     </Option>
                     <UpdateEmail userEmail={user?.email}/>
+                    {user?.role==='punter'&&<UpdateBio initialValue={user?.bio}/>}
                 </OptionsWrapper>
             </BodyWrapper>
         </div>

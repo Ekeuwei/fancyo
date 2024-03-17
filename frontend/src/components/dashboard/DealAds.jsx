@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
 import { formatAmount, formatNumber, setAlpha } from "../../common/utils"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCheckCircle, faMinus, faPlus, faTimesCircle } from "@fortawesome/free-solid-svg-icons"
+import { faCheckCircle, faHand, faMinus, faPlus, faTimesCircle } from "@fortawesome/free-solid-svg-icons"
 import { clearProjectErrors } from "../../app/project/projectSlice"
 import { useDispatch } from "react-redux"
 
@@ -51,13 +51,13 @@ const DealAds = ({user, project, idx}) => {
     return (
         <>
             <Wrapper onClick={handleOpenProject}>
-                <Timer color={project.status==='successful'?'success':project.status==='failed'?'error':''}>
+                <Timer color={project.status==='successful'?'success':project.status==='failed'?'error':project.status==='no engagement'?'accent':''}>
                     {toEndIn.split(" ")[0]==0?
                     <Completed>
-                        {['successful', 'failed'].includes(project.status)?
+                        {['no engagement', 'successful', 'failed'].includes(project.status)?
                         <StatusIcon 
-                            color={project.status==='successful'?'success':'error'} 
-                            icon={project.status==='successful'? faCheckCircle:faTimesCircle}
+                            color={project.status==='successful'?'success':project.status==='failed'?'error':'accent'} 
+                            icon={project.status==='successful'? faCheckCircle:project.status==='failed'? faTimesCircle : faHand}
                             size="2x"/>:
                         <Ended>Ended</Ended>}
                     </Completed>:
@@ -81,7 +81,11 @@ const DealAds = ({user, project, idx}) => {
                     <SubscriberLabel>{project.contributors.length>1?'Contributors':'Contributor'}</SubscriberLabel>
                 </StatusWrapper>:
                 <EarningsWrapper>
-                    {profit!=0&&<>
+                    {project.status === 'no engagement'?<>
+                            {project.contributors.length>0?
+                                <PercentIncrease>Contributions <br/>refunded</PercentIncrease>:
+                                <PercentIncrease>No Contributor</PercentIncrease>}
+                    </>:<>
                         {contributor||userIsPunter?<>
                             <Profit value={profit}><FontAwesomeIcon icon={profit>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{formatNumber(profit)}</Profit>
                             <Balance>{balance}</Balance>
