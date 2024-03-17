@@ -6,7 +6,7 @@ import dateFormat from "dateformat"
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
 import { formatNumber, setAlpha } from "../../../common/utils"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCheckCircle, faMinus, faPlus, faTimesCircle } from "@fortawesome/free-solid-svg-icons"
+import { faCheckCircle, faHand, faMinus, faPlus, faTimesCircle } from "@fortawesome/free-solid-svg-icons"
 import { useDispatch } from "react-redux"
 import { clearProjectErrors } from "../../../app/project/projectSlice"
 import DealEngagement from "../modals/DealEngagement"
@@ -33,7 +33,7 @@ const ProjectItem = ({project, idx}) => {
     }
 
     const projectDuration = Math.ceil(Math.abs(new Date(project.endAt).getTime() - new Date(project.startAt).getTime())/(1000 * 60 * 60 * 24))
-    const title = `${project.eRoi}% in ${projectDuration} day${projectDuration>1?'s':''}`
+    const title = `Project ${project.uniqueId} - ${project.eRoi}% in ${projectDuration} day${projectDuration>1?'s':''}`
     const toStartIn = calculateCountdown(project.startAt)
     const toEndIn = calculateCountdown(project.endAt)
     const projectStarted = project.status!=='pending';
@@ -45,13 +45,13 @@ const ProjectItem = ({project, idx}) => {
     return (
         <>
             <Wrapper onClick={handleOpenProject}>
-                <Timer color={project.status==='successful'?'success':project.status==='failed'?'error':''}>
+                <Timer color={project.status==='successful'?'success':project.status==='failed'?'error':project.status==='no engagement'?'accent':''}>
                     {toEndIn.split(" ")[0]==0?
                     <Completed>
-                        {['successful', 'failed'].includes(project.status)?
+                        {['no engagement', 'successful', 'failed'].includes(project.status)?
                         <StatusIcon 
-                            color={project.status==='successful'?'success':'error'} 
-                            icon={project.status==='successful'? faCheckCircle:faTimesCircle}
+                            color={project.status==='successful'?'success':project.status==='failed'?'error':'accent'} 
+                            icon={project.status==='successful'? faCheckCircle:project.status==='failed'? faTimesCircle : faHand}
                             size="2x"/>:
                         <Ended>Ended</Ended>}
                     </Completed>:
@@ -61,24 +61,33 @@ const ProjectItem = ({project, idx}) => {
                         <TimeValue>{projectStarted? toEndIn.split(" ")[1]:toStartIn.split(" ")[1]}</TimeValue>
                     </>}
                 </Timer>
-                <Details>
+                <ProjectDetails>
                     <Title>{title}</Title>
-                    <InvestmentType>Project ID: {project.uniqueId}</InvestmentType>
-                    {project.status!='pending'&& <DateLabel>{`${toEndIn.split(" ")[0]==0?'Ended':'Started'} ${dateFormat(toEndIn.split(" ")[0]==0?project.endAt:project.startAt, 'dd mmm, yyyy')}`}</DateLabel>}
-                    <Status>Status: {project.status}</Status>
-                    {/* <ProgressBar width={10} content={''}/> */}
-                </Details>
-                {!projectStarted?
-                <StatusWrapper value={project.contributors.length}>
-                    <Subscribers>{project.contributors.length}</Subscribers>
-                    <SubscriberLabel>{project.contributors.length>1?'Contributors':'Contributor'}</SubscriberLabel>
-                </StatusWrapper>:
-                <EarningsWrapper>
-                    {percentIncrease!=0&&
-                        <Balance value={percentIncrease} color={percentIncrease>0?'success':'error'}><FontAwesomeIcon icon={percentIncrease>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{percentIncrease}%</Balance>
-                        }
-                    
-                </EarningsWrapper>}
+                    <ProjectLogistics>
+                        <Details>
+                            <InvestmentType>Project ID: {project.uniqueId}</InvestmentType>
+                            {project.status!='pending'&& <DateLabel>{`${toEndIn.split(" ")[0]==0?'Ended':'Started'} ${dateFormat(toEndIn.split(" ")[0]==0?project.endAt:project.startAt, 'dd mmm, yyyy')}`}</DateLabel>}
+                            <Status>Status: {project.status}</Status>
+                            {/* <ProgressBar width={10} content={''}/> */}
+                        </Details>
+                        {!projectStarted?
+                        <StatusWrapper value={project.contributors.length}>
+                            <Subscribers>{project.contributors.length}</Subscribers>
+                            <SubscriberLabel>{project.contributors.length>1?'Contributors':'Contributor'}</SubscriberLabel>
+                        </StatusWrapper>:
+                        <EarningsWrapper>
+                            {project.status === 'no engagement'?<>
+                                    {project.contributors.length>0?
+                                        <PercentIncrease>Contributions <br/>refunded</PercentIncrease>:
+                                        <PercentIncrease>No Contributor</PercentIncrease>}
+                            </>:
+                                <Balance display={percentIncrease == 0?'none':''} value={percentIncrease} color={percentIncrease>0?'success':'error'}><FontAwesomeIcon icon={percentIncrease>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{percentIncrease}%</Balance>
+                            }
+                            
+                        </EarningsWrapper>}
+
+                    </ProjectLogistics>
+                </ProjectDetails>
 
             </Wrapper>
             {/* Modal */}
@@ -107,6 +116,15 @@ const Wrapper = styled.div`
     column-gap: 5px;
     padding: 5px;
     border-radius: 10px;
+`
+const ProjectDetails = styled.div`
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+`
+const ProjectLogistics = styled.div`
+    display: flex;
+    align-items: center;
 `
 const Timer = styled.div`
     display: flex;
@@ -145,7 +163,8 @@ const Details = styled.div`
 `
 const Title = styled(Time)`
     font-size: 18px;
-    margin-bottom: 5px;
+    font-weight: 500;
+    margin-bottom: 3px;
 `
 const Status = styled.p`
     margin: 0;
@@ -202,12 +221,18 @@ const EarningsWrapper = styled(StatusWrapper)`
 
 `
 const Balance = styled.h3`
+    display: ${({display})=>display};
     margin: 1px 0;
     font-size: 18px;
     font-weight: 500;
     color: ${({theme, color})=>color?theme.colors[color]:''}
 `
-
+const PercentIncrease = styled.div`
+    color:${({theme})=>theme.colors.dark2};
+    text-transform: capitalize;
+    font-size: 12px;
+    font-weight: 500;
+`
 const calculateCountdown = (timestamp)=>{
     const difference = new Date(timestamp).getTime() - new Date().getTime();
 

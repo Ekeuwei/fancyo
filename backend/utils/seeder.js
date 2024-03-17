@@ -86,7 +86,7 @@ const updateProject = async ()=>{
   process.exit(1)
 }
 
-// updateProject();
-seedBadges();
+updateProject();
+// seedBadges();
 // updateTickets();
 // seedBanks();

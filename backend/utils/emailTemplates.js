@@ -137,7 +137,7 @@ exports.projectNoEngagementNotificationEmailTemplateUser = (details)=>`
     <ul>
       <li>Contribution Amount: ${formatAmount(details.contributedAmount)}</li>
       <li>Loss Incurred: ${formatAmount(Math.abs(0))}</li>
-      <li>Total Amount Returned: ${formatAmount(details.details.contributedAmount.toString())}</li>
+      <li>Total Amount Returned: ${formatAmount(details.contributedAmount.toString())}</li>
     </ul>
     <p>We understand that this outcome may be disappointing. If you have any questions or concerns, please don't hesitate to reach out. We appreciate your participation in this project.</p>
     <p>Best regards,</p>

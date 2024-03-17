@@ -156,7 +156,7 @@ exports.updateProjectProgress = async () => {
                 await creditWallet(contributor.amount, `Investment capital and returns. Project: ${project.uniqueId}`, contributor.user._id);
                 contributor.status = 'settled';
 
-                // Send notification contributor about refund
+                // Send notification to contributor about refund
                 await ProjectNoEngagementNotification({
                   username: contributor.user.username,
                   userId: contributor.user._id,
@@ -169,9 +169,9 @@ exports.updateProjectProgress = async () => {
             }));
           }
 
-          // Send notification contributor about refund
+          // Send No engagement notification to punter
           await ProjectNoEngagementNotification({
-            username: contributor.user.username,
+            username: project.punter.username,
             userId: project.punter._id,
             projectId: project.uniqueId,
             contributedAmount,
