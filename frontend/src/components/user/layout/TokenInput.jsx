@@ -1,13 +1,15 @@
-import { Fragment, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components'
-import { Input } from '../../../theme/ThemeStyle';
-import { useDispatch } from 'react-redux';
+import { Input, Loading } from '../../../theme/ThemeStyle';
+import { useDispatch, useSelector } from 'react-redux';
 import { api } from '../../../common/api';
 import PropTypes from 'prop-types'
 import { calculateTimeLeft } from '../../../common/utils';
 
 const TokenInput = ({loginId, token, tokenExpires, setToken})=>{
     const dispatch = useDispatch()
+
+    const { loading } = useSelector(state => state.auth)
 
     const handleChange = (index, value) => {
         const newToken = [...token];
@@ -52,7 +54,7 @@ const TokenInput = ({loginId, token, tokenExpires, setToken})=>{
     }, [tokenExpires]);
 
     return (
-        <Fragment>
+        <CodeInputWrapper>
             <CodeConfirmation>Enter the code to proceed</CodeConfirmation>
             <TokenWrapper >
                 {token.map((value, index) => (
@@ -68,12 +70,21 @@ const TokenInput = ({loginId, token, tokenExpires, setToken})=>{
                     />
                 ))}
             </TokenWrapper>
-            <Text onClick={handleTokenRequest}>OTP expires in {timeLeft}</Text>
+            {tokenExpires&&<Text onClick={handleTokenRequest}>OTP expires in {timeLeft}</Text>}
             <InvalidCode error={+false}>Invalide code</InvalidCode>
-        </Fragment>
+            <Loading value={loading?'validating...':''}/>
+        </CodeInputWrapper>
     );
 
 }
+
+const CodeInputWrapper = styled.div`
+    position: relative;
+    background-color: rgba(79, 161, 94, 0.2);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px 0;
+`
 
 TokenInput.propTypes ={
     loginId: PropTypes.string.isRequired,

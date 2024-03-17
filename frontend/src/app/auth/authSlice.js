@@ -118,6 +118,22 @@ const authSlice = createSlice({
       state.error = action.payload;
     },
     
+    // Register Punter
+    registerPunterStart: state => {
+      state.loading = true;
+      state.error = null;
+      state.message = null;
+    },
+    registerPunterSuccess: (state, action) => {
+      state.user = action.payload;
+      state.isAuthenticated = true;
+      state.loading = false;
+    },
+    registerPunterFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    
     // Update Password user
     updatePasswordStart: state => {
       state.loading = true;
@@ -210,6 +226,9 @@ export const {
   registerStart, 
   registerSuccess, 
   registerFailure,
+  registerPunterStart, 
+  registerPunterSuccess, 
+  registerPunterFailure,
   updatePasswordStart, 
   updatePasswordSuccess, 
   updatePasswordFailure,

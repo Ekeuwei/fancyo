@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Button, FormControlWrapper, HomeStyle, Input, InputLabel, InputWrapper, Loading, SubtleLabel } from "../../theme/ThemeStyle"
+import { Button, FormControlWrapper, HomeStyle, Input, InputIcon, InputLabel, InputWrapper, Loading, SubtleLabel } from "../../theme/ThemeStyle"
 import styled from 'styled-components'
 import TokenInput from "./layout/TokenInput"
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
@@ -8,6 +8,8 @@ import { api } from "../../common/api"
 import { clearAuthError, createAuthError } from "../../app/auth/authSlice"
 import Logo from "../dashboard/layout/Logo"
 import validator from "validator"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faCheckCircle } from "@fortawesome/free-solid-svg-icons"
 
 const Register = () => {
     const history = useHistory()
@@ -53,7 +55,9 @@ const Register = () => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(()=>setSamePassword(password === confirmPassword),[confirmPassword])
+    useEffect(()=>{
+        setSamePassword(password === confirmPassword)
+    },[confirmPassword, password])
 
     const submitHandler = (e)=>{
         e.preventDefault()
@@ -89,15 +93,14 @@ const Register = () => {
                         <form onSubmit={validateUserHandler}>
                             <InputWrapper>
                                 <InputLabel value={loginId}>Email or Phone Number</InputLabel>
-                                <Input disabled={isValidToken} placeholder="Email or Phone Number" label={loginId.length} value={loginId} onChange={e => setLoginId(e.target.value)}/>
+                                <Input disabled={isValidToken} placeholder="Email or Phone Number" label={loginId} value={loginId} onChange={e => setLoginId(e.target.value)}/>
+                                {isValidToken&&<InputIcon color="success"><FontAwesomeIcon icon={faCheckCircle}/></InputIcon>}
                             </InputWrapper>
 
                             {!(message || isValidToken)&& <Button disabled={loading} type="submit"> <Loading value={loading} /> Get code</Button>}
                         </form>
 
-                        {message && <CodeInputWrapper>
-                            <TokenInput loginId={loginId} token={token} setToken={setToken} tokenExpires={tokenExpires}/>
-                        </CodeInputWrapper>}
+                        {message && <TokenInput loginId={loginId} token={token} setToken={setToken} tokenExpires={tokenExpires}/>}
 
                         {isValidToken&&<form onSubmit={submitHandler}>
                             <InputWrapper>
@@ -156,12 +159,6 @@ const Error = styled.div`
     border-radius: 10px;
     border: solid 1px;
     margin: 10px;
-`
-const CodeInputWrapper = styled.div`
-    background-color: rgba(79, 161, 94, 0.2);
-    border-radius: 10px;
-    padding: 10px;
-    margin: 10px 0;
 `
 
 const RedirectAccess = styled.div`

@@ -23,6 +23,7 @@ import Toast from "./components/user/layout/Toast";
 import Disclaimer from "./components/dashboard/modals/Disclaimer";
 import Transactions from "./components/dashboard/transactions";
 import ValidateBvn from "./components/user/ValidateBvn";
+import RegisterPunter from "./components/user/RegisterPunter";
     
 export const appName = import.meta.env.VITE_APP_NAME
 
@@ -40,6 +41,7 @@ function App() {
               <Route path="/" component={Home} exact />
               <Route path="/login" component={Login} exact />
               <Route path="/register" component={Register} exact />
+              <Route path="/register/punter" component={RegisterPunter} exact />
               <Route path="/password/forgot" component={ForgotPassword} exact />
               <Route path="/disclaimer" component={Disclaimer} exact />
               <Route path="/transactions" component={Transactions} exact />
@@ -52,7 +54,7 @@ function App() {
               <ProtectedRoute path="/settings/profile" component={ProfileSettings} exact />
               
               <ProtectedRoute path="/project/details/:id" component={ProjectDetails} exact />
-              <ProtectedRoute path="/project/punter/:id" component={Manager} exact />
+              <ProtectedRoute path="/punter/:id" component={Manager} exact />
               <ProtectedRoute path="/dashboard/punter" component={PunterDashboard} exact />
               <ProtectedRoute path="/dashboard/punter/project/details" component={ProjectDetails} exact />
               

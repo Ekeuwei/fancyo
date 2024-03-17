@@ -22,7 +22,8 @@ const {
     requestToken,
     validateToken,
     addBankAccount,
-    getBvnDetails
+    getBvnDetails,
+    registerPunter
 } = require ('../controllers/authController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../midllewares/auth')
@@ -32,6 +33,7 @@ router.route('/auth/validateuser').get(validateUser);
 router.route('/auth/validatetoken').post(validateToken);
 router.route('/auth/requesttoken').get(requestToken);
 router.route('/register').post(registerUser);
+router.route('/register/punter').post(registerPunter);
 router.route('/login').post(loginUser);
 router.route('/password/forgot').get(forgotPassword);
 router.route('/password/reset').put(resetPassword);

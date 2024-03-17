@@ -203,6 +203,61 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
 
 })
 
+// Register a punter => /api/v1/register/punter
+exports.registerPunter = catchAsyncErrors( async (req, res, next) =>{
+
+    const { email, password, username, token, bio, referralId } = req.body;
+
+    const validEmail = validator.isEmail(email)
+    
+    let user;
+
+    try {
+
+        if(validEmail){
+            
+            user = await User.findOne({ email }).select('+isActivated +password +token')
+            
+        }else{
+
+            return next(new ErrorHandler('Invalid email or phone number', 401))
+        }
+
+        if(user.password){
+            return next(new ErrorHandler('Account already created! Login to continue.', 401))
+        }
+
+        const tokenExpired = user.tokenExpires < new Date();
+        user.isActivated = !tokenExpired && user.token!=undefined && user.token === token
+        
+        if(!user.isActivated){
+            return next(new ErrorHandler('Token expired or account not validated! Revalidate account', 500))
+        }
+        
+        if(!user.walletId){
+            const wallet = await Wallet.create({ userId: user._id })
+            user.walletId = wallet._id;
+        }
+
+        user.username = username
+        user.password = password
+        user.bio = bio
+        user.role = 'punter'
+        user.token = undefined
+        user.tokenExpires = undefined
+
+        user = await user.save({ validateStateBeforeSave: false });
+
+        // Send a welcome message to punter
+
+    } catch (error) {
+        return next(new ErrorHandler(error.message, 500));
+    }
+
+    sendToken(user, 200, res);
+
+})
+
 // Login user => /api/v1/login
 exports.loginUser = catchAsyncErrors( async (req, res, next)=>{
     const { loginId, password } = req.body;

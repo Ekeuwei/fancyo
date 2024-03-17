@@ -189,24 +189,26 @@ exports.getAdminProjects = catchAsyncErrors(async (req, res, next) => {
 // Get project by Id => /api/v1/project/:id
 exports.getProjectPunter = catchAsyncErrors(async (req, res, next) => {
 
-    const punter = await User.findById(req.params.id)
-        .select(['-phoneNumber', '-bankAccounts', '-role', '-walletId', '-userMode', '-email', '-_id', '-__v']);
+    const punter = await User.findOne({username: req.params.username})
+        .select(['-phoneNumber', '-bankAccounts', '-role', '-walletId', '-userMode', '-email', '-__v']);
     
     if(!punter){
         return next(new ErrorHandler('User Not Found', 404));
     }
     const projectCount = await Project.countDocuments({
         $and:[
-            {punter: req.params.id}, 
+            {punter: punter.id}, 
             {status:{$in:['successful', 'failed']}}
         ]
     })
-    const successfulCount = await Project.countDocuments({punter: req.params.id, status: 'successful'})
+    const badge = await Badge.findOne({number: punter.badge}).select(['-__v', '-_id'])
+
+    const successfulCount = await Project.countDocuments({punter: punter.id, status: 'successful'})
 
     const pipeline = [
         {$match: {
             $and:[
-                {punter: req.params.id}, 
+                {punter: punter.id}, 
                 {status:{$in:['successful', 'failed']}}
             ]
         }},
@@ -216,7 +218,7 @@ exports.getProjectPunter = catchAsyncErrors(async (req, res, next) => {
     const averageRoi = result.length>0? result[0].averageRoi : 0
 
 
-    const projects = await Project.find({punter: req.params.id});
+    const projects = await Project.find({punter: punter.id}).sort({endAt: -1});
 
     // Success Rate
     // Average ROI
@@ -230,6 +232,7 @@ exports.getProjectPunter = catchAsyncErrors(async (req, res, next) => {
         successfulCount,
         averageRoi,
         punter,
+        badge,
         projects,
     });
 });

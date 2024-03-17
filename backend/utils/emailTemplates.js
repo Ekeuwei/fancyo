@@ -177,7 +177,7 @@ exports.projectFailureNotificationEmailTemplateUser = (details)=>`
 <body>
   <div class="container">
     <p>Dear ${details.username},</p>
-    <p>We regret to inform you that Project ${details.projectId} did not yield any profit, and there was a loss in the project. Here are the details:</p>
+    <p>We regret to inform you that Project ${details.projectId} did not yield any profit, and there was ${details.profit < 0?'a':'no'} loss in the project. Here are the details:</p>
     <ul>
       <li>Contribution Amount: ${details.contributedAmount}</li>
       <li>Loss Incurred: ${Math.abs(details.profit)}</li>

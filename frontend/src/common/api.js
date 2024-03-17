@@ -21,6 +21,9 @@ import {
     registerStart,
     registerSuccess,
     registerFailure,
+    registerPunterStart,
+    registerPunterSuccess,
+    registerPunterFailure,
     updatePasswordStart,
     updatePasswordSuccess,
     updatePasswordFailure,
@@ -60,9 +63,7 @@ import {
     verifyTopupStart,
     verifyTopupSuccess,
     verifyTopupFailure,
-    getBadgeStart,
     getBadgeSuccess,
-    getBadgeFailure,
     fetchBvnDetailsStart,
     fetchBvnDetailsSuccess,
     fetchBvnDetailsFailure,
@@ -298,7 +299,28 @@ export const api = {
         }
     },
     
-    // Register
+    // Register Punter
+    registerPunter: (userDetails) => async (dispatch) =>{
+        try {
+            dispatch(registerPunterStart())
+
+            const config = {
+                headers: {'content-Type': 'application/json'},
+            }
+
+            const { data } = await instance.post('/api/v1/register/punter', userDetails, config)
+
+            localStorage.setItem('user', JSON.stringify(data.user))
+
+            dispatch(registerPunterSuccess(data.user))
+
+        } catch (error) {
+
+            dispatch(registerPunterFailure(error.response.data.message))
+        }
+    },
+    
+    // Update profile
     updateProfile: (userDetails) => async (dispatch) =>{
         try {
             dispatch(updateProfileStart())

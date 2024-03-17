@@ -230,6 +230,37 @@ export const Button = styled.button`
   border-radius: 4px;
 `
 
+export const InputButton = styled(Button)`
+    position: absolute;
+    right: 2px;
+    bottom: 50%;
+    cursor: pointer;
+    z-index: 1;
+    background: ${({theme, color})=>color?theme.colors[color]:''};
+    padding: 0 12px;
+    color: ${({theme})=>theme.colors.white};
+    border-radius: ${({color})=>color?'50%':'7px'};
+    transform: translateY(50%);
+    height: calc(100% - 4px);
+    width: fit-content;
+`
+
+export const InputIcon = styled.div`
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    right: 2px;
+    bottom: 50%;
+    z-index: 1;
+    color: ${({theme, color})=>color?theme.colors[color]:'text'};
+    padding: 0 12px;
+    border-radius: 50%;
+    transform: translateY(50%);
+    height: calc(100% - 4px);
+    width: fit-content;
+`
+
 export const FormControlWrapper = styled.div`
     position: relative;
     border-radius: 20px;

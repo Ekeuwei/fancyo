@@ -1,16 +1,17 @@
 import styled from "styled-components"
 // import ProgressBar from "./ProgressBar"
-import DealEngagement from "./modals/DealEngagement"
 import { useState } from "react"
 import PropTypes from 'prop-types'
+import dateFormat from "dateformat"
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
-import { formatAmount, formatNumber, setAlpha } from "../../common/utils"
+import { formatNumber, setAlpha } from "../../../common/utils"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCheckCircle, faMinus, faPlus, faTimesCircle } from "@fortawesome/free-solid-svg-icons"
-import { clearProjectErrors } from "../../app/project/projectSlice"
 import { useDispatch } from "react-redux"
+import { clearProjectErrors } from "../../../app/project/projectSlice"
+import DealEngagement from "../modals/DealEngagement"
 
-const DealAds = ({user, project, idx}) => {
+const ProjectItem = ({project, idx}) => {
     const dispatch = useDispatch()
     const history = useHistory()
     const [isOpen, setOpen] = useState("closed")
@@ -36,16 +37,9 @@ const DealAds = ({user, project, idx}) => {
     const toStartIn = calculateCountdown(project.startAt)
     const toEndIn = calculateCountdown(project.endAt)
     const projectStarted = project.status!=='pending';
-    const totalContributedAmount = project.contributors.reduce((total, contributor) => total + contributor.amount, 0)
-    const contributor = project.contributors.find(contributor => contributor.user === user._id)
-    const userIsPunter = user._id === project.punter._id
-    const contributedAmount = contributor?.amount || totalContributedAmount
-    const contributedQuota = isNaN(contributedAmount / totalContributedAmount)? 0 : (contributedAmount / totalContributedAmount)
+    const contributedAmount = project.contributors.reduce((total, contributor) => total + contributor.amount, 0)
     
-    // const profit = (project.availableBalance - totalContributedAmount) * contributedQuota
-    const profit = ((project.availableBalance>0? project.availableBalance : (project.roi + contributedAmount)) - contributedAmount) * contributedQuota
-    // const balance = formatAmount(project.availableBalance * contributedQuota)
-    const balance = isNaN((project.availableBalance||project.roi) * contributedQuota)? formatAmount(0) : formatAmount((project.availableBalance||project.roi) * contributedQuota)
+    const profit = ((project.availableBalance>0? project.availableBalance : (project.roi + contributedAmount)) - contributedAmount)
     const percentIncrease = isNaN(profit/contributedAmount)? 0: formatNumber(profit/contributedAmount * 100)
 
     return (
@@ -70,26 +64,20 @@ const DealAds = ({user, project, idx}) => {
                 <Details>
                     <Title>{title}</Title>
                     <InvestmentType>Project ID: {project.uniqueId}</InvestmentType>
-                    <Author>Punter: {project.punter.username}</Author>
-                    <Status>{project.status}</Status>
+                    {project.status!='pending'&& <DateLabel>{`${toEndIn.split(" ")[0]==0?'Ended':'Started'} ${dateFormat(toEndIn.split(" ")[0]==0?project.endAt:project.startAt, 'dd mmm, yyyy')}`}</DateLabel>}
+                    <Status>Status: {project.status}</Status>
                     {/* <ProgressBar width={10} content={''}/> */}
                 </Details>
                 {!projectStarted?
                 <StatusWrapper value={project.contributors.length}>
-                    {contributor&&<AmountContributed>{formatAmount(contributedAmount)}</AmountContributed>}
                     <Subscribers>{project.contributors.length}</Subscribers>
                     <SubscriberLabel>{project.contributors.length>1?'Contributors':'Contributor'}</SubscriberLabel>
                 </StatusWrapper>:
                 <EarningsWrapper>
-                    {profit!=0&&<>
-                        {contributor||userIsPunter?<>
-                            <Profit value={profit}><FontAwesomeIcon icon={profit>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{formatNumber(profit)}</Profit>
-                            <Balance>{balance}</Balance>
-                            <PercentIncrease>{percentIncrease}% {profit>0?'up':'down'}</PercentIncrease>
-                        </>:
+                    {percentIncrease!=0&&
                         <Balance value={percentIncrease} color={percentIncrease>0?'success':'error'}><FontAwesomeIcon icon={percentIncrease>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{percentIncrease}%</Balance>
                         }
-                    </>}
+                    
                 </EarningsWrapper>}
 
             </Wrapper>
@@ -106,7 +94,7 @@ const DealAds = ({user, project, idx}) => {
         </>
     )
 }
-DealAds.propTypes = {
+ProjectItem.propTypes = {
     user: PropTypes.object.isRequired,
     project: PropTypes.object.isRequired,
     idx: PropTypes.number.isRequired,
@@ -157,6 +145,7 @@ const Details = styled.div`
 `
 const Title = styled(Time)`
     font-size: 18px;
+    margin-bottom: 5px;
 `
 const Status = styled.p`
     margin: 0;
@@ -177,10 +166,9 @@ const InvestmentType = styled(Label)`
     font-size: 12px;
     font-weight: 500;
 `
-const Author = styled(InvestmentType)`
+const DateLabel = styled(InvestmentType)`
     color: ${({theme})=>theme.colors.text};
 `
-
 const Ended = styled(TimeValue)`
     font-size: 75%;
 `
@@ -197,16 +185,7 @@ const StatusWrapper = styled.div`
     min-width: 75px;
     overflow: hidden;
 `
-const AmountContributed = styled(Label)`
-    background-color: ${({theme})=>theme.colors.primaryColor};
-    color: ${({theme})=>theme.colors.white};
-    text-align: center;
-    font-size: 12px;
-    font-weight: 500;
-    width: calc(100% + 10px);
-    margin-top: -5px;
-    padding: 5px;
-`
+
 const Subscribers = styled(Time)`
     margin: 5px;
     font-size: 16px;
@@ -227,15 +206,6 @@ const Balance = styled.h3`
     font-size: 18px;
     font-weight: 500;
     color: ${({theme, color})=>color?theme.colors[color]:''}
-`
-const Profit = styled(Label)`
-    font-size: 12px;
-    font-weight: 500;
-    color: ${({value, theme})=>value>0?theme.colors.won:theme.colors.lost}
-`
-const PercentIncrease = styled(Profit)`
-    color:${({theme})=>theme.colors.dark2};
-    text-transform: capitalize;
 `
 
 const calculateCountdown = (timestamp)=>{
@@ -261,4 +231,4 @@ const calculateCountdown = (timestamp)=>{
     }
 }
 
-export default DealAds
+export default ProjectItem

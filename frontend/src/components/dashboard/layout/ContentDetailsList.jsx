@@ -2,8 +2,10 @@ import styled from 'styled-components'
 import PropTypes from 'prop-types'
 import dateFormat from 'dateformat'
 import { formatAmount, formatNumber } from '../../../common/utils'
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min'
 
 const ContentDetailsList = ({project, title}) => {
+    const history = useHistory()
     const user = JSON.parse(localStorage.getItem('user'))
     const totalContributedAmount = project.contributors.reduce((acc, contributor)=>acc+contributor.amount, 0)
     const contributor = project.contributors.find(contributor => contributor.user === user._id)
@@ -22,10 +24,10 @@ const ContentDetailsList = ({project, title}) => {
                 <Label>{'Description'}</Label>
                 <Details>{project.notes}</Details>
             </Item>}
-            <Item>
+            <PunterItem onClick={()=>history.push(`/punter/${project.punter.username}`)}>
                 <Label>{'Punter'}</Label>
-                <Details>{project.punter?.username}</Details>
-            </Item>
+                <PunterLink >{project.punter?.username}</PunterLink>
+            </PunterItem>
             <Item>
                 <Label>{'Project Duration'}</Label>
                 <Details>{title.split(' in ')[1]}</Details>
@@ -86,6 +88,10 @@ const Item = styled.div`
         border-top: solid ${({theme})=>theme.colors.fainted};
     }
 `
+const PunterItem = styled(Item)`
+    cursor: pointer;
+`
+
 const Label = styled.p`
     color: ${({theme})=>theme.colors.dark2};
     font-size: 12px;
@@ -98,6 +104,14 @@ const Details = styled.p`
     font-size: 16px;
     line-height: 1.3;
     margin: 0 0 10px;
+    `
+
+const PunterLink = styled(Details)`
+    text-decoration: underline;
+    color: ${({theme})=>theme.colors.accent};
+    &:hover{
+        font-size: larger;
+    }
 `
 
 export default ContentDetailsList

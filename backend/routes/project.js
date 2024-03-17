@@ -29,7 +29,7 @@ router.route('/bookie/loadticket').get(isAuthenticatedUser, /*authorizeRoles('ad
 router.route('/projects').get(isAuthenticatedUser, getProjects); // more roles can be pass to the authorizeRole function like 'admin, editor, superAdmin...'
 router.route('/projects/me').get(isAuthenticatedUser, getMyProjects); // more roles can be pass to the authorizeRole function like 'admin, editor, superAdmin...'
 router.route('/project/:id').get(getSingleProject);
-router.route('/project/punter/:id').get(getProjectPunter);
+router.route('/project/punter/:username').get(getProjectPunter);
 
 router.route('/project/:id')
                     .put(isAuthenticatedUser, authorizeRoles('admin', 'punter'), updateProject)
