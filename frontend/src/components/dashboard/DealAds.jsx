@@ -92,7 +92,13 @@ const DealAds = ({user, project, idx}) => {
                                         <Balance>{balance}</Balance>
                                         <PercentIncrease>{percentIncrease}% {profit>0?'up':'down'}</PercentIncrease>
                                     </>:
-                                    <Balance value={profit} color={profit>0?'success':'error'}><FontAwesomeIcon icon={profit>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{formatAmount(profit)}</Balance>
+                                    <ProjectLogistics>
+                                        {/* <FontAwesomeIcon icon={profit>0?faPlus:faMinus} size="xs" style={{marginRight:'5px'}}/> */}
+                                        <div>
+                                            <Balance value={profit}>{formatAmount(profit)}</Balance>
+                                            <PercentIncrease>{percentIncrease}% {profit>0?'Profit':'Lost'}</PercentIncrease>
+                                        </div>
+                                    </ProjectLogistics>
                                     }
                                 </>:
                                 <Balance value={percentIncrease} color={percentIncrease>0?'success':'error'}><FontAwesomeIcon icon={percentIncrease>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{percentIncrease}%</Balance>
