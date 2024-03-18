@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { api } from "../../../common/api"
 import PropTypes from 'prop-types'
 import { createToast } from "../../../app/user/userSlice"
+import MetaData from "../layout/MetaData"
 
 const ProjectDetails = ({match}) => {
     const dispatch =  useDispatch()
@@ -32,11 +33,12 @@ const ProjectDetails = ({match}) => {
     },[error, dispatch])
 
     const projectDuration = Math.ceil(Math.abs(new Date(projectDetails?.project.endAt).getTime() - new Date(projectDetails?.project.startAt).getTime())/(1000 * 60 * 60 * 24))
-    const title = projectDetails?`Project ${projectDetails.project.uniqueId} - ${projectDetails.project.eRoi}% in ${projectDuration} days`:'Project'
+    const title = projectDetails?`Project ${projectDetails.project.uniqueId} | ${projectDetails.project.eRoi}% in ${projectDuration} days`:'Project'
     const canCreateTicket = projectDetails?.project.punter._id===user._id && projectDetails?.project.status==='in progress'
 
     return (
       <Wrapper>
+          <MetaData title={title} />
           <NavHeader title={title}/>
           <BodyWrapper>
             {loading &&isOpen==="closed"?<Loading value={loading?'loading':''} />:<>
