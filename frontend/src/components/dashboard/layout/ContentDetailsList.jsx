@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 import dateFormat from 'dateformat'
@@ -19,7 +20,7 @@ const ContentDetailsList = ({project, title}) => {
     const percentIncrease = isNaN(profit / contributedAmount)? 0: formatNumber(profit/contributedAmount * 100)
 
     return (
-        <Content>
+        <Content>            
             {project.notes&&<Item>
                 <Label>{'Description'}</Label>
                 <Details>{project.notes}</Details>
@@ -29,12 +30,24 @@ const ContentDetailsList = ({project, title}) => {
                 <PunterLink >{project.punter?.username}</PunterLink>
             </PunterItem>
             <Item>
+                <Label>{'Odds Range Per Ticket'}</Label>
+                <Details>{`${(project.minOdds)?.toFixed(2)} - ${(project.maxOdds)?.toFixed(2)} odds`}</Details>
+            </Item>
+            {project.progressiveStaking&&<Item>
+                <Label>{'Staking strategy'}</Label>
+                <Details>{`Progressive ${project.progressiveSteps}`}</Details>
+            </Item>}
+            <Item>
                 <Label>{'Project Duration'}</Label>
                 <Details>{title.split(' in ')[1]}</Details>
             </Item>
             <Item>
                 <Label>ROI</Label>
                 <Details>Estimated at {project.eRoi}%</Details>
+            </Item>
+            <Item>
+                <Label>Minimum Contribution</Label>
+                <Details>{formatAmount(project.minContribution)}</Details>
             </Item>
             <Item>
                 <Label>{'Starts'}</Label>
@@ -66,6 +79,8 @@ const ContentDetailsList = ({project, title}) => {
                 <Label>{'Project Status'}</Label>
                 <Details>{project.status.toUpperCase()}</Details>
             </Item>
+
+            {project.status==="pending"&&<CallToAction>Don't Miss Out! Secure Your Spot Now and Contribute to this Exciting Project Before It Begins on {dateFormat(project.startAt, 'mmmm dS, yyyy')}. </CallToAction>}
         </Content>
     )
 }
@@ -91,7 +106,6 @@ const Item = styled.div`
 const PunterItem = styled(Item)`
     cursor: pointer;
 `
-
 const Label = styled.p`
     color: ${({theme})=>theme.colors.dark2};
     font-size: 12px;
@@ -104,8 +118,13 @@ const Details = styled.p`
     font-size: 16px;
     line-height: 1.3;
     margin: 0 0 10px;
-    `
-
+`
+const CallToAction = styled(Details)`
+    margin: 10px 0;
+    text-align: center;
+    font-size: 18px;
+    color: ${({theme})=> theme.colors.error};
+`
 const PunterLink = styled(Details)`
     text-decoration: underline;
     color: ${({theme})=>theme.colors.accent};

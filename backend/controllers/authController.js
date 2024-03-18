@@ -243,6 +243,7 @@ exports.registerPunter = catchAsyncErrors( async (req, res, next) =>{
         user.password = password
         user.bio = bio
         user.role = 'punter'
+        user.badge = 1
         user.token = undefined
         user.tokenExpires = undefined
 

@@ -5,7 +5,7 @@ import NavHeader from "../layout/NavHeader"
 import ModalContainter from "../modals/ModalContainter"
 import PropTypes from 'prop-types'
 import { useEffect, useRef, useState } from "react"
-import { estimateRoi, formatNumber, setAlpha } from "../../../common/utils"
+import { estimateRoi, formatNumber, formatNumberToFloat, setAlpha } from "../../../common/utils"
 import CustomDatePicker from "../layout/CustomDatePicker"
 import { useDispatch, useSelector } from "react-redux"
 import { api } from "../../../common/api"
@@ -35,6 +35,7 @@ const NewProject = ({isOpen, handleCloseModal}) => {
         startAt:'',
         endAt:'',
         notes:'',
+        minContribution: '',
         progressiveSteps:'',
     })
     const [progressiveStaking, setProgressiveStaking] = useState(false)
@@ -48,7 +49,7 @@ const NewProject = ({isOpen, handleCloseModal}) => {
         if(error||message){
             dispatch(clearProjectErrors())
         }
-        if(['eRoi' ].includes(e.target.name)){
+        if(['eRoi', 'minContribution' ].includes(e.target.name)){
             e.target.value = e.target.value==0?'':formatNumber(e.target.value)
         }
         
@@ -143,8 +144,19 @@ const NewProject = ({isOpen, handleCloseModal}) => {
         e.preventDefault()
         
         if(currentIndex === 1){
-            dispatch(api.createProject({...data, progressiveStaking}, projects))
+            let newData = {...data, 
+                minContribution:formatNumberToFloat(data.minContribution),
+                eRoi: formatNumberToFloat(data.eRoi),
+                progressiveStaking
+            }
+            dispatch(api.createProject(newData, projects))
         }else{
+
+            let defaultNotes = `This project promises a ${data.eRoi}% Return on Investment (ROI)! With odds per bet ticket ranging from ${parseFloat(data.minOdds).toFixed(2)} to ${parseFloat(data.maxOdds).toFixed(2)}${progressiveStaking?', we employ a progressive staking strategy to effectively manage the bankroll and maximize your potential gains':''}.`
+            
+            if(!data.notes && data.eRoi && data.minOdds&& data.maxOdds){
+                setData(prevData => ({...prevData, notes: defaultNotes}))
+            }
 
             let newEmptyFields = Object.keys(data).filter(key => key!='notes' && (data[key]===''||data[key]=== undefined))
             if(!progressiveStaking){
@@ -217,6 +229,17 @@ const NewProject = ({isOpen, handleCloseModal}) => {
                                                 rows={7}
                                                 placeholder="Add notes about the project"
                                             />
+                                        </InputWrapper>
+                                        <InputWrapper value={emptyFields.includes('minContribution')?'error':''}>
+                                            <InputLabel value={data.minContribution}>Minimum contribution amount per contributor</InputLabel>
+                                            <Input 
+                                                placeholder="Minimum contribution amount per contributor"
+                                                name="minContribution"
+                                                invalid={emptyFields.includes('minContribution')?'error':''}
+                                                autoComplete="off"
+                                                onChange={onChange}
+                                                value={data.minContribution}
+                                                label={data.minContribution} />
                                         </InputWrapper>
 
                                         {/* Apply progressive staking calculator (4 steps) */}

@@ -87,7 +87,7 @@ const DealEngagement = ({isOpen, handleModalClose, project, title, idx}) => {
         <>
             <ModalContainter isOpen={isOpen} handleModalClose={handleModalClose}>
                 <SliderWrapper ref={modalRef}>
-                    <NavHeader handleModalClose={handleModalClose} title={`Project ${project.uniqueId} | ${title}`} />
+                    <NavHeader handleModalClose={handleModalClose} title={title} />
                     <ParentWrap >
                         {Array.from({ length: 2 }, (_, index) => (
                             <View key={index} style={{ transform: `translateX(${(index - currentIndex*2) * 100}%)` }}>

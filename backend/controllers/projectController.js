@@ -7,6 +7,7 @@ const User = require('../models/user');
 const { debitWallet } = require('./paymentController');
 const Ticket = require('../models/ticket');
 const Badge = require('../models/badge');
+const { formatAmount } = require('../utils/routineTasks');
 
 // Create new project => /api/v1/punter/project/new
 exports.newProject = catchAsyncErrors( async (req, res, next) => {
@@ -68,6 +69,10 @@ exports.contribute = catchAsyncErrors(async (req, res, next)=>{
         const contributorIndex = project.contributors.findIndex(contributor => contributor.user.equals(req.user._id))
         const projectStarted = new Date() > new Date(project.startAt)
 
+        if(amount < project.minContribution){
+            return next(new ErrorHandler(`Contributed amount too low! Minimum contribution for this project is ${formatAmount(project.minContribution)}`))
+        }
+        
         if(projectStarted){
             return next(new ErrorHandler("Project unavailable for contribution"))
         }

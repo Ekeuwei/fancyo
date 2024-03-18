@@ -7,7 +7,6 @@ const Home = () => {
 
     return (
         <HomeStyle>
-            Home
             <Wrapper style={{alignItems:"center"}}>
                 <img src="assets/fancyO.png" alt={appName} width="100px"/>
             </Wrapper>

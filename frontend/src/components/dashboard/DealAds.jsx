@@ -32,7 +32,7 @@ const DealAds = ({user, project, idx}) => {
     }
 
     const projectDuration = Math.ceil(Math.abs(new Date(project.endAt).getTime() - new Date(project.startAt).getTime())/(1000 * 60 * 60 * 24))
-    const title = `Projct ${project.uniqueId} - ${project.eRoi}% in ${projectDuration} day${projectDuration>1?'s':''}`
+    const title = `Projct ${project.uniqueId} | ${project.eRoi}% in ${projectDuration} day${projectDuration>1?'s':''}`
     const toStartIn = calculateCountdown(project.startAt)
     const toEndIn = calculateCountdown(project.endAt)
     const projectStarted = project.status!=='pending';
@@ -248,7 +248,7 @@ const AmountContributed = styled(Label)`
     padding: 5px;
 `
 const Subscribers = styled(Time)`
-    margin: 5px;
+    margin: 1px;
     font-size: 16px;
 `
 const SubscriberLabel = styled(Label)`

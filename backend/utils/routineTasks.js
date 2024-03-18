@@ -7,6 +7,8 @@ const logger = require('../config/logger');
 const { ProjectCompletionNotification, ProjectNoEngagementNotification } = require('./notifications');
 const Wallet = require('../models/wallet');
 
+exports.formatAmount = value => `₦${new Intl.NumberFormat('en-US').format(parseFloat(value.toString().replace(/[^\d.]/g, '')).toFixed(2))}`;
+
 exports.getTicketStatus = async (ticket)=> {
 
     let liveScores

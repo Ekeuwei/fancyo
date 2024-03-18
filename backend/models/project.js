@@ -20,6 +20,11 @@ const projectSchema = new mongoose.Schema({
     maxOdds: { 
         type: Number, 
     },
+    minContribution: { 
+        type: Number, 
+        default: 1000,
+        min: [1000, 'Minimum contribution amount is NGN 1,000']
+    },
     eRoi: { 
         type: Number, 
         required: true 
@@ -56,7 +61,8 @@ const projectSchema = new mongoose.Schema({
             },
             amount: {
                 type: Number,
-                required: true
+                required: true,
+                min: [1000, 'Minimum amount you can contribute is NGN 1,000']
             },
             status: {
                 type: String,

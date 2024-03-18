@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 const NewProjectPreview = ({project}) => {
     const difference = new Date(project.endAt).getTime() - new Date().getTime(project.startAt);
     const duration = Math.floor(difference / (1000 * 60 * 60 * 24)) + 1;
-    const notes = `This project runs from ${dateFormat(project.startAt, 'mmmm dd')} to ${dateFormat(project.endAt, 'mmmm dd, yyyy')}, promising a ${project.eRoi}% Return on Investment (ROI). Throughout, odds per bet ticket will vary from ${parseFloat(project.minOdds).toFixed(2)} to ${parseFloat(project.maxOdds).toFixed(2)} odds. ${project.progressiveStaking?"We're using a progressive staking strategy to manage the bankroll effectively.":''}`
+    const notes = `This project runs from ${dateFormat(project.startAt, 'mmmm dd')} to ${dateFormat(project.endAt, 'mmmm dd, yyyy')}, promising a ${project.eRoi}% Return on Investment (ROI). Throughout the progress of this project, odds per bet ticket will vary from ${parseFloat(project.minOdds).toFixed(2)} to ${parseFloat(project.maxOdds).toFixed(2)} odds. ${project.progressiveStaking?"We're using a progressive staking strategy to manage the bankroll effectively.":''}`
 
     return (
         <Content>
