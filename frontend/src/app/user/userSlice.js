@@ -129,6 +129,34 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+
+    getUsersStart: state => {
+      state.loading = true;
+      state.error = null;
+    },
+    getUsersSuccess: (state, action) => {
+      state.users = action.payload;
+      state.loading = false;
+    },
+    getUsersFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    getWithdrawalsStart: state => {
+      state.loading = true;
+      state.error = null;
+    },
+    getWithdrawalsSuccess: (state, action) => {
+      state.withdrawals = action.payload;
+      state.loading = false;
+    },
+    getWithdrawalsFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+
+
     fetchBvnDetailsStart: state => {
       state.loading = true;
       state.error = null;
@@ -205,6 +233,13 @@ export const {
   getBadgeStart,
   getBadgeSuccess,
   getBadgeFailure,
+  
+  getUsersStart,
+  getUsersSuccess,
+  getUsersFailure,
+  getWithdrawalsStart,
+  getWithdrawalsSuccess,
+  getWithdrawalsFailure,
 
   clearLink,
   clearUserErrors,

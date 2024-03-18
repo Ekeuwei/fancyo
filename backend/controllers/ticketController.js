@@ -99,6 +99,16 @@ exports.loadBookieTicket = catchAsyncErrors(async (req, res, next) =>{
     })
 })
 
+// Get tickets => /api/v1/admin/tickets?=pending
+exports.allTickets =  catchAsyncErrors(async (req, res, next)=>{
+    let tickets  = await Ticket.find().sort({createdAt: -1})
+
+    res.status(200).json({
+        success: true,
+        tickets
+    })
+})
+
 
 // Upate ticket => /api/v1/admin/ticket/:id
 exports.updateTicket = catchAsyncErrors(async (req, res, next) => {

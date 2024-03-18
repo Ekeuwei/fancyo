@@ -1,17 +1,24 @@
 import styled from 'styled-components'
-import { faUser } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min'
+import PropTypes from 'prop-types'
 
-const Legend = () => {
+const Legend = ({link, icon, title, value}) => {
     const history = useHistory()
     return (
-      <Wrapper onClick={()=>history.push('/admin/users')}>
-          <Icon icon={faUser}/>
-          <Value>23,098</Value>
-          <Label>All users</Label>
+      <Wrapper onClick={()=>history.push(`/admin/${link}`)}>
+          <Icon icon={icon}/>
+          <Value>{value}</Value>
+          <Label>{title}</Label>
       </Wrapper>
     )
+}
+
+Legend.propTypes = {
+    link: PropTypes.string.isRequired,
+    icon: PropTypes.object.isRequired,
+    title: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
 }
 
 const Wrapper = styled.div`

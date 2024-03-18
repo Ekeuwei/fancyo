@@ -67,6 +67,12 @@ import {
     fetchBvnDetailsStart,
     fetchBvnDetailsSuccess,
     fetchBvnDetailsFailure,
+    getUsersStart,
+    getUsersSuccess,
+    getUsersFailure,
+    getWithdrawalsStart,
+    getWithdrawalsSuccess,
+    getWithdrawalsFailure,
     createToast,
 } from "../app/user/userSlice"
 
@@ -99,6 +105,9 @@ import {
     createTicketStart,
     createTicketSuccess,
     createTicketFailure,
+    getAllTicketsStart,
+    getAllTicketsSuccess,
+    getAllTicketsFailure,
     
 } from "../app/ticket/ticketSlice"
 
@@ -650,6 +659,66 @@ export const api = {
         } catch (error) {
 
             dispatch(contributeFailure(error.response.data.message))
+        }
+    },
+
+
+    // Admin requests
+    // Get All tickets 
+    getUsers: () => async (dispatch) =>{
+        try {
+            dispatch(getUsersStart())
+
+            // eslint-disable-next-line no-unused-vars
+            const config = {
+                headers: {'content-Type': 'application/json'},
+            }
+
+            const { data } = await instance.get(`/api/v1/admin/users?status=pending`)
+            
+            dispatch(getUsersSuccess(data.users))
+
+        } catch (error) {
+
+            dispatch(getUsersFailure(error.response.data.message))
+        }
+    },
+    // Get All tickets 
+    getAllTickets: () => async (dispatch) =>{
+        try {
+            dispatch(getAllTicketsStart())
+
+            // eslint-disable-next-line no-unused-vars
+            const config = {
+                headers: {'content-Type': 'application/json'},
+            }
+
+            const { data } = await instance.get(`/api/v1/admin/tickets?status=pending`)
+            
+            dispatch(getAllTicketsSuccess(data.tickets))
+
+        } catch (error) {
+
+            dispatch(getAllTicketsFailure(error.response.data.message))
+        }
+    },
+    // Get All withdrawal requests 
+    getWithdrawals: () => async (dispatch) =>{
+        try {
+            dispatch(getWithdrawalsStart())
+
+            // eslint-disable-next-line no-unused-vars
+            const config = {
+                headers: {'content-Type': 'application/json'},
+            }
+
+            const { data } = await instance.get(`/api/v1/admin/withdrawals?status=pending`)
+            
+            dispatch(getWithdrawalsSuccess(data.withdrawals))
+
+        } catch (error) {
+
+            dispatch(getWithdrawalsFailure(error.response.data.message))
         }
     },
     

@@ -620,7 +620,7 @@ exports.getBvnDetails = catchAsyncErrors( async (req, res, next)=>{
 
 // Get all users => /api/v1/users
 exports.allUsers = catchAsyncErrors( async (req, res, next) => {
-    const users = await User.find();
+    const users = await User.find().sort({createdAt: -1});
 
     res.status(200).json({
         success: true,

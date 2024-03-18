@@ -25,6 +25,20 @@ const ticketSlice = createSlice({
             state.error = action.payload;
         },
         
+        // Admin actions //get tickets
+        getAllTicketsStart: state => {
+            state.loading = true;
+            state.error = null;
+        },
+        getAllTicketsSuccess: (state, action) => {
+            state.tickets = action.payload;
+            state.loading = false;
+        },
+        getAllTicketsFailure: (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        },
+        
         createTicketError: (state, action) => {
             state.loading = false;
             state.error = action.payload;
@@ -42,6 +56,10 @@ export const {
     createTicketStart,
     createTicketSuccess,
     createTicketFailure,
+    
+    getAllTicketsStart,
+    getAllTicketsSuccess,
+    getAllTicketsFailure,
 
     createTicketError,
     clearTicketErrors,

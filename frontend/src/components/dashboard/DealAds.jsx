@@ -71,7 +71,10 @@ const DealAds = ({user, project, idx}) => {
                         <Details>
                             <InvestmentType>Project ID: {project.uniqueId}</InvestmentType>
                             <Author>Punter: {project.punter.username}</Author>
-                            <Status>{project.status}</Status>
+                            <Status>
+                                <StatusLabel>Status</StatusLabel> 
+                                <StatusValue color={project.status==='successful'?'success':project.status==='failed'?'error':'accent'}>{project.status}</StatusValue>
+                            </Status>
                             {/* <ProgressBar width={10} content={''}/> */}
                         </Details>
                         {!projectStarted?
@@ -92,14 +95,13 @@ const DealAds = ({user, project, idx}) => {
                                         <Balance>{balance}</Balance>
                                         <PercentIncrease>{percentIncrease}% {profit>0?'up':'down'}</PercentIncrease>
                                     </>:
-                                    <ProjectLogistics>
-                                        {/* <FontAwesomeIcon icon={profit>0?faPlus:faMinus} size="xs" style={{marginRight:'5px'}}/> */}
-                                        <div>
-                                            <Balance value={profit}>{formatAmount(profit)}</Balance>
-                                            <PercentIncrease>{percentIncrease}% {profit>0?'Profit':'Lost'}</PercentIncrease>
-                                        </div>
-                                    </ProjectLogistics>
-                                    }
+                                    <>
+                                        <Balance value={profit}>
+                                            <FontAwesomeIcon icon={profit>0?faPlus:faMinus} size="xs" style={{marginRight:'5px'}}/>
+                                            {formatAmount(profit)}
+                                        </Balance>
+                                        <PercentIncrease>{percentIncrease}% {profit>0?'Profit':'Lost'}</PercentIncrease>
+                                    </>}
                                 </>:
                                 <Balance value={percentIncrease} color={percentIncrease>0?'success':'error'}><FontAwesomeIcon icon={percentIncrease>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{percentIncrease}%</Balance>
                                 }
@@ -185,12 +187,23 @@ const Title = styled(Time)`
     font-weight: 500;
     margin-bottom: 3px;
 `
-const Status = styled.p`
+const Status = styled.div`
     margin: 0;
+    display: flex;
+    color: ${({theme})=>theme.colors.white};
     font-size: 10px;
-    font-weight: 600;
     text-transform: capitalize;
-    font-style: italic;
+    margin-top: 2px;
+`
+const StatusLabel = styled.span`
+    background: ${({theme})=>setAlpha(theme.colors.black, 0.58)};
+    border-radius: 5px 0 0 5px;
+    padding: 3px 7px;
+    `
+const StatusValue = styled.span`
+    background: ${({theme, color})=>theme.colors[color]};
+    border-radius: 0 5px 5px 0;
+    padding: 3px 7px;
 `
 const Completed = styled.div`
     display: flex;
@@ -264,6 +277,7 @@ const Profit = styled(Label)`
 const PercentIncrease = styled(Profit)`
     color:${({theme})=>theme.colors.dark2};
     text-transform: capitalize;
+    text-align: end;
 `
 
 const calculateCountdown = (timestamp)=>{

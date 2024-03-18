@@ -26,6 +26,8 @@ import ValidateBvn from "./components/user/ValidateBvn";
 import RegisterPunter from "./components/user/RegisterPunter";
 import AdminDashboard from "./components/admin";
 import AllUsers from "./components/admin/users";
+import AdminTicket from "./components/admin/tickets";
+import Withdrawals from "./components/admin/withdrawals";
     
 export const appName = import.meta.env.VITE_APP_NAME
 
@@ -62,6 +64,8 @@ function App() {
               
               <Route path="/admin/dashboard" component={AdminDashboard} exact />
               <Route path="/admin/users" component={AllUsers} exact />
+              <Route path="/admin/tickets" component={AdminTicket} exact />
+              <Route path="/admin/withdrawals" component={Withdrawals} exact />
               
               <Route path="/bvn" component={ValidateBvn} exact />
           </Router>

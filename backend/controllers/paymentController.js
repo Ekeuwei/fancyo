@@ -443,3 +443,13 @@ exports.flwPaymentWebhook = catchAsyncErrors(async(req, res, next)=>{
 
     res.status(200).end()
 });
+
+// Admin =>/api/v1/admin/cashouts
+exports.allWithdrawals = catchAsyncErrors(async(req, res, next)=>{
+    let withdrawals = await Cashout.find().sort({createdAt: -1})
+
+    res.status(200).json({
+        success: true,
+        withdrawals
+    })
+})

@@ -17,13 +17,13 @@ const {
 } = require('../controllers/projectController');
 
 const { isAuthenticatedUser, authorizeRoles  } = require('../midllewares/auth');
-const { loadBookieTicket, newTicket } = require('../controllers/ticketController');
+const { loadBookieTicket, newTicket, allTickets } = require('../controllers/ticketController');
 
 router.route('/project/new').post(isAuthenticatedUser, authorizeRoles('admin', 'punter'), newProject); 
 router.route('/project/contribute').post(isAuthenticatedUser, authorizeRoles('user'), contribute); 
 
 // Ticket Routes
-router.route('/ticket/new').post(isAuthenticatedUser, /*authorizeRoles('admin', 'punter'),*/ newTicket); 
+router.route('/ticket/new').post(isAuthenticatedUser, authorizeRoles('admin', 'punter'), newTicket); 
 router.route('/bookie/loadticket').get(isAuthenticatedUser, /*authorizeRoles('admin', 'punter'),*/ loadBookieTicket); 
 
 router.route('/projects').get(isAuthenticatedUser, getProjects); // more roles can be pass to the authorizeRole function like 'admin, editor, superAdmin...'
@@ -40,6 +40,7 @@ router.route('/reviews')
             .get(isAuthenticatedUser, getProjectReviews)
             .delete(isAuthenticatedUser, deleteReview)
 
+router.route('/admin/tickets').get(/*isAuthenticatedUser, authorizeRoles('admin'),*/ allTickets);
 
             
 module.exports = router;

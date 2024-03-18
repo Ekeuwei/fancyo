@@ -67,7 +67,10 @@ const ProjectItem = ({project, idx}) => {
                         <Details>
                             <InvestmentType>Project ID: {project.uniqueId}</InvestmentType>
                             {project.status!='pending'&& <DateLabel>{`${toEndIn.split(" ")[0]==0?'Ended':'Started'} ${dateFormat(toEndIn.split(" ")[0]==0?project.endAt:project.startAt, 'dd mmm, yyyy')}`}</DateLabel>}
-                            <Status>Status: {project.status}</Status>
+                            <Status>
+                                <StatusLabel>Status</StatusLabel> 
+                                <StatusValue color={project.status==='successful'?'success':project.status==='failed'?'error':'accent'}>{project.status}</StatusValue>
+                            </Status>
                             {/* <ProgressBar width={10} content={''}/> */}
                         </Details>
                         {!projectStarted?
@@ -166,12 +169,23 @@ const Title = styled(Time)`
     font-weight: 500;
     margin-bottom: 3px;
 `
-const Status = styled.p`
+const Status = styled.div`
     margin: 0;
+    display: flex;
+    color: ${({theme})=>theme.colors.white};
     font-size: 10px;
-    font-weight: 600;
     text-transform: capitalize;
-    font-style: italic;
+    margin-top: 2px;
+`
+const StatusLabel = styled.span`
+    background: ${({theme})=>setAlpha(theme.colors.black, 0.58)};
+    border-radius: 5px 0 0 5px;
+    padding: 3px 7px;
+    `
+const StatusValue = styled.span`
+    background: ${({theme, color})=>theme.colors[color]};
+    border-radius: 0 5px 5px 0;
+    padding: 3px 7px;
 `
 const Completed = styled.div`
     display: flex;

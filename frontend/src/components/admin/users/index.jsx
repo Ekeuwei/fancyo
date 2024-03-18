@@ -1,20 +1,39 @@
 import styled from "styled-components"
-import { BodyWrapper } from "../../../theme/ThemeStyle"
 import NavHeader from "../../dashboard/layout/NavHeader"
 import AdminUserTemplate from "./AdminUserTemplate"
 import { setAlpha } from "../../../common/utils"
+import { useEffect, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { api } from "../../../common/api"
+import { Loading } from "../../../theme/ThemeStyle"
 
 const AllUsers = () => {
-  return (
-    <div>
-        <NavHeader title={'All Users'} />
-        <Wrapper>
-            <Users>
-                {[1,2,3,4,5].map((user, idx) => (<AdminUserTemplate user={user} key={idx}/>))}
-            </Users>
-        </Wrapper>
-    </div>
-  )
+    const dispatch = useDispatch()
+    const { loading, users } = useSelector(state => state.user)
+    const [actionPosition, setViewPosition] = useState('')
+    const handleShowActions = (idx)=> setViewPosition(prevPosition => idx===prevPosition?'':idx)
+    
+    useEffect(()=>{
+        dispatch(api.getUsers())
+    },[])
+    
+    return (
+        <div>
+            <NavHeader title={'All Users'} />
+            <Wrapper>
+                <Loading value={+loading}/>
+                {users&&<Users>
+                    {users.map((user, idx) => (
+                    <AdminUserTemplate 
+                        actionPosition={actionPosition} 
+                        handleShowActions={handleShowActions}
+                        user={user} 
+                        idx={idx}
+                        key={idx}/>))}
+                </Users>}
+            </Wrapper>
+        </div>
+    )
 }
 
 const Wrapper = styled.div`

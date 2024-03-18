@@ -11,7 +11,8 @@ const {
     walletTransactions,
     flwVerifyAccount,
     flwGetAllBanks,
-    cashout
+    cashout,
+    allWithdrawals
 } = require('../controllers/paymentController')
 
 const { isAuthenticatedUser } = require('../midllewares/auth');
@@ -28,5 +29,6 @@ router.route('/flwpayment/process').post(isAuthenticatedUser, flwPayment);
 router.route('/flwpayment/callback').get(isAuthenticatedUser, flwPaymentCallback);
 router.route('/flwpayment/webhook').get(flwPaymentWebhook);
 
+router.route('/admin/withdrawals').get(/*isAuthenticatedUser, */allWithdrawals);
 
 module.exports = router;
