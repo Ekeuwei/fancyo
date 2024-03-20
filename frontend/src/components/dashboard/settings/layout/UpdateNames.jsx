@@ -78,7 +78,7 @@ const UpdateNames = ({accountUpdateError}) => {
                   name='otherNames' 
                   onChange={onChange}/>
             </InputWrapper>
-            <Button type='submit'>Update <Loading value={loading} /></Button>
+            <Button disabled={loading} type='submit'>Update <Loading value={+loading} /></Button>
 
           </Wrapper>
         </>

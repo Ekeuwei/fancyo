@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Button, Input, InputLabel, InputWrapper, NoticeMessage } from "../../../../theme/ThemeStyle"
+import { Button, Input, InputLabel, InputWrapper, Loading, NoticeMessage } from "../../../../theme/ThemeStyle"
 import styled from "styled-components"
 import ModalContainter from "../../modals/ModalContainter"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -58,7 +58,7 @@ const UpdateValue = ({updateValue, name}) => {
                             placeholder={name}
                             onChange={onChange}/>
                     </InputWrapper>
-                    <Button type="submit">Update</Button>
+                    <Button disabled={loading} type="submit">Update <Loading value={+loading} /></Button>
                 </Wrapper>
             </>
         </ModalContainter>

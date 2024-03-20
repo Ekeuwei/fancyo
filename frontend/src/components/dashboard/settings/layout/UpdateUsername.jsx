@@ -57,7 +57,7 @@ const UpdateUsername = ({userName}) => {
                   placeholder='Username' 
                   onChange={onChange}/>
             </InputWrapper>
-            <Button type='submit'>Update <Loading value={loading} /></Button>
+            <Button disabled={loading} type='submit'>Update <Loading value={+loading} /></Button>
 
           </Wrapper>
         </>

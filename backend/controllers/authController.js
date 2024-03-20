@@ -563,8 +563,13 @@ exports.updateProfile = catchAsyncErrors( async (req, res, next) => {
     }
 
     if(newUserData.email || newUserData.phoneNumber){
-        // Delete any uncompleted user 
-        // const unCompletedRegistration = await User.find({user})
+        // Delete any uncompleted registration 
+        await User.findOneAndDelete({
+            $or:[
+                {$and:[{email:newUserData.email},{$or:[{password:{$exists:false}},{password:''}]}]},
+                {$and:[{phoneNumber:newUserData.phoneNumber},{$or:[{password:{$exists:false}},{password:''}]}]}
+            ]
+        })
     }
 
     const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
