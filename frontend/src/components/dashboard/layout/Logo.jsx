@@ -1,9 +1,11 @@
 import styled from "styled-components"
 import { appName } from "../../../App"
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
 
 const Logo = () => {
+  const history = useHistory()
   return (
-    <IconWrapper>
+    <IconWrapper onClick={()=> history.push('/')}>
         <img src="assets/fancyO.png" alt={appName} width="100px"/>
     </IconWrapper>
   )

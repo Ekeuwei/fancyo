@@ -18,30 +18,33 @@ const sendSMS__ = async (message, to)=>{
 }
 
 const sendSMS = async (message, to)=>{
-    var data = {
+    
+    var data = JSON.stringify({
         to,
         "from": process.env.SMS_SENDER_ID,
-        "sms": "message",
+        "sms": message,
         "type": "plain",
         "api_key": process.env.TERMII_API_KEY,
         "channel": "generic",
-    };
+    });
+
     var options = {
-        'method': 'POST',
-        'url': 'https://api.ng.termii.com/api/sms/otp/send',
+        'method': "POST",
+        'url': 'https://api.ng.termii.com/api/sms/send',
         'headers': {
         'Content-Type': ['application/json', 'application/json']
         },
-        body: JSON.stringify(data)
+        body: data
     };
 
+  
     request(options, function (error, response) { 
         
         if (error){
             console.error(error.message);
         }else{
             const {message_id} = JSON.parse(response.body)
-            console.log('SMS sent: message_id-> ', message_id);
+            console.log('SMS sent: message_id-> ', JSON.parse(response.body));
         }
     });
 

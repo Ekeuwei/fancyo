@@ -28,7 +28,8 @@ const sendUserToken = async (token, senderId, type)=>{
     else {
         // Send activation SMS
         // const text = `For ${type.toLowerCase()}, please use the following code:${token}. This code would expire after 20 minutes`
-        // sendSMS(text, `0${senderId.slice(-10)}`)
+        const text = `Your six digit authentication pin:${token}. Expires after 20 minutes.`
+        sendSMS(text, `234${senderId.slice(-10)}`)
     }
 }
 

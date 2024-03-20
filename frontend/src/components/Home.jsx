@@ -18,9 +18,10 @@ const Home = () => {
                 <Subtitle>Not harder with {appName}</Subtitle>
             </Wrapper>
 
-            <Wrapper style={{marginTop:"30px"}}>
-                <Btn onClick={()=>history.push('/login')}>Get Started</Btn>
-            </Wrapper>
+            <ButtonWrapper>
+                <Btn onClick={()=>history.push('/register')}>Get Started</Btn>
+                <Btn onClick={()=>history.push('/login')}>Login</Btn>
+            </ButtonWrapper>
 
         </HomeStyle>
     )
@@ -38,6 +39,14 @@ const Wrapper = styled.div`
     padding: 0 40px;
     margin: 1em 0;
 `
+
+const ButtonWrapper = styled(Wrapper)`
+    margin-top: 30px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+`
+
 const Title = styled.h1`
     font-weight: 600;
     font-size: 40px;
@@ -49,8 +58,8 @@ const Subtitle = styled.h3`
     margin: 0;
 `
 const Btn = styled(Button)`
-    width: 100%;
-    padding: 15px;
+    max-width: 300px;
+    padding: 20px;
     background-color: #16414E;
 `
 

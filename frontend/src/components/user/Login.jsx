@@ -79,9 +79,9 @@ const Login = () => {
 
                     <Wrapper>
                         <InputWrapper value={emptyFields.includes('loginId')?'error':''}>
-                            <InputLabel value={loginDetails.loginId}>Username</InputLabel>
+                            <InputLabel value={loginDetails.loginId}>Email or Phone Number</InputLabel>
                             <Input 
-                                placeholder="Username" 
+                                placeholder="Email or Phone Number" 
                                 name="loginId"
                                 invalid={emptyFields.includes('loginId')}
                                 label={loginDetails.loginId} value={loginDetails.loginId} 

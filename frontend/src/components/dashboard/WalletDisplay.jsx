@@ -68,6 +68,7 @@ const ButtonGroup = styled.div`
     position: absolute;
     width: 100%;
     bottom: 0;
+    padding: 0 10px;
     left: 0;
     transform: translate(0, 50%);
     align-items: center;
@@ -78,6 +79,7 @@ const Button = styled.div`
     flex-direction: column;
     align-items: center;
     row-gap: 5px;
+    flex: 1;
 `
 const ButtonIcon = styled.div`
     border-radius: 50%;
