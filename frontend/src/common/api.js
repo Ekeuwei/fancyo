@@ -34,8 +34,9 @@ import {
     resetPasswordSuccess,
     resetPasswordFailure,
 
-    logout,
-    clearAuthError,
+    logoutStart,
+    logoutSuccess,
+    logoutFailure,
 } from "../app/auth/authSlice"
 
 import {
@@ -171,15 +172,17 @@ export const api = {
     logout: () => async (dispatch) =>{
         try {
     
+            dispatch(logoutStart())
+
             await instance.get('/api/v1/logout')
     
             localStorage.removeItem('userMode')
             localStorage.removeItem('user')
             
-            dispatch(logout())
+            dispatch(logoutSuccess())
     
         } catch (error) {
-            dispatch(clearAuthError)
+            dispatch(logoutFailure(error.response.data.message))
         }
     },
 

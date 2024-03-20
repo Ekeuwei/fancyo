@@ -196,10 +196,17 @@ const authSlice = createSlice({
     },
     
     // Logout 
-    logout: (state) => {
+    logoutStart: (state) => {
+        state.loading = true;
+    },
+    logoutSuccess: (state) => {
         state.loading = false;
         state.user = null;
         state.isAuthenticated = false;
+    },
+    logoutFailed: (state, action) => {
+        state.loading = false;
+        state.error = action.payload
     }
   },
 });
@@ -238,10 +245,12 @@ export const {
   resetPasswordStart, 
   resetPasswordSuccess, 
   resetPasswordFailure,
+  logoutStart, 
+  logoutSuccess, 
+  logoutFailure,
   
   clearAuthError,
   createAuthError,
-  logout,
 } = authSlice.actions;
 
 export default authSlice.reducer;

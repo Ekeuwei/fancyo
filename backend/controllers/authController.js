@@ -81,7 +81,7 @@ exports.validateUser = catchAsyncErrors( async (req, res, next)=>{
 
     } catch (error) {
         
-        next(new ErrorHandler(error.message, 500))
+        return next(new ErrorHandler(error.message, 500))
         
     }
 
@@ -274,10 +274,10 @@ exports.loginUser = catchAsyncErrors( async (req, res, next)=>{
     let user;
 
     if(validEmail){
-        user = await User.findOne({ email: loginId }).select('+password +isActivated');
+        user = await User.findOne({ email: loginId, password: { $exists: true, $ne: ''} }).select('+password +isActivated');
     }
     else{
-        user = await User.findOne({ phoneNumber: loginId.slice(-10) }).select('+password +isActivated');
+        user = await User.findOne({ phoneNumber: loginId.slice(-10), password: { $exists: true, $ne: ''} }).select('+password +isActivated');
     }
 
     if(!user){
@@ -562,6 +562,10 @@ exports.updateProfile = catchAsyncErrors( async (req, res, next) => {
         }
     }
 
+    if(newUserData.email || newUserData.phoneNumber){
+        // Delete any uncompleted user 
+        // const unCompletedRegistration = await User.find({user})
+    }
 
     const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
         new: true,
