@@ -14,6 +14,10 @@ exports.newProject = catchAsyncErrors( async (req, res, next) => {
 
     const { startAt, endAt, minOdds, maxOdds } = req.body;
 
+    const newEndDate = new Date(endAt);
+    newEndDate.setDate(newEndDate.getDate() + parseInt(req.body.progressiveSteps));
+    req.body.endAt = newEndDate
+
     req.body.punter = req.user._id;
 
     // Check if the pproject start and end time reconcile
@@ -37,7 +41,7 @@ exports.newProject = catchAsyncErrors( async (req, res, next) => {
         return next(new ErrorHandler(`Minimum odds value must be lower than maximum odds value.`))
     }
     
-    if((parseFloat(minOdds) + 0.2) >= parseFloat(maxOdds) ){
+    if((parseFloat(minOdds) + 0.2) > parseFloat(maxOdds) ){
         return next(new ErrorHandler(`Allow a odd difference of 0.2 between maximum and minimum odds.`))
     }
     

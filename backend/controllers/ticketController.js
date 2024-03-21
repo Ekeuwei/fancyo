@@ -28,6 +28,16 @@ exports.newTicket = catchAsyncErrors( async (req, res, next) => {
         return next(new ErrorHandler("Project cannot receive tickets", 403))
     }
 
+    // Check if the last ticket was won and the project has reached progressiveSteps - endAt
+    const currentDate = new Date().getTime();
+    const supposedEndDate = new Date().setDate(new Date(project.endAt).getDate() - project.progressiveSteps)
+    let tickets = await Ticket.find({ projectId: project._id }).sort({createdAt: -1});
+    const wonLastTicket = tickets[0].status === 'successful'
+    if(currentDate > supposedEndDate && wonLastTicket){
+        // Cannot stake because we have fewer time remaining to stake
+        return next(new ErrorHandler("Project is winding down and cannot receive more tickets.", 403))
+    }
+    
     if(project.availableBalance < parseInt(req.body.stakeAmount)){
         return next(new ErrorHandler("Bankroll too lower! Try lower stake amount", 403))
     }
@@ -42,14 +52,27 @@ exports.newTicket = catchAsyncErrors( async (req, res, next) => {
                 return next(new ErrorHandler("Invalid Option Selected", 403))
             }
     } catch (error) {
-        return next(new ErrorHandler(error.message, 403))
+        return next(new ErrorHandler('Error creating ticket.', 403))
     }
 
     const threeHoursLater = new Date().getTime() + 3 * 60 * 60 * 1000
+    const startTimeLimit = new Date().setHours(18, 0, 0); // 6 PM
+    const endTimeLimit = new Date().setHours(8, 0, 0); // 8 AM next day
+    
+    const allGamesStartThreeHoursLaterAndNotStartingAfterWorkTime = games.every(game => 
+        game.time > threeHoursLater // Event starts at least 3 hours from now
+        && !(game.time >= startTimeLimit && game.time < endTimeLimit) // Event is not starting between 6 PM and 8 AM next day
+        )
+
     const allGamesStartThreeHoursLater = games.every(game => game.time > threeHoursLater)
     if(!allGamesStartThreeHoursLater){
         // return next(new ErrorHandler("Tickets must be submitted 3 hours before kickoff of all matches.", 403))   
     }
+    if(!allGamesStartThreeHoursLaterAndNotStartingAfterWorkTime){
+        console.log('Caught a ticket violating work time posting');
+        // return next(new ErrorHandler("Please submit a ticket that starts 3 hours from now and does not start our off time!", 403))   
+    }
+    return next(new ErrorHandler("Blobber", 403))   
 
     const totalOdds  = games.reduce((prev, game)=> prev * game.odds, 1)
     const allowedOddsRange = !project.minOdds || project.maxOdds >= totalOdds && totalOdds >= project.minOdds

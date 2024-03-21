@@ -36,7 +36,7 @@ const NewProject = ({isOpen, handleCloseModal}) => {
         endAt:'',
         notes:'',
         minContribution: '',
-        progressiveSteps:'',
+        progressiveSteps:'1',
     })
     const [progressiveStaking, setProgressiveStaking] = useState(false)
     const [showInfo, setShowInfo] = useState(false)
@@ -87,7 +87,7 @@ const NewProject = ({isOpen, handleCloseModal}) => {
 
     useEffect(()=>{
         const withinBadgeClearanceLimit = data.maxOdds > badge?.minOdds || data.minOdds > badge?.minOdds
-        let start = withinBadgeClearanceLimit? 4:2
+        let start = withinBadgeClearanceLimit? (badge?.number+3) : 2
         // let start = badge?.minOdds >= parseFloat(data.maxOdds)? 1:4
         const end = 10
     
@@ -100,7 +100,8 @@ const NewProject = ({isOpen, handleCloseModal}) => {
         setEnforceProgressiveStaking(withinBadgeClearanceLimit)
         if(withinBadgeClearanceLimit){
             // Minimum steps
-            setData(prev => ({...prev, progressiveSteps: '4'}))
+            setData(prev => ({...prev, progressiveSteps: `${(badge?.number + 3)}`}))
+            // We are setting the minimum level to 3 plus the badge number
         }
         setProgressiveStaking(withinBadgeClearanceLimit)
         setProgressiveOptions(options)
