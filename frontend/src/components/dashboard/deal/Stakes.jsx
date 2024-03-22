@@ -30,12 +30,12 @@ Stakes.propTypes = {
 
 const Stake = ({ticket, index, openIndex, handleToggle})=>{
 
-    const { isGuest } = useContext(ProjectDetailsContext)
+    const { isGuest, contributedQuota } = useContext(ProjectDetailsContext)
     
     const collapseHandler = ()=> handleToggle(index)
     const value = openIndex === index?"collapsing":"";
     const combinedOdds = (ticket.games.reduce((acc, game)=> acc * parseFloat(game.odds), 1))
-    const expectedRoi = formatNumberFraction(combinedOdds * ticket.stakeAmount - ticket.stakeAmount)
+    const expectedRoi = formatNumberFraction((combinedOdds * ticket.stakeAmount - ticket.stakeAmount) * contributedQuota)
     const gameType = ticket.games.length > 1? 'Accumulator':'Single'
     const title = `Ticket ${index+1} - ${gameType} @${formatNumberFraction(combinedOdds)} Odds`
 
@@ -43,7 +43,7 @@ const Stake = ({ticket, index, openIndex, handleToggle})=>{
     const wonTicket = allMatchesConcluded && ticket.games.every(game => game.outcome == 1)
     const lostAGame = ticket.games.some(game => game.outcome === 0);
     const color = wonTicket?'success':lostAGame?'error':'warning'
-    const winning = wonTicket? expectedRoi: lostAGame? -ticket.stakeAmount:''
+    const winning = wonTicket? expectedRoi: lostAGame? -(ticket.stakeAmount * contributedQuota):''
 
     return(
         <StakeWrapper>

@@ -39,8 +39,9 @@ const ProjectDetails = ({match}) => {
     const isProjectPunter = projectDetails?.project.punter._id === user._id
     const canCreateTicket = isProjectPunter && projectDetails?.project.status==='in progress'
     
+    const totalContributedAmount = projectDetails?.project.contributors.reduce((total, contributor) => total + contributor.amount, 0)
     const contributor = projectDetails?.project.contributors.find(contributor => contributor.user === user._id)
-    const contributedQuota = isNaN(contributor?.amount)? 1 : (contributor?.amount)
+    const contributedQuota = isNaN(contributor?.amount)? 1 : (contributor.amount/totalContributedAmount)
     const isGuest = !(contributor || isProjectPunter)
     
     return (
