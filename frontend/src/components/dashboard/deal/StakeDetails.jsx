@@ -2,10 +2,13 @@ import styled from "styled-components"
 import MatchFixture from "./MatchFixture"
 import PropTypes from 'prop-types'
 import { formatAmountFraction, formatNumberFraction } from "../../../common/utils"
+import { useContext } from "react"
+import { ProjectDetailsContext } from "../punter/ProjectDetails"
 
 const StakeDetails = ({value, ticket}) => {
+    const { contributedQuota, isGuest } = useContext(ProjectDetailsContext)
     const combinedOdds = ticket.games.reduce((acc, game)=> acc * game.odds, 1)
-    const expectedRoi = ticket.status==='failed'? 0 : combinedOdds * ticket.stakeAmount
+    const expectedRoi = ticket.status==='failed'? 0 : combinedOdds * ticket.stakeAmount * contributedQuota
 
     return (
         <Details value={value} >
@@ -19,11 +22,11 @@ const StakeDetails = ({value, ticket}) => {
             </TextWrapper>
             <TextWrapper>
                 <TextField>Stake Amount</TextField>
-                <Value>{formatAmountFraction(ticket.stakeAmount)}</Value>
+                <Value>{isGuest? 'XXX' : formatAmountFraction(ticket.stakeAmount)}</Value>
             </TextWrapper>
             <TextWrapper value={'underline'}>
                 <TextField>{['failed', 'successful'].includes(ticket.status)? 'Return':'Expected Return'}</TextField>
-                <Value>{formatAmountFraction(expectedRoi)}</Value>
+                <Value>{isGuest? `${formatAmountFraction(combinedOdds)}X` : formatAmountFraction(expectedRoi)}</Value>
             </TextWrapper>
             <TextWrapper>
                 <TextField>Status</TextField>

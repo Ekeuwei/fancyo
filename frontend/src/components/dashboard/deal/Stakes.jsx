@@ -1,10 +1,11 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styled from 'styled-components'
 import StakeDetails from './StakeDetails'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 import { formatAmount, formatNumberFraction, formatNumberToFloat } from '../../../common/utils'
 import { faAngleRight, faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { ProjectDetailsContext } from '../punter/ProjectDetails'
 
 const Stakes = ({tickets}) => {
     const [openIndex, setOpenIndex] = useState(null)
@@ -28,6 +29,8 @@ Stakes.propTypes = {
 }
 
 const Stake = ({ticket, index, openIndex, handleToggle})=>{
+
+    const { isGuest } = useContext(ProjectDetailsContext)
     
     const collapseHandler = ()=> handleToggle(index)
     const value = openIndex === index?"collapsing":"";
@@ -51,7 +54,7 @@ const Stake = ({ticket, index, openIndex, handleToggle})=>{
                 <Title>{title}</Title>
                 <Label value={{winning, color}}>
                     <FontAwesomeIcon icon={winning<0? faMinus:faPlus} size='xs' style={{marginRight:'2px'}}/>
-                    {formatAmount(Math.abs(formatNumberToFloat(winning)))}
+                    {isGuest?`${formatAmount(combinedOdds)}X`:formatAmount(Math.abs(formatNumberToFloat(winning)))}
                 </Label>
             </Header>
             <StakeDetails ticket={ticket} value={value} />
