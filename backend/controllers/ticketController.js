@@ -32,10 +32,16 @@ exports.newTicket = catchAsyncErrors( async (req, res, next) => {
     const currentDate = new Date().getTime();
     const supposedEndDate = new Date().setDate(new Date(project.endAt).getDate() - project.progressiveSteps)
     let tickets = await Ticket.find({ projectId: project._id }).sort({createdAt: -1});
-    const wonLastTicket = tickets[0].status === 'successful'
+    const wonLastTicket = tickets.length > 0 && tickets[0].status === 'successful'
     if(currentDate > supposedEndDate && wonLastTicket){
         // Cannot stake because we have fewer time remaining to stake
         return next(new ErrorHandler("Project is winding down and cannot receive more tickets.", 403))
+    }
+
+    const isTicketInProgress = tickets.some(ticket => !['successful', 'failed'].includes(ticket.status))
+
+    if(isTicketInProgress && project.progressiveStaking){
+        return next(new ErrorHandler("Allow the last ticket to conclude before posting a new ticket.", 403))
     }
     
     if(project.availableBalance < parseInt(req.body.stakeAmount)){
@@ -72,7 +78,6 @@ exports.newTicket = catchAsyncErrors( async (req, res, next) => {
         console.log('Caught a ticket violating work time posting');
         // return next(new ErrorHandler("Please submit a ticket that starts 3 hours from now and does not start our off time!", 403))   
     }
-    return next(new ErrorHandler("Blobber", 403))   
 
     const totalOdds  = games.reduce((prev, game)=> prev * game.odds, 1)
     const allowedOddsRange = !project.minOdds || project.maxOdds >= totalOdds && totalOdds >= project.minOdds

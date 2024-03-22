@@ -172,7 +172,7 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) =>{
             return next(new ErrorHandler('Invalid email or phone number', 401))
         }
 
-        if(user.password){
+        if(user.isActivated){
             return next(new ErrorHandler('Account already created! Login to continue.', 401))
         }
 

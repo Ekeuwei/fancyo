@@ -39,7 +39,8 @@ const ProjectItem = ({project, idx}) => {
     const projectStarted = project.status!=='pending';
     const contributedAmount = project.contributors.reduce((total, contributor) => total + contributor.amount, 0)
     
-    const profit = ((project.availableBalance>0? project.availableBalance : (project.roi + contributedAmount)) - contributedAmount)
+    // const profit = ((project.status==='in progress'? project.availableBalance : (project.roi + contributedAmount)) * contributedQuota) - contributedAmount
+    const profit = (project.status==='in progress'? project.availableBalance : (project.roi + contributedAmount)) - contributedAmount
     const percentIncrease = isNaN(profit/contributedAmount)? 0: formatNumber(profit/contributedAmount * 100)
 
     return (
@@ -84,7 +85,7 @@ const ProjectItem = ({project, idx}) => {
                                         <PercentIncrease>Contributions <br/>refunded</PercentIncrease>:
                                         <PercentIncrease>No Contributor</PercentIncrease>}
                             </>:
-                                <Balance display={percentIncrease == 0?'none':''} value={percentIncrease} color={percentIncrease>0?'success':'error'}><FontAwesomeIcon icon={percentIncrease>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{percentIncrease}%</Balance>
+                                <Balance display={percentIncrease == 0?'none':''} value={percentIncrease} color={profit>0?'success':'error'}><FontAwesomeIcon icon={profit>0?faPlus:faMinus} size="xs" style={{marginRight:'2px'}}/>{percentIncrease}%</Balance>
                             }
                             
                         </EarningsWrapper>}
