@@ -8,7 +8,8 @@ import { ProjectDetailsContext } from "../punter/ProjectDetails"
 const StakeDetails = ({value, ticket}) => {
     const { contributedQuota, isGuest } = useContext(ProjectDetailsContext)
     const combinedOdds = ticket.games.reduce((acc, game)=> acc * game.odds, 1)
-    const expectedRoi = ticket.status==='failed'? 0 : combinedOdds * ticket.stakeAmount * contributedQuota
+    const stakeAmount = ticket.stakeAmount * contributedQuota
+    const expectedRoi = ticket.status==='failed'? 0 : combinedOdds * stakeAmount
 
     return (
         <Details value={value} >
@@ -22,7 +23,7 @@ const StakeDetails = ({value, ticket}) => {
             </TextWrapper>
             <TextWrapper>
                 <TextField>Stake Amount</TextField>
-                <Value>{isGuest? 'XXX' : formatAmountFraction(ticket.stakeAmount)}</Value>
+                <Value>{isGuest? 'XXX' : formatAmountFraction(stakeAmount)}</Value>
             </TextWrapper>
             <TextWrapper value={'underline'}>
                 <TextField>{['failed', 'successful'].includes(ticket.status)? 'Return':'Expected Return'}</TextField>
