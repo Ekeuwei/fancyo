@@ -130,15 +130,18 @@ export const estimateRoi = (odds, steps, numberOfStakes)=>{
   let bankroll = 100//parseFloat(bankroll.toString().replace(/,/g, ''));
 
   let newBankroll = bankroll;
-   
-   for(let i=0; i<numberOfStakes; i++){
-       const timeToAdd = Math.floor(Math.random() * parseInt(steps/2)) + 1;
-       const stakes = betproCalc(odds, steps, newBankroll);
-       const minProfit = stakes[0]*odds-stakes[0];
-      
-      newBankroll += minProfit*timeToAdd;
-      
-   }
+
+  let newNumberOfStakes = 0;
+  
+  while(newNumberOfStakes < numberOfStakes){
+    const timeToAdd = Math.floor(Math.random() * parseInt(steps/2)) + 1;
+    const stakes = betproCalc(odds, steps, newBankroll);
+    const minProfit = stakes[0]*odds-stakes[0];
+    
+    newBankroll += minProfit*timeToAdd;
+
+    newNumberOfStakes += timeToAdd
+  }
    
    const formatNumber = value => new Intl.NumberFormat('en-US').format(value.toFixed(2))//Number(value).toLocaleString("en-US");
    
