@@ -191,7 +191,7 @@ exports.updateProjectProgress = async () => {
         const profit = projectCurrentBalance - contributedAmount;
         project.status = profit>0?'successful':'failed'
         
-        const platformCommission = project.status==='successful'? profit * 0.05 : 0; // 5%
+        const platformCommission = project.status==='successful'? profit * 0.1 : 0; // 10%
         const punterCommission = project.status==='successful'? profit * 0.2 : 0; // 20%
         const contributorsCommission = profit - platformCommission - punterCommission;
         

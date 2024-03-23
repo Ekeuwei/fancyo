@@ -16,11 +16,11 @@ const Disclaimer = () => {
 
             <Item><strong>Commitment Amount:</strong> Contributors should only commit funds that they can afford to lose. Investment decisions are at the contributor's discretion, and they are responsible for assessing their risk tolerance.</Item>
             
-            <Item><strong>Platform Commission:</strong> {appName} charges a platform commission of 5% on the profits generated from each successful project. This commission contributes to the maintenance and improvement of the platform.</Item>
+            <Item><strong>Platform Commission:</strong> {appName} charges a platform commission of 10% on the profits generated from each successful project. This commission contributes to the maintenance and improvement of the platform.</Item>
             
             <Item><strong>Punter Commission:</strong> Punters receive a commission of 20% on the profits generated from each successful project they manage.</Item>
 
-            <Item><strong>Profit Distribution:</strong> After deducting the platform and punter commissions, the remaining balance (75%) of the profit, along with your initial capital, will be credited to your {appName} wallet in the event of a successful project.</Item>
+            <Item><strong>Profit Distribution:</strong> After deducting the platform and punter commissions, the remaining balance (70%) of the profit, along with your initial capital, will be credited to your {appName} wallet in the event of a successful project.</Item>
 
             <Item><strong>No Refunds:</strong> Once funds are committed to a project, they cannot be refunded. Contributors should carefully review project details before making a commitment.</Item>
 
