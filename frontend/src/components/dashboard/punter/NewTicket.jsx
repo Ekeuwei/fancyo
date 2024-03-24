@@ -41,14 +41,6 @@ const NewTicket = ({isOpen, handleModalClose, projectId}) => {
             name: "Sporty Bet",
             value: "Sporty"
         },
-        {
-            name: "Bet9ja",
-            value: ""
-        },
-        {
-            name: "Merrybet",
-            value: ""
-        },
     ]
 
     const loadTicket = ()=> {
