@@ -47,14 +47,12 @@ const ProjectItem = ({project, idx}) => {
         <>
             <Wrapper onClick={handleOpenProject}>
                 <Timer color={project.status==='successful'?'success':project.status==='failed'?'error':project.status==='no engagement'?'accent':''}>
-                    {toEndIn.split(" ")[0]==0?
+                    {['no engagement', 'successful', 'failed'].includes(project.status)?
                     <Completed>
-                        {['no engagement', 'successful', 'failed'].includes(project.status)?
                         <StatusIcon 
                             color={project.status==='successful'?'success':project.status==='failed'?'error':'accent'} 
                             icon={project.status==='successful'? faCheckCircle:project.status==='failed'? faTimesCircle : faHand}
-                            size="2x"/>:
-                        <Ended>Ended</Ended>}
+                            size="2x"/>
                     </Completed>:
                     <>
                         <Label>{projectStarted?'Ends':'Starts'} in</Label>
@@ -202,9 +200,6 @@ const InvestmentType = styled(Label)`
 `
 const DateLabel = styled(InvestmentType)`
     color: ${({theme})=>theme.colors.text};
-`
-const Ended = styled(TimeValue)`
-    font-size: 75%;
 `
 
 // Status Starts 
