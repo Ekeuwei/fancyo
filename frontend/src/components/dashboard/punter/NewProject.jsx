@@ -318,7 +318,7 @@ const NewProject = ({isOpen, handleCloseModal}) => {
                     <NoticeMessage value={error?'error':''}>{error}</NoticeMessage>
                     <ButtonWrapper>
                         <ButtonClose onClick={prevView}>{currentIndex==0?'Close':'Edit'}{currentIndex==1&&<FontAwesomeIcon icon={faEdit} style={{marginLeft: '5px'}}/>}</ButtonClose>
-                        <Btn type="submit">{currentIndex===1?'Submit':'Preview'} <Loading value={loading}/> {currentIndex==0&&<FontAwesomeIcon icon={faAngleRight} style={{marginLeft: '5px'}}/>}</Btn>
+                        <Btn disabled={loading} type="submit">{currentIndex===1?'Submit':'Preview'} {currentIndex==0&&<FontAwesomeIcon icon={faAngleRight} style={{marginLeft: '5px'}}/>} <Loading value={loading}/> </Btn>
                     </ButtonWrapper>
                 </FormController>
             </>
