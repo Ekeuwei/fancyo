@@ -109,7 +109,6 @@ const DealAds = ({user, project, idx}) => {
                         </EarningsWrapper>}
                     </ProjectLogistics>
                 </ProjectDetails>
-
             </Wrapper>
             {/* Modal */}
             <DealEngagement 

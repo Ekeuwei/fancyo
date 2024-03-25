@@ -89,8 +89,9 @@ exports.updateTicketProgress = async () => {
         const matchesConcluded = ticket.games.every(game => game.outcome != undefined);
         const wonAllMatches = ticket.games.every(game => game.outcome === 1);
         const lostAGame = ticket.games.some(game => game.outcome === 0);
-        ticket.status = matchesConcluded && wonAllMatches ? 'successful' :
-          (matchesConcluded && !wonAllMatches) || lostAGame ? 'failed' : ticket.status;
+        ticket.status = lostAGame ? 'failed' : matchesConcluded? 'successful' : ticket.status;
+        // ticket.status = matchesConcluded && wonAllMatches ? 'successful' :
+        //   (matchesConcluded && !wonAllMatches) || lostAGame ? 'failed' : ticket.status;
           
         if(ticket.status !== 'in progress'){
           
@@ -132,6 +133,8 @@ exports.updateTicketProgress = async () => {
 
 exports.updateProjectProgress = async () => {
   const currentDate = new Date();
+  // Current date plus 7 days
+  currentDate.setDate(currentDate.getDate() + 7)
 
   try {
     const projects = await Project.find({ endAt: { $lte: currentDate }, status: 'in progress' })
@@ -141,8 +144,13 @@ exports.updateProjectProgress = async () => {
     const updatedRunningProjects = await Promise.all(projects.map(async (project) => {
       let tickets = await Ticket.find({ projectId: project._id });
       const isTicketInprogress = tickets.some(ticket => ticket.status === 'in progress');
+      
+      const minEndDate  = (new Date()).setDate(project.endAt.getDate() - project.progressiveSteps)
+      const projectRoundingUp = minEndDate < currentDate && 
+            // Last ticket was successfull or failed or progressiveStaking not applied
+            (project.stats.lossStreakCount=== 0 || project.stats.lossStreakCount > project.progressiveSteps)
 
-      if (!isTicketInprogress) {
+      if (!isTicketInprogress && projectRoundingUp) {
 
         const contributedAmount = project.contributors.reduce((amount, contributor) => amount + contributor.amount, 0);
         
@@ -184,7 +192,8 @@ exports.updateProjectProgress = async () => {
         }
 
         const projectCurrentBalance = tickets.reduce((prev, ticket) => {
-          const totalOdds = ticket.games.reduce((odds, game) => odds * game.odds, 1);
+          // Total odds only calculate odds where the outcome was a success
+          const totalOdds = ticket.games.reduce((odds, game) => odds * (game.outcome==1? game.odds : 1), 1);
           const outcome = ticket.status === 'successful' ? (ticket.stakeAmount * totalOdds - ticket.stakeAmount) : -ticket.stakeAmount;
           return prev + outcome;
         }, contributedAmount);

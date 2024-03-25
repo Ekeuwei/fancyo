@@ -34,7 +34,8 @@ const projectSchema = new mongoose.Schema({
         default: false 
     },
     progressiveSteps: { 
-        type: Number
+        type: Number,
+        default: 0
     },
     availableBalance: { 
         type: Number, 
