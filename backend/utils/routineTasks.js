@@ -132,12 +132,10 @@ exports.updateTicketProgress = async () => {
 
 
 exports.updateProjectProgress = async () => {
-  const currentDate = new Date();
-  // Current date plus 7 days
-  currentDate.setDate(currentDate.getDate() + 7)
+  const sevenDaysFromNow = new Date().setDate(new Date().getDate() + 7)
 
   try {
-    const projects = await Project.find({ endAt: { $lte: currentDate }, status: 'in progress' })
+    const projects = await Project.find({ endAt: { $lte: sevenDaysFromNow }, status: 'in progress' })
                           .populate('punter', 'username')
                           .populate('contributors.user', 'username');
 
@@ -146,7 +144,7 @@ exports.updateProjectProgress = async () => {
       const isTicketInprogress = tickets.some(ticket => ticket.status === 'in progress');
       
       const minEndDate  = (new Date()).setDate(project.endAt.getDate() - project.progressiveSteps)
-      const projectRoundingUp = minEndDate < currentDate && 
+      const projectRoundingUp = minEndDate < sevenDaysFromNow && 
             // Last ticket was successfull or failed or progressiveStaking not applied
             (project.stats.lossStreakCount=== 0 || project.stats.lossStreakCount > project.progressiveSteps)
 
@@ -263,6 +261,7 @@ exports.updateProjectProgress = async () => {
     }));
 
     // Update pending projects to 'in progress' when startAt is reached
+    const currentDate = new Date();
     const pendingProjects = await Project.find({ startAt: { $lte: currentDate }, status: 'pending' });
     const updatedPendingProjects = await Promise.all(pendingProjects.map(async (project) => {
       project.status = 'in progress';
