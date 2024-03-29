@@ -28,7 +28,7 @@ const authSlice = createSlice({
     
     // Load user
     loadUserStart: state => {
-      state.loading = true;
+      // state.loading = true;
       state.error = null;
     },
     loadUserSuccess: (state, action) => {
@@ -36,9 +36,9 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.loading = false;
     },
-    loadUserFailure: (state, action) => {
+    loadUserFailure: (state) => {
       state.loading = false;
-      state.error = action.payload;
+      // state.error = action.payload;
     },
     
     // Update profile
