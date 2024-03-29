@@ -77,6 +77,12 @@ const projectSchema = new mongoose.Schema({
         enum: ['pending', 'in progress', 'successful', 'failed', 'no engagement'],
         default: 'pending'
     },
+    punterSettlement: {
+        type: String,
+        enum: ['pending', 'completed'],
+        default: 'pending',
+        select: false
+    },
     balanceBefore: {
         type: Number,
     },

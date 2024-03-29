@@ -132,6 +132,7 @@ const Wrapper = styled.div`
     background-color: ${({theme})=> theme.colors.bg};
     align-items: center;
     column-gap: 5px;
+    cursor: pointer;
     padding: 5px;
     border-radius: 10px;
 `

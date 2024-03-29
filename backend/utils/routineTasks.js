@@ -133,18 +133,20 @@ exports.updateTicketProgress = async () => {
 
 exports.updateProjectProgress = async () => {
   const sevenDaysFromNow = new Date().setDate(new Date().getDate() + 7)
-
+  const currentDate = new Date();
+  
   try {
     const projects = await Project.find({ endAt: { $lte: sevenDaysFromNow }, status: 'in progress' })
                           .populate('punter', 'username')
-                          .populate('contributors.user', 'username');
+                          .populate('contributors.user', 'username')
+                          .select('+punterSettlement');
 
     const updatedRunningProjects = await Promise.all(projects.map(async (project) => {
       let tickets = await Ticket.find({ projectId: project._id });
       const isTicketInprogress = tickets.some(ticket => ticket.status === 'in progress');
       
-      const minEndDate  = (new Date()).setDate(project.endAt.getDate() - project.progressiveSteps)
-      const projectRoundingUp = minEndDate < sevenDaysFromNow && 
+      const supposedEndDate  = (new Date()).setDate(project.endAt.getDate() - project.progressiveSteps)
+      const projectRoundingUp = currentDate < supposedEndDate && 
             // Last ticket was successfull or failed or progressiveStaking not applied
             (project.stats.lossStreakCount=== 0 || project.stats.lossStreakCount > project.progressiveSteps)
 
@@ -160,7 +162,7 @@ exports.updateProjectProgress = async () => {
           if(project.contributors.length > 0){
             // Refund contributed amount
             await Promise.all(project.contributors.map(async (contributor) => {
-              if (contributor.status === 'pending') {
+              if (contributor.status !== 'settled') {
 
                 await creditWallet(contributor.amount, `Investment capital and returns. Project: ${project.uniqueId}`, contributor.user._id);
                 contributor.status = 'settled';
@@ -205,7 +207,7 @@ exports.updateProjectProgress = async () => {
         
         // Settle contributors
         await Promise.all(project.contributors.map(async (contributor) => {
-          if (contributor.status === 'pending') {
+          if (contributor.status !== 'settled') {
             const investmentQuota = contributor.amount / contributedAmount;
             const contributorProfit = contributorsCommission * investmentQuota;
             
@@ -236,6 +238,8 @@ exports.updateProjectProgress = async () => {
         if(project.status === 'successful'){
           await creditWallet(punterCommission, `Project commission. Project: ${project.uniqueId}`, project.punter._id);
         }
+        
+        project.punterSettlement = 'completed'
         const wallet = await Wallet.findOne({userId: project.punter._id});
 
         // Send notification to punter
@@ -261,7 +265,6 @@ exports.updateProjectProgress = async () => {
     }));
 
     // Update pending projects to 'in progress' when startAt is reached
-    const currentDate = new Date();
     const pendingProjects = await Project.find({ startAt: { $lte: currentDate }, status: 'pending' });
     const updatedPendingProjects = await Promise.all(pendingProjects.map(async (project) => {
       project.status = 'in progress';

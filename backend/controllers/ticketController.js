@@ -30,10 +30,10 @@ exports.newTicket = catchAsyncErrors( async (req, res, next) => {
 
     // Check if the last ticket was won and the project has reached progressiveSteps - endAt
     const currentDate = new Date().getTime();
-    const supposedEndDate = new Date().setDate(new Date(project.endAt).getDate() - project.progressiveSteps)
+    const supposedEndDate = new Date().setDate(project.endAt.getDate() - project.progressiveSteps)
     let tickets = await Ticket.find({ projectId: project._id }).sort({createdAt: -1});
     const wonLastTicket = tickets.length > 0 && tickets[0].status === 'successful'
-    if(currentDate > supposedEndDate && wonLastTicket){
+    if(currentDate < supposedEndDate && wonLastTicket){
         // Cannot stake because we have fewer time remaining to stake
         return next(new ErrorHandler("Project is winding down and cannot receive more tickets.", 403))
     }
