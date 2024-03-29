@@ -176,6 +176,7 @@ export const api = {
 
             await instance.get('/api/v1/logout')
     
+            document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
             localStorage.removeItem('userMode')
             localStorage.removeItem('user')
             
