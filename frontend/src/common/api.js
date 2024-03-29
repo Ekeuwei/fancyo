@@ -171,16 +171,21 @@ export const api = {
     // Logout user
     logout: () => async (dispatch) =>{
         try {
-    
+            const config = {
+                        headers: {'content-Type': 'application/json'},
+                    }
             dispatch(logoutStart())
 
-            await instance.get('/api/v1/logout')
+            const response = await instance.post('/api/v1/logout', {}, config)
     
-            document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            dispatch(logoutSuccess())
+
+            console.log(response);
+            
+            // document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
             localStorage.removeItem('userMode')
             localStorage.removeItem('user')
             
-            dispatch(logoutSuccess())
     
         } catch (error) {
             dispatch(logoutFailure(error.response.data.message))
