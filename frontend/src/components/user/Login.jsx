@@ -61,11 +61,12 @@ const Login = () => {
         dispatch(clearAuthError())
     },[dispatch])
     
+    
     return (
         <HomeStyle>
             <FormControl onSubmit={submitHandler}>
                 
-                <Logo />
+                <Logo logoUrl='assets/cashpanthers.png'/>
 
                 <FormControlWrapper >
                     <Wrapper>

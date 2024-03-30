@@ -66,7 +66,7 @@ const ForgotPassword = () => {
         <HomeStyle>
             <FormControl onSubmit={submitHandler}>
 
-                <Logo />
+                <Logo logoUrl='assets/cashpanthers.png' />
                 
                 <FormControlWrapper >
                     <Wrapper>

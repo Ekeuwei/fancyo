@@ -77,7 +77,7 @@ const Register = () => {
         <HomeStyle>
             <FormControl>
                 
-                <Logo />
+                <Logo logoUrl='assets/cashpanthers.png' />
                 
                 <FormControlWrapper >
                     <Wrapper>
