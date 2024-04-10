@@ -12,7 +12,7 @@ const { formatAmount } = require('../utils/routineTasks');
 // Create new project => /api/v1/punter/project/new
 exports.newProject = catchAsyncErrors( async (req, res, next) => {
 
-    const { startAt, endAt, minOdds, maxOdds } = req.body;
+    const { startAt, endAt, minOdds, maxOdds, progressiveSteps } = req.body;
 
     const newEndDate = new Date(endAt);
     newEndDate.setDate(newEndDate.getDate() + parseInt(req.body.progressiveSteps));
@@ -44,6 +44,12 @@ exports.newProject = catchAsyncErrors( async (req, res, next) => {
     if((parseFloat(minOdds) + 0.2) > parseFloat(maxOdds) ){
         return next(new ErrorHandler(`Allow a odd difference of 0.2 between maximum and minimum odds.`))
     }
+
+    // Apply riskFreeContribution
+    if(progressiveSteps && minOdds < 2 && maxOdds < 2){
+        // Check if the punter plays safe then allow risk
+        // req.body.riskFreeContribution = true
+    }
     
 
     const project = await Project.create(req.body);
@@ -58,7 +64,7 @@ exports.newProject = catchAsyncErrors( async (req, res, next) => {
 // Contribute/Subscribe to a project => /api/project/contribute
 exports.contribute = catchAsyncErrors(async (req, res, next)=>{
 
-    const { amount, projectId } = req.body
+    const { amount, projectId, riskFreeContribution } = req.body
     let project, debitResponse
 
     
@@ -76,7 +82,7 @@ exports.contribute = catchAsyncErrors(async (req, res, next)=>{
         if(amount < project.minContribution){
             return next(new ErrorHandler(`Contributed amount too low! Minimum contribution for this project is ${formatAmount(project.minContribution)}`))
         }
-        
+
         if(projectStarted){
             return next(new ErrorHandler("Project unavailable for contribution"))
         }
@@ -86,7 +92,8 @@ exports.contribute = catchAsyncErrors(async (req, res, next)=>{
         if(contributorIndex === -1){
             project.contributors.push({
                 user: req.user._id,
-                amount
+                amount,
+                riskFreeContribution: project.riskFreeContribution? riskFreeContribution : false,
             })
         }else{
             project.contributors[contributorIndex].amount += parseInt(amount)

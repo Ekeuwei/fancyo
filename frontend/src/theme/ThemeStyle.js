@@ -108,7 +108,7 @@ export const StyleWrapper = styled.div`
 
 export const HomeStyle = styled.div`
     background: linear-gradient(180deg, #ACCF9F, #D2E9A1);
-    height: 100%;
+    /* height: 100%; */
     width: 100%;
     padding: 3em 1em;
 `;

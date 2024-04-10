@@ -115,9 +115,22 @@ import {
 const instance = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true,
-    timeout: 5000,
+    timeout: 10 * 1000,
+    signal: AbortSignal.timeout(10 * 1000),
     timeoutErrorMessage: 'Request timeout, check network connectivity.'
 })
+
+// instance.interceptors.response.use(
+//     response => response,
+//     error => {
+//         if(!error.response){
+//             console.error('Network error: ', error.message)
+//         }
+
+//         return Promise.reject(error)
+//     }
+// )
+
 // Login
 export const api = {
     login: (loginDetails) => async (dispatch) =>{
@@ -129,8 +142,12 @@ export const api = {
                 headers: {'content-Type': 'application/json'},
             }
 
+            // console.log('Login request started')
+            
             const { data } = await instance.post('/api/v1/login', loginDetails, config)
-
+            
+            // console.log('Login response received')
+            
             localStorage.setItem('user', JSON.stringify(data.user))
 
             if(data.badge){
@@ -140,6 +157,7 @@ export const api = {
             dispatch(loginSuccess(data.user))
 
         } catch (error) {
+            console.log('Error encountered ++', error.response.data.message)
             dispatch(loginFailure(error.response.data.message))
         }
     },

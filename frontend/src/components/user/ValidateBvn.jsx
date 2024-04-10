@@ -41,7 +41,7 @@ const ValidateBvn = () => {
             { error }
         </NoticeMessage>}
 
-        <form onSubmit={fetchBvn}>
+        <FormControl onSubmit={fetchBvn}>
           <InputWrapper>
             <InputLabel value={bvn} >BVN</InputLabel>
             <Input 
@@ -59,7 +59,7 @@ const ValidateBvn = () => {
 
 
 
-        </form>
+        </FormControl>
 
         {bvnDetails&&Object.keys(bvnDetails).map(key=>(
             <Entry key={key}>
@@ -71,6 +71,11 @@ const ValidateBvn = () => {
     </>
   )
 }
+
+const FormControl = styled.form`
+  margin: auto;
+  max-width: 500px;
+`
 
 const Entry = styled.div`
     display: flex;

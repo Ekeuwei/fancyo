@@ -192,6 +192,8 @@ const FormControl = styled.div`
     flex-direction: column;
     justify-content: center;
     row-gap: 50px;
+    margin: 20px auto;
+    max-width: 500px;
     height: 100%;
 `
 

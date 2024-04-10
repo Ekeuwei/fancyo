@@ -29,6 +29,10 @@ const projectSchema = new mongoose.Schema({
         type: Number, 
         required: true 
     },
+    riskFreeContribution: { 
+        type: Boolean, 
+        default: false
+    },
     progressiveStaking: { 
         type: Boolean, 
         default: false 
@@ -64,6 +68,10 @@ const projectSchema = new mongoose.Schema({
                 type: Number,
                 required: true,
                 min: [1000, 'Minimum amount you can contribute is NGN 1,000']
+            },
+            riskFreeContribution: {
+                type: Number,
+                default: false
             },
             status: {
                 type: String,

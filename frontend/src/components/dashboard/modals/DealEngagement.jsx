@@ -8,14 +8,16 @@ import ModalContainter from './ModalContainter'
 import { useDispatch, useSelector } from 'react-redux'
 import { api } from '../../../common/api'
 import { clearProjectErrors } from '../../../app/project/projectSlice'
-import { formatAmount, formatAmountFraction, formatNumber, formatNumberToFloat } from '../../../common/utils'
+import { formatAmount, formatAmountFraction, formatNumber, formatNumberToFloat, setAlpha } from '../../../common/utils'
 import Disclaimer from './Disclaimer'
 import { createToast } from '../../../app/user/userSlice'
+import RiskFreeContribution from './RiskFreeContribution'
 
 const DealEngagement = ({isOpen, handleModalClose, project, title, idx}) => {
     const dispatch = useDispatch()
     const [fieldErrors, setFieldErrors] = useState('')
     const [hasAcknowledgedTerms, setHasAcknowledgedTerms] = useState(false)
+    const [riskFreeContribution, setRiskFreeContribution] = useState(false)
     const [amount, setAmount] = useState('')
     const [sufficientFunds, setSufficientFunds] = useState(true)
 
@@ -41,7 +43,7 @@ const DealEngagement = ({isOpen, handleModalClose, project, title, idx}) => {
     }
 
     const confirmContribution = ()=>{
-        dispatch(api.contribute({amount:formatNumberToFloat(amount), projectId: project._id}, projects, idx))
+        dispatch(api.contribute({amount:formatNumberToFloat(amount), projectId: project._id, riskFreeContribution}, projects, idx))
     }
 
     useEffect(()=>{
@@ -116,6 +118,8 @@ const DealEngagement = ({isOpen, handleModalClose, project, title, idx}) => {
                                                     <AccountBalance>Bal. {formatAmountFraction(walletBalance)}</AccountBalance>
                                                 </Commitment>
                                             </Shake>
+                                            {project?.riskFreeContribution && <RiskFreeContribution riskFreeContribution={riskFreeContribution} setRiskFreeContribution={setRiskFreeContribution} />}
+                                                
                                         </CommitmentWrapper>
                                     </Content>
                                 </Wrapper>}
@@ -245,6 +249,7 @@ const CheckBoxWrapper = styled.div`
     align-items: center;
     cursor: pointer;
 `
+
 const Commitment = styled(CheckBoxWrapper)`
     column-gap: 10px;
 `
@@ -254,8 +259,8 @@ const CommitmentWrapper = styled.div`
     padding: 0 20px 20px;
     border-radius: 10px;
     margin-top: 10px;
-    color: ${({theme})=>theme.colors.white};
-    background-color: ${({theme})=>theme.colors.dark2};
+    color: ${({theme})=>theme.colors.black};
+    border: solid ${({theme})=>setAlpha(theme.colors.primary, 0.7)};
 `
 const AmountInput = styled(Input)`
     max-width: 150px;

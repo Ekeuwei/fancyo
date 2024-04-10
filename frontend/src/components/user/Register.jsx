@@ -173,6 +173,8 @@ const FormControl = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
+    margin: auto;
+    max-width: 500px;
     row-gap: 50px;
     height: 100%;
 `

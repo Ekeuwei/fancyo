@@ -493,7 +493,8 @@ exports.addBankAccount = catchAsyncErrors( async (req, res, next) => {
 
     const accountName = response.data.account_name.toLowerCase()
 
-    const detailsMatchesUsersRecord = accountName.includes(user.firstName.toLowerCase()) && user.otherNames.split(/\s+/).some(name => accountName.includes(name.toLowerCase()));
+    const detailsMatchesUsersRecord = (accountName.includes(user.firstName.toLowerCase()) && user.otherNames.split(/\s+/).some(name => accountName.includes(name.toLowerCase())) ||
+                                       accountName.includes(user.otherNames.split(/\s+/)[0].toLowerCase()) && accountName.includes(user.otherNames.split(/\s+/)[1].toLowerCase()));
 
     if(!detailsMatchesUsersRecord){
         return next(new ErrorHandler('Names on bank account does not match your profile names.'))
