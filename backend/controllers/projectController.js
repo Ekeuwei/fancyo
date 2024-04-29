@@ -46,9 +46,9 @@ exports.newProject = catchAsyncErrors( async (req, res, next) => {
     }
 
     // Apply riskFreeContribution
-    if(progressiveSteps && minOdds < 2 && maxOdds < 2){
+    if(req.user.role === 'super punter'/*progressiveSteps && minOdds < 2 && maxOdds < 2*/){
         // Check if the punter plays safe then allow risk
-        // req.body.riskFreeContribution = true
+        req.body.riskFreeContribution = true
     }
     
 
