@@ -69,7 +69,7 @@ ticketSchema.pre('save', async function(){
 
 
 ticketSchema.statics.generateNextId = async function () {
-  const lastTicket = await this.findOne().sort({ uniqueId: -1 });
+  const lastTicket = await this.findOne().sort({ createdAt: -1 });
   return lastTicket? (parseInt(lastTicket.uniqueId) + 1).toString().padStart(2,'0') : "01";
 };
 module.exports = mongoose.model('Ticket', ticketSchema);

@@ -123,7 +123,7 @@ projectSchema.pre('save', async function(){
 })
 
 projectSchema.statics.generateNextId = async function () {
-  const lastProject = await this.findOne().sort({ uniqueId: -1 });
+  const lastProject = await this.findOne().sort({ createdAt: -1 });
   return lastProject? (parseInt(lastProject.uniqueId) + 1).toString() : "1178";
 };
 

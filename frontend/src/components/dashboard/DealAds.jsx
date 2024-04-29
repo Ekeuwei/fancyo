@@ -44,7 +44,7 @@ const DealAds = ({user, project, idx}) => {
     
     // const profit = ((project.status==='in progress'? project.availableBalance : (project.roi + contributedAmount)) * contributedQuota) - contributedAmount
     // const profit = ((project.status==='in progress'? project.availableBalance : (project.roi + contributedAmount)) - contributedAmount) * contributedQuota
-    const profit = (project.status==='in progress'? project.availableBalance - contributedAmount : project.roi ) * contributedQuota
+    const profit = (project.status==='in progress'? (project.availableBalance * contributedQuota) - contributedAmount : project.roi * contributedQuota)
     const balance = isNaN(project.availableBalance * contributedQuota)? formatAmount(0) : formatAmount(project.availableBalance * contributedQuota)
     const percentIncrease = isNaN(profit/contributedAmount)? 0: formatNumber(profit/contributedAmount * 100)
 

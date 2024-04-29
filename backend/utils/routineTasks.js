@@ -145,10 +145,12 @@ exports.updateProjectProgress = async () => {
       let tickets = await Ticket.find({ projectId: project._id });
       const isTicketInprogress = tickets.some(ticket => ticket.status === 'in progress');
       
-      const supposedEndDate  = (new Date()).setDate(project.endAt.getDate() - project.progressiveSteps)
-      const projectRoundingUp = currentDate < supposedEndDate && 
-            // Last ticket was successfull or failed or progressiveStaking not applied
-            (project.stats.lossStreakCount=== 0 || project.stats.lossStreakCount > project.progressiveSteps)
+      const supposedEndDate = new Date(project.endAt);
+      supposedEndDate.setDate(supposedEndDate.getDate() - project.progressiveSteps);
+
+      const projectRoundingUp = currentDate > supposedEndDate &&
+        // Last ticket was successfull or failed or progressiveStaking not applied
+        (project.stats.lossStreakCount=== 0 || project.stats.lossStreakCount > project.progressiveSteps)
 
       if (!isTicketInprogress && projectRoundingUp) {
 
@@ -167,26 +169,38 @@ exports.updateProjectProgress = async () => {
                 await creditWallet(contributor.amount, `Investment capital and returns. Project: ${project.uniqueId}`, contributor.user._id);
                 contributor.status = 'settled';
 
-                // Send notification to contributor about refund
-                await ProjectNoEngagementNotification({
-                  username: contributor.user.username,
-                  userId: contributor.user._id,
-                  projectId: project.uniqueId,
-                  contributedAmount: contributor.amount,
-                })
+                try {
+                  
+                  // Send notification to contributor about refund
+                  await ProjectNoEngagementNotification({
+                    username: contributor.user.username,
+                    userId: contributor.user._id,
+                    projectId: project.uniqueId,
+                    contributedAmount: contributor.amount,
+                  })
+                  
+                } catch (error) {
+                  logger.error(error)
+                }
 
                 await project.save();
               }
             }));
           }
 
-          // Send No engagement notification to punter
-          await ProjectNoEngagementNotification({
-            username: project.punter.username,
-            userId: project.punter._id,
-            projectId: project.uniqueId,
-            contributedAmount,
-          })
+          try {
+            
+            // Send No engagement notification to punter
+            await ProjectNoEngagementNotification({
+              username: project.punter.username,
+              userId: project.punter._id,
+              projectId: project.uniqueId,
+              contributedAmount,
+            })
+            
+          } catch (error) {
+            logger.error(error)
+          }
 
           return project.save()
         }
@@ -221,14 +235,20 @@ exports.updateProjectProgress = async () => {
               contributor.status = 'settled';
             }
 
-            // Send notification contributor
-            await ProjectCompletionNotification({
-              username: contributor.user.username,
-              userId: contributor.user._id,
-              projectId: project.uniqueId,
-              contributedAmount: contributor.amount,
-              profit: contributorProfit,
-            })
+            try {
+              
+              // Send notification contributor
+              await ProjectCompletionNotification({
+                username: contributor.user.username,
+                userId: contributor.user._id,
+                projectId: project.uniqueId,
+                contributedAmount: contributor.amount,
+                profit: contributorProfit,
+              })
+
+            } catch (error) {
+              logger.error(error)
+            }
 
             await project.save();
           }
@@ -242,16 +262,22 @@ exports.updateProjectProgress = async () => {
         project.punterSettlement = 'completed'
         const wallet = await Wallet.findOne({userId: project.punter._id});
 
-        // Send notification to punter
-        await ProjectCompletionNotification({
-          username: project.punter.username,
-          userId: project.punter._id,
-          projectId: project.uniqueId,
-          commission: punterCommission,
-          profit,
-          contributedAmount,
-          walletBalance: wallet.balance,
-        })
+        try {
+          
+          // Send notification to punter
+          await ProjectCompletionNotification({
+            username: project.punter.username,
+            userId: project.punter._id,
+            projectId: project.uniqueId,
+            commission: punterCommission,
+            profit,
+            contributedAmount,
+            walletBalance: wallet.balance,
+          })
+          
+        } catch (error) {
+          logger.error(error)
+        }
 
         // Settle platform
         // await creditWallet(platformCommission, `Platform commission settlement. Project: ${project.uniqueId}`, 'platform purse');

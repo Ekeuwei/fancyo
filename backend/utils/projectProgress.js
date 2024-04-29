@@ -34,11 +34,15 @@ exports.updateProjectProgress = async () => {
 };
 
 function shouldRoundUpProject(project, currentDate) {
-  const supposedEndDate = new Date(project.endAt);
-  supposedEndDate.setDate(supposedEndDate.getDate() - project.progressiveSteps);
-  const projectRoundingUp = currentDate > supposedEndDate &&
-    (!project.progressiveStaking || (project.stats.lossStreakCount === 0 || project.stats.lossStreakCount > project.progressiveSteps));
-  return projectRoundingUp;
+    const supposedEndDate = new Date(project.endAt);
+    supposedEndDate.setDate(supposedEndDate.getDate() - project.progressiveSteps);
+    
+    const projectRoundingUp = (currentDate > supposedEndDate && !project.pogressiveStaking) || 
+    // Last ticket was successfull or failed or progressiveStaking not applied
+    (currentDate > supposedEndDate && (project.stats.lossStreakCount=== 0 || project.stats.lossStreakCount > project.progressiveSteps))
+  
+
+    return projectRoundingUp;
 }
 
 async function handleProjectCompletion(project, tickets) {
@@ -59,6 +63,7 @@ async function handleNoEngagementProject(project, contributedAmount) {
     if (contributor.status !== 'settled') {
       await creditWalletAndNotifyUser(contributor.amount, project, contributor);
       contributor.status = 'settled' //---
+      project.save() //---
     }
   }));
 
@@ -99,13 +104,13 @@ async function creditWalletAndNotifyUser(amount, project, user) {
   // Credit wallet and send notification to user
 
   await creditWallet(amount, `Investment capital and returns. Project: ${project.uniqueId}`, user._id);
-  contributor.status = 'settled';
+//   contributor.status = 'settled';
   
   // Send notification to contributor about refund
   await ProjectNoEngagementNotification({
-    username: contributor.user.username,
-    userId: contributor.user._id,
+    username: user.username,
+    userId: user._id,
     projectId: project.uniqueId,
-    contributedAmount: contributor.amount,
+    contributedAmount: amount,
   })
 }
