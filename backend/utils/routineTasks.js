@@ -146,9 +146,9 @@ exports.updateProjectProgress = async () => {
       const isTicketInprogress = tickets.some(ticket => ticket.status === 'in progress');
       
       const supposedEndDate = new Date(project.endAt);
-      supposedEndDate.setDate(supposedEndDate.getDate() - project.progressiveSteps);
+      supposedEndDate.setDate(supposedEndDate.getDate() - project.progressiveStaking? project.progressiveSteps : 0);
 
-      const projectRoundingUp = currentDate > supposedEndDate &&
+      const projectRoundingUp = new Date() > supposedEndDate &&
         // Last ticket was successfull or failed or progressiveStaking not applied
         (project.stats.lossStreakCount=== 0 || project.stats.lossStreakCount > project.progressiveSteps)
 
@@ -218,12 +218,14 @@ exports.updateProjectProgress = async () => {
         const platformCommission = project.status==='successful'? profit * 0.1 : 0; // 10%
         const punterCommission = project.status==='successful'? profit * 0.2 : 0; // 20%
         const contributorsCommission = profit - platformCommission - punterCommission;
+        const contributorsCommissionRiskFree = profit * 0.2;
+
         
         // Settle contributors
         await Promise.all(project.contributors.map(async (contributor) => {
           if (contributor.status !== 'settled') {
             const investmentQuota = contributor.amount / contributedAmount;
-            const contributorProfit = contributorsCommission * investmentQuota;
+            const contributorProfit = (contributor.riskFreeContribution? contributorsCommissionRiskFree : contributorsCommission) * investmentQuota;
             
             const onePercentContributedAmount = contributedAmount * 0.01
             if(projectCurrentBalance >= onePercentContributedAmount || onePercentContributedAmount >= 100){
@@ -231,7 +233,18 @@ exports.updateProjectProgress = async () => {
               await creditWallet((contributorProfit + contributor.amount), `Investment capital and returns. Project: ${project.uniqueId}`, contributor.user._id);
               contributor.status = 'settled';
 
+              if(contributor.riskFreeContribution){
+                // Credit insurance wallet if it was a risk free contribution
+
+              }
+
             }else{
+              if(contributor.riskFreeContribution){
+                // Debit insurance wallet if it was a risk free contribution
+                
+                // Refund user thier contribution
+                
+              }
               contributor.status = 'settled';
             }
 

@@ -93,7 +93,7 @@ exports.contribute = catchAsyncErrors(async (req, res, next)=>{
             project.contributors.push({
                 user: req.user._id,
                 amount,
-                riskFreeContribution: project.riskFreeContribution? riskFreeContribution : false,
+                riskFreeContribution: project.riskFreeContribution && riskFreeContribution,
             })
         }else{
             project.contributors[contributorIndex].amount += parseInt(amount)

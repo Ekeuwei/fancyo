@@ -167,6 +167,55 @@ exports.debitWallet = async (amount, title, userId)=>{
     };
 }
 
+// credit wallet
+exports.creditSystemWallet = async (amount, title, walletId)=>{
+    const wallet = await Wallet.findOne({walletId});
+
+    const transaction = await Transaction.create({
+        title,
+        userId: wallet.userId,
+        amount,
+        type: 'credit',
+        walletId: wallet.walletId
+    });
+
+    transaction.balanceBefore = wallet.balance
+    transaction.balanceAfter = wallet.balance + amount
+
+    wallet.balance += amount;
+    transaction.status = 'successful';
+
+    await Promise.all([wallet.save(), transaction.save()]);
+
+    return transaction.reference;
+}
+
+// debit wallet
+exports.debitSystemWallet = async (amount, title, walletId)=>{
+    const wallet = await Wallet.findOne({walletId});
+
+    const transaction = await Transaction.create({
+        title,
+        userId: wallet.userId,
+        amount,
+        type: 'debit',
+        walletId: wallet.walletId
+    });
+
+    transaction.balanceBefore = wallet.balance
+    transaction.balanceAfter = wallet.balance - amount
+
+    wallet.balance -= amount;
+    transaction.status = 'successful';
+
+    await Promise.all([wallet.save(), transaction.save()]);
+    
+    return { 
+        transactionRef: transaction.reference, 
+        walletBalance: wallet.balance
+    };
+}
+
 // debit wallet
 exports.debitPlateformCommission = async (amount, userId, taskId)=>{
     const title = `Platform Commission taskRef:${taskId}`
