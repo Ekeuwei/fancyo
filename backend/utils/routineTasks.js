@@ -145,7 +145,7 @@ exports.updateProjectProgress = async () => {
       let tickets = await Ticket.find({ projectId: project._id });
       const isTicketInprogress = tickets.some(ticket => ticket.status === 'in progress');
       
-      const supposedEndDate = new Date(project.endAt);
+      const supposedEndDate = new Date(`${project.endAt}`);
       supposedEndDate.setDate(supposedEndDate.getDate() - project.progressiveStaking? project.progressiveSteps : 0);
 
       const projectRoundingUp = new Date() > supposedEndDate &&
