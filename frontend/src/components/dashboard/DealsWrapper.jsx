@@ -69,7 +69,7 @@ const DealsWrapper = () => {
                 </>
             </List>
 
-            {user.role==='punter'&&<>
+            {user.role.includes('punter')&&<>
                 <FloatingButton title={'New Project'} isOpen={isOpen} handleButtonClick={handleModalOpen} />
                 <NewProject isOpen={isOpen} handleCloseModal={handleModalClose} />
             </>}
