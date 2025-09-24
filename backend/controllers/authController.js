@@ -516,7 +516,7 @@ exports.getUserProfile = catchAsyncErrors( async (req, res, next) => {
     const user = req.user;
     let badge;
 
-    if(req.user.role==='punter'){
+    if(req.user.role.includes('punter')){
         badge = await Badge.findOne({number: req.user.badge}).select('-_id -__v')
     }
 

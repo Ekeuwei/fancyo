@@ -86,6 +86,7 @@ const NewProject = ({isOpen, handleCloseModal}) => {
     },[dispatch, message])
 
     useEffect(()=>{
+        console.log(badge);
         const withinBadgeClearanceLimit = data.maxOdds > badge?.minOdds || data.minOdds > badge?.minOdds
         let start = withinBadgeClearanceLimit? (badge?.number+3) : 2
         // let start = badge?.minOdds >= parseFloat(data.maxOdds)? 1:4

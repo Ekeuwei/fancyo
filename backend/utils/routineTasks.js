@@ -155,10 +155,11 @@ exports.updateProjectProgress = async () => {
       if (!isTicketInprogress && projectRoundingUp) {
 
         const contributedAmount = project.contributors.reduce((amount, contributor) => amount + contributor.amount, 0);
-        
+        let projectStatus = project.status
+
         if(tickets.length === 0){
           // Either no value was contributed or punter did not submit ticket
-          project.status = 'no engagement'
+          projectStatus = 'no engagement'
           project.availableBalance = 0
 
           if(project.contributors.length > 0){
@@ -202,6 +203,8 @@ exports.updateProjectProgress = async () => {
             logger.error(error)
           }
 
+          project.status = projectStatus
+
           return project.save()
         }
 
@@ -213,10 +216,10 @@ exports.updateProjectProgress = async () => {
         }, contributedAmount);
 
         const profit = projectCurrentBalance - contributedAmount;
-        project.status = profit>0?'successful':'failed'
+        projectStatus = profit>0?'successful':'failed'
         
-        const platformCommission = project.status==='successful'? profit * 0.1 : 0; // 10%
-        const punterCommission = project.status==='successful'? profit * 0.2 : 0; // 20%
+        const platformCommission = projectStatus==='successful'? profit * 0.1 : 0; // 10%
+        const punterCommission = projectStatus==='successful'? profit * 0.2 : 0; // 20%
         const contributorsCommission = profit - platformCommission - punterCommission;
         const contributorsCommissionRiskFree = profit * 0.2;
 
@@ -268,11 +271,17 @@ exports.updateProjectProgress = async () => {
         }));
         
         // Settle punter
-        if(project.status === 'successful'){
+        if(project.punterSettlement !== 'completed'){
           await creditWallet(punterCommission, `Project commission. Project: ${project.uniqueId}`, project.punter._id);
+        
+          project.status = projectStatus
+          project.availableBalance = 0
+          project.roi = profit
+          project.punterSettlement = 'completed'
+      
+          await project.save();
         }
         
-        project.punterSettlement = 'completed'
         const wallet = await Wallet.findOne({userId: project.punter._id});
 
         try {
@@ -295,8 +304,6 @@ exports.updateProjectProgress = async () => {
         // Settle platform
         // await creditWallet(platformCommission, `Platform commission settlement. Project: ${project.uniqueId}`, 'platform purse');
         
-        project.availableBalance = 0
-        project.roi = profit
       }
 
 

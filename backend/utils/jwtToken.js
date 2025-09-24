@@ -15,7 +15,7 @@ const sendToken = async (user, statusCode, res) => {
 
     let badge;
 
-    if(user.role==='punter'){
+    if(user.role.includes('punter')){
         badge = await Badge.findOne({number: user.badge}).select('-_id -__v')
     }
 
