@@ -2,7 +2,7 @@
   force = true
   from = "/api/*"
   status = 200
-  to = "https://sapphire-selective-chocolate.glitch.me/api/:splat"
+  to = "https://cashpanthers-b15ff30073b4.herokuapp.com/api/:splat"
 #to = "https://pandapulse.netlify.app/api/:splat"
   
 [[redirects]]
