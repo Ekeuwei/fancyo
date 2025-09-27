@@ -75,6 +75,9 @@ import {
     getWithdrawalsSuccess,
     getWithdrawalsFailure,
     createToast,
+    loadBetTicketStart,
+    loadBetTicketSuccess,
+    loadBetTicketFailure,
 } from "../app/user/userSlice"
 
 import {
@@ -496,6 +499,21 @@ export const api = {
         } catch (error) {
 
             dispatch(fetchBvnDetailsFailure(error.response.data.message))
+        }
+    },
+    
+    // Fetch BVN Details
+    loadBetTicket: (freeTicket, vipTicket) => async (dispatch) =>{
+        try {
+            dispatch(loadBetTicketStart())
+
+            const { data } = await instance.get(`/api/v1/betticket?freeTicket=${freeTicket}&vipTicket=${vipTicket}`)
+            
+            dispatch(loadBetTicketSuccess(data.betTicket))
+
+        } catch (error) {
+
+            dispatch(loadBetTicketFailure(error.response.data.message))
         }
     },
 

@@ -28,6 +28,7 @@ import AdminDashboard from "./components/admin";
 import AllUsers from "./components/admin/users";
 import AdminTicket from "./components/admin/tickets";
 import Withdrawals from "./components/admin/withdrawals";
+import BettingTips from "./components/user/BettingTips";
     
 export const appName = import.meta.env.VITE_APP_NAME
 
@@ -68,6 +69,7 @@ function App() {
               <Route path="/admin/withdrawals" component={Withdrawals} exact />
               
               <Route path="/bvn" component={ValidateBvn} exact />
+              <Route path="/betticket" component={BettingTips} exact />
           </Router>
       </StyleWrapper>
     </ThemeProvider>

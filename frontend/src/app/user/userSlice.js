@@ -170,6 +170,20 @@ const userSlice = createSlice({
       state.bvnDetails = null;
       state.error = action.payload;
     },
+
+    loadBetTicketStart: state => {
+      state.loading = true;
+      state.error = null;
+    },
+    loadBetTicketSuccess: (state, action) => {
+      state.betTicket = action.payload;
+      state.loading = false;
+    },
+    loadBetTicketFailure: (state, action) => {
+      state.loading = false;
+      state.betTicket = null;
+      state.error = action.payload;
+    },
     
     
     clearUserErrors: (state) => {
@@ -233,6 +247,9 @@ export const {
   getBadgeStart,
   getBadgeSuccess,
   getBadgeFailure,
+  loadBetTicketStart,
+  loadBetTicketSuccess,
+  loadBetTicketFailure,
   
   getUsersStart,
   getUsersSuccess,

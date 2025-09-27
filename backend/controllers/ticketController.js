@@ -5,7 +5,8 @@ const catchAsyncErrors = require('../midllewares/catchAsyncErrors');
 const APIFeatures = require('../utils/apiFeatures');
 const cloudinary = require('cloudinary')
 const got = require('got');
-const { sporty } = require('../utils/bookies');
+const { sporty, sportyBetting, download, upload } = require('../utils/bookies');
+const dayjs = require('dayjs');
 
 // Create new ticket => /api/v1/ticket/new
 exports.newTicket = catchAsyncErrors( async (req, res, next) => {
@@ -30,10 +31,13 @@ exports.newTicket = catchAsyncErrors( async (req, res, next) => {
 
     // Check if the last ticket was won and the project has reached progressiveSteps - endAt
     const currentDate = new Date().getTime();
-    const supposedEndDate = new Date().setDate(project.endAt.getDate() - project.progressiveSteps)
+    
+    const supposedEndDate = new Date(project.endAt);
+    supposedEndDate.setDate(supposedEndDate.getDate() - project.progressiveSteps);
+
     let tickets = await Ticket.find({ projectId: project._id }).sort({createdAt: -1});
     const wonLastTicket = tickets.length > 0 && tickets[0].status === 'successful'
-    if(currentDate < supposedEndDate && wonLastTicket){
+    if(currentDate > supposedEndDate && wonLastTicket){
         // Cannot stake because we have fewer time remaining to stake
         return next(new ErrorHandler("Project is winding down and cannot receive more tickets.", 403))
     }
@@ -127,6 +131,68 @@ exports.loadBookieTicket = catchAsyncErrors(async (req, res, next) =>{
     })
 })
 
+
+// Get tickets => /api/v1/admin/upload/betting
+exports.uploadBttingTips =  catchAsyncErrors(async (req, res, next)=>{
+
+    let games;
+    const {freeTicket, vipTicket} = req.query
+    try {
+        
+        switch ('Sporty') {
+            case "Sporty":
+                const freePicks = await sportyBetting(freeTicket, 'free');
+                const vipPicks = await sportyBetting(vipTicket, 'vip');
+
+                games = [...freePicks, ...vipPicks]
+                
+                break;
+        
+            default:
+                return next(new ErrorHandler("Invalid Option Selected", 403))
+        }
+
+        // perform upload to betting page
+        const downloadDirectory = 'https://bettingtips.rveasy.net/dailybettingtips/';
+        const uploadDirectory = '/public_html/bettingtips/dailybettingtips';
+        await uploadBettingTips(downloadDirectory, uploadDirectory, games)
+
+        const tickets = await download('tickets', downloadDirectory) || {};
+
+        const {url_date} = getUrlDateAndMonth()
+        const todayTickets = { 
+            today: { 
+              date: url_date.replace(/-/g, ''),
+              freeTicket,
+              vipTicket
+            }
+        };
+        
+		if (tickets.today) {
+            const prevDate = tickets.today.date;
+            if (prevDate) {
+                tickets[prevDate] = tickets.today;  
+            }
+        }
+        
+        tickets.today = todayTickets.today;
+            
+        await upload(tickets, 'tickets', uploadDirectory);
+
+    } catch (error) {
+        
+        return next(new ErrorHandler(error.message, 403))   
+    }
+
+    // console.log(games);
+    
+    res.status(200).json({
+        success: true,
+        games
+    })
+
+})
+
 // Get tickets => /api/v1/admin/tickets?=pending
 exports.allTickets =  catchAsyncErrors(async (req, res, next)=>{
     let tickets  = await Ticket.find().sort({createdAt: -1})
@@ -175,3 +241,68 @@ exports.deleteTicket = catchAsyncErrors(async (req, res, next) => {
     });
 });
 
+async function uploadBettingTips(downloadDirectory, uploadDirectory, data){
+
+    const { url_date, month } = getUrlDateAndMonth();
+
+	const todaysTips = await download('today', downloadDirectory);
+	const currentMonthsTips = await download(month, downloadDirectory);
+	let history;
+	let addedAlready = false;
+
+	if(todaysTips && currentMonthsTips){
+    for(let i in currentMonthsTips)
+      if(currentMonthsTips[i].date == todaysTips[0].date){
+        addedAlready = true;
+        break;
+      }
+
+		history = addedAlready ? currentMonthsTips : todaysTips.concat(currentMonthsTips);
+	}
+
+	if(history){
+		console.log('uploading data...');
+		var upload_history = await upload(history, month, uploadDirectory);
+		console.log(upload_history ?'...upload complete':'...upload unsuccessful');
+	}else if(todaysTips){
+		console.log('uploading data...');
+		var upload_todaysTips = await upload(todaysTips, month, uploadDirectory);
+		console.log(upload_todaysTips ?'...upload complete':'...upload unsuccessful');
+	}
+
+	if(data){
+		console.log('uploading data...');
+		var upload_todays = await upload(data, 'today', uploadDirectory);
+		console.log(upload_todays ?'...upload complete':'...upload unsuccessful');
+	}
+	// console.log(data);
+}
+
+function getUrlDateAndMonth(argDate){
+
+    let baseDate;
+
+    if (argDate) {
+        const parsed = dayjs(argDate, 'YYYY-MM-DD', true); // true = strict parsing
+        if (parsed.isValid()) {
+            baseDate = parsed;
+        }
+    }
+
+    if (!baseDate) {
+        const now = dayjs();
+        // if current time is 10 p.m. or later, use tomorrow
+        baseDate = now.hour() >= 22 ? now.add(1, 'day') : now;
+    }
+
+    const url_date = baseDate.format('YYYY-MM-DD');
+
+    const previousMonth = baseDate.date() === 1
+        ? baseDate.subtract(2, 'month')
+        : baseDate.subtract(1, 'month');
+  
+    const month = previousMonth.format('YYYY-MM');
+        
+    return { url_date, month };
+    
+}

@@ -15,7 +15,7 @@ exports.newProject = catchAsyncErrors( async (req, res, next) => {
     const { startAt, endAt, minOdds, maxOdds, progressiveSteps } = req.body;
 
     const newEndDate = new Date(endAt);
-    newEndDate.setDate(newEndDate.getDate() + parseInt(req.body.progressiveSteps));
+    newEndDate.setDate(newEndDate.getDate() + parseInt(progressiveSteps));
     req.body.endAt = newEndDate
 
     req.body.punter = req.user._id;

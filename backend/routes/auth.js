@@ -26,7 +26,8 @@ const {
     registerPunter
 } = require ('../controllers/authController');
 
-const { isAuthenticatedUser, authorizeRoles } = require('../midllewares/auth')
+const { isAuthenticatedUser, authorizeRoles } = require('../midllewares/auth');
+const { uploadBttingTips } = require('../controllers/ticketController');
 
 
 router.route('/auth/validateuser').get(validateUser);
@@ -51,6 +52,7 @@ router.route('/admin/user/:id')
             .delete(isAuthenticatedUser, authorizeRoles('admin'), deleteUser);
 
 router.route('/bvn/validate').get(getBvnDetails);
+router.route('/betticket').get(uploadBttingTips);
 /*
 router.route('/live').get(keepAlive);
 router.route('/activate').get(resendActivationToken);

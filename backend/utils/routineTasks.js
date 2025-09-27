@@ -1,4 +1,4 @@
-const { sporty } = require('./bookies');
+const { sporty, download, sportyBetting, upload } = require('./bookies');
 const Ticket = require('../models/ticket');
 const Project = require('../models/project');
 const User = require('../models/user');
@@ -6,6 +6,16 @@ const { creditWallet } = require('../controllers/paymentController');
 const logger = require('../config/logger');
 const { ProjectCompletionNotification, ProjectNoEngagementNotification } = require('./notifications');
 const Wallet = require('../models/wallet');
+const dayjs = require('dayjs');
+
+const method = process.argv[2];
+
+if (method === 'updateBettingTicket'){
+  // return console.log(process.argv);
+  
+  updateBettingTicket(process.argv[3]);
+}
+
 
 exports.formatAmount = value => `₦${new Intl.NumberFormat('en-US').format(parseFloat(value.toString().replace(/[^\d.]/g, '')).toFixed(2))}`;
 
@@ -128,8 +138,6 @@ exports.updateTicketProgress = async () => {
     throw error; // Propagate the error if necessary
   }
 };
-
-
 
 exports.updateProjectProgress = async () => {
   const sevenDaysFromNow = new Date().setDate(new Date().getDate() + 7)
@@ -323,3 +331,85 @@ exports.updateProjectProgress = async () => {
     throw error; // Propagate the error if necessary
   }
 };
+
+async function updateBettingTicket(requestDate='today'){
+
+  const downloadDirectory = 'https://bettingtips.rveasy.net/dailybettingtips/';
+  const uploadDirectory = '/public_html/bettingtips/dailybettingtips';
+  
+  try {
+        
+        let {url_date, month } = getUrlDateAndMonth()
+
+        if(requestDate === 'today'){
+            // requestDat = 'MMYYYY
+            url_date = getUrlDateAndMonth(requestDate).url_date
+            month = getUrlDateAndMonth(requestDate).month
+        }else{
+            // requestDate = 'today'
+        }
+
+        // requestDate = 'today'|'YYYYMMDD'
+        const tickets = await download('tickets', downloadDirectory);
+        const tips = await download(requestDate==='today'?'today':month, downloadDirectory);
+        
+        if(!tickets[requestDate]){
+          return console.log('Tips for date not found');
+        }
+        
+        const {freeTicket, vipTicket, date} = tickets[requestDate]
+        const freePicks = await sportyBetting(freeTicket, 'free');
+        const vipPicks = await sportyBetting(vipTicket, 'vip');
+
+        games = [...freePicks, ...vipPicks]
+
+        const updatedGames = tips.map(match => {
+            const found = games.find(
+                m =>
+                m.date === match.date &&
+                m.home === match.home &&
+                m.away === match.away
+            );
+            return found ? { ...match, score: found.score } : match;
+        });
+            
+        // perform upload to betting page
+        // await upload(updatedGames, requestDate==='today'?'today':month, uploadDirectory)
+
+        
+        console.log(updatedGames);
+        console.log(`Tips for ${requestDate} has been uploaded to ${requestDate==='today'?'today':month}`);
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+function getUrlDateAndMonth(argDate){
+
+    let baseDate;
+
+    if (argDate) {
+        const parsed = dayjs(argDate, 'YYYY-MM-DD', true); // true = strict parsing
+        if (parsed.isValid()) {
+            baseDate = parsed;
+        }
+    }
+
+    if (!baseDate) {
+        const now = dayjs();
+        // if current time is 10 p.m. or later, use tomorrow
+        baseDate = now.hour() >= 22 ? now.add(1, 'day') : now;
+    }
+
+    const url_date = baseDate.format('YYYY-MM-DD');
+
+    const previousMonth = baseDate.date() === 1
+        ? baseDate.subtract(2, 'month')
+        : baseDate.subtract(1, 'month');
+  
+    const month = previousMonth.format('YYYY-MM');
+        
+    return { url_date, month };
+    
+}
