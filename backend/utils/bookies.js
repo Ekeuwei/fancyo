@@ -58,7 +58,7 @@ exports.sportyBetting = async (ticketId, accessType)=> {
                 home: game.homeTeamName,
                 away: game.awayTeamName,
                 pick: getBettingPickShortCode(`${game.markets[0].desc}: ${game.markets[0].outcomes[0].desc}`), //get pick
-                score: !(game.status > 2 || game.matchStatus==='Ended' || game.matchStatus==='AP')? "?":game.setScore,
+                score: !(game.status > 2 || game.matchStatus==='Ended' || game.matchStatus==='AP')? "?":game.setScore.replace(':','-'),
                 odd: game.markets[0].outcomes[0].odds,
                 first: idx === 0,
                 last: idx === response.data.outcomes.length - 1,

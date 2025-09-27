@@ -8,6 +8,10 @@ const { ProjectCompletionNotification, ProjectNoEngagementNotification } = requi
 const Wallet = require('../models/wallet');
 const dayjs = require('dayjs');
 
+if(process.env.NODE_ENV !== 'PRODUCTION') {
+    require('dotenv').config({ path: 'backend/config/config.env' });
+}
+
 const method = process.argv[2];
 
 if (method === 'updateBettingTicket'){
@@ -354,7 +358,7 @@ async function updateBettingTicket(requestDate='today'){
         const tips = await download(requestDate==='today'?'today':month, downloadDirectory);
         
         if(!tickets[requestDate]){
-          return console.log('Tips for date not found');
+          return console.log(`Tips for ${url_date} not found`);
         }
         
         const {freeTicket, vipTicket, date} = tickets[requestDate]
@@ -374,10 +378,10 @@ async function updateBettingTicket(requestDate='today'){
         });
             
         // perform upload to betting page
-        // await upload(updatedGames, requestDate==='today'?'today':month, uploadDirectory)
+        await upload(updatedGames, requestDate==='today'?'today':month, uploadDirectory)
 
         
-        console.log(updatedGames);
+        // console.log(updatedGames);
         console.log(`Tips for ${requestDate} has been uploaded to ${requestDate==='today'?'today':month}`);
 
     } catch (error) {
