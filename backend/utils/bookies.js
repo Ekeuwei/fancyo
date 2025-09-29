@@ -105,7 +105,7 @@ exports.download__ = async (fileName, url) => {
   }
 }
 
-export const download = async (fileName, url) => {
+exports.download = async (fileName, url) => {
     const cleanName = fileName.replace(/-/g, '');
     const fullUrl = `${url}${cleanName}.json`;
   
