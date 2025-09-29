@@ -155,7 +155,7 @@ exports.uploadBttingTips =  catchAsyncErrors(async (req, res, next)=>{
         // perform upload to betting page
         const downloadDirectory = 'https://bettingtips.rveasy.net/dailybettingtips/';
         const uploadDirectory = '/public_html/bettingtips/dailybettingtips';
-        // await uploadBettingTips(downloadDirectory, uploadDirectory, games)
+        await uploadBettingTips(downloadDirectory, uploadDirectory, games)
 
         const tickets = await download('tickets', downloadDirectory) || {};
 
@@ -177,9 +177,9 @@ exports.uploadBttingTips =  catchAsyncErrors(async (req, res, next)=>{
         
         tickets.today = todayTickets.today;
             
-        // await upload(tickets, 'tickets', uploadDirectory);
+        await upload(tickets, 'tickets', uploadDirectory);
 
-        console.log(games, tickets, 'Uploaded DONE!');
+        // console.log(games, tickets, 'Uploaded DONE!');
         
 
     } catch (error) {

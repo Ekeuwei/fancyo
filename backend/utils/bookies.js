@@ -87,24 +87,6 @@ exports.sportyBetting = async (ticketId, accessType)=> {
 
 // Node 18+ (or install node-fetch for older versions)
 
-exports.download__ = async (fileName, url) => {
-  const cleanName = fileName.replace(/-/g, '');
-  const fullUrl = `${url}${cleanName}.json`;
-
-  console.log(`Fetching tips from ${fullUrl}`);
-
-  try {
-    const res = await fetch(fullUrl);
-    if (!res.ok) {
-      throw new Error(`Request failed: ${res.status} ${res.statusText}`);
-    }
-    return await res.json();
-  } catch (err) {
-    console.error(err.message);
-    return false;
-  }
-}
-
 exports.download = async (fileName, url) => {
     const cleanName = fileName.replace(/-/g, '');
     const fullUrl = `${url}${cleanName}.json`;
