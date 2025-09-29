@@ -174,6 +174,14 @@ function getBettingPickShortCode(prediction){
             return 'o2.5';
         case 'Over/Under: Under 2.5':
             return 'u2.5';
+        case 'Over/Under: Over 3.5':
+            return 'o3.5';
+        case 'Over/Under: Under 3.5':
+            return 'u3.5';
+        case 'Over/Under: Over 4.5':
+            return 'o4.5';
+        case 'Over/Under: Under 4.5':
+            return 'u4.5';
         case 'GG/NG: Yes':
             return "bts";
         case 'GG/NG: No':

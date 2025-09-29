@@ -118,8 +118,8 @@ import {
 const instance = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true,
-    timeout: 10 * 1000,
-    signal: AbortSignal.timeout(10 * 1000),
+    timeout: 2 * 60 * 600,
+    signal: AbortSignal.timeout(2 * 60 * 1000),
     timeoutErrorMessage: 'Request timeout, check network connectivity.'
 })
 
