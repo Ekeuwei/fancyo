@@ -87,7 +87,7 @@ exports.sportyBetting = async (ticketId, accessType)=> {
 
 // Node 18+ (or install node-fetch for older versions)
 
-exports.download = async (fileName, url) => {
+exports.download__ = async (fileName, url) => {
   const cleanName = fileName.replace(/-/g, '');
   const fullUrl = `${url}${cleanName}.json`;
 
@@ -104,6 +104,31 @@ exports.download = async (fileName, url) => {
     return false;
   }
 }
+
+// utils/download.js
+import got from 'got';
+
+export const download = async (fileName, url) => {
+    const cleanName = fileName.replace(/-/g, '');
+    const fullUrl = `${url}${cleanName}.json`;
+  
+    console.log(`Fetching tips from ${fullUrl}`);
+    
+    try {
+        // got automatically parses JSON when you use the responseType option
+        const data = await got(fullUrl, { responseType: 'json' }).json();
+        return data;
+    } catch (err) {
+        // err.response?.statusCode and err.response?.statusMessage
+        // contain HTTP details if it was an HTTP error
+        console.error(
+            `Request failed: ${err.response?.statusCode || ''} ${err.response?.statusMessage || ''}`.trim() ||
+            err.message
+        );
+        return false;
+    }
+};
+
 
 
 exports.upload = async (uploadData, fileName, directory)=> {

@@ -179,6 +179,9 @@ exports.uploadBttingTips =  catchAsyncErrors(async (req, res, next)=>{
             
         // await upload(tickets, 'tickets', uploadDirectory);
 
+        console.log(games, tickets, 'Uploaded DONE!');
+        
+
     } catch (error) {
         
         return next(new ErrorHandler(error.message, 403))   
